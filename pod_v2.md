@@ -26,7 +26,7 @@
 | **F0 — Sincronização** | docs alinhados à v1.2 | ✅ concluído |
 | **F1 — Scaffold** | Next/TS/Tailwind, lint, tokens | ✅ concluído |
 | **F2 — Banco** | migrations + seed no dev | ✅ **aplicado e auditado** (5/5, 200 questões; `verify-security.sql` passou em 2026-10-20) |
-| **F3 — Auth** | cadastro/login/recuperação, trigger, proxy | 🟡 código pronto; fluxo manual **parcial** (BUG-001/003/004/005 corrigidos; **BUG-002 aberto**) |
+| **F3 — Auth** | cadastro/login/recuperação, trigger, proxy | 🟡 cadastro e login **verificados no PC e no celular** (BUG-001 a BUG-007); recuperação de senha ainda não testada |
 | **F4 — Motor** | start/answer/advance/summary/ranking | 🟡 código pronto; RPCs **exercitadas** (20 `question_views`, ranking com `dev-ana`/8) |
 | **F5 — UI** | home, auth, quiz, resumo, ranking | 🟡 código pronto; **a11y/perf não medidos** |
 | **F6 — Banco de questões** | 200 questões revisadas + seed validado | ✅ 200 sem erro objetivo de rubrica e **revisão humana atestada** (2026-10-20); dry-run de produção exit 0 |
@@ -45,7 +45,7 @@ P0.2  verify-security.sql (dev)  ✅ concluído 2026-10-20 ────┤
                                                              ├──►  F8 deploy
 BUG-004  confirmação off no dev  ✅ concluído 2026-10-20 ────┤
                                                              │
-BUG-002  respostas do celular ─────► P1 E2E manual ──────────┘
+P1  E2E manual (recuperação, timer, a11y) ──► F8 deploy ────┘
 ```
 
 **P0.3 era o gargalo.** Agora que ele está concluído, o caminho crítico é só a sequência operacional de deploy: criar o Supabase de produção, criar a Vercel e publicar.
@@ -56,7 +56,7 @@ BUG-002  respostas do celular ─────► P1 E2E manual ─────�
 | --- | --- | --- |
 | ~~P0.2 `verify-security.sql`~~ ✅ 2026-10-20 | gate de deploy (D56) | — |
 | ~~BUG-004 "Confirm email" off no dev~~ ✅ 2026-10-20 | cadastro e login no dev | — |
-| BUG-002 respostas do celular | diagnóstico do login Android | P1 §3.1 (item Android) |
+| ~~BUG-002 respostas do celular~~ ✅ 2026-10-20 | login Android (causa raiz no BUG-007) | — |
 | ~~P0.3 revisão humana~~ ✅ 2026-10-20 | seed de produção | — |
 | DA3/DA4/DA5 | — | sem travamento técnico | §8.2 |
 
@@ -137,13 +137,13 @@ npm run review -- --level=3          # nível 3 (desafiadora)
 Rodar contra dev com `npm run dev`. Executar o checklist de `pod.md` §12 e registrar cada item (data, ambiente, resultado).
 
 ### 3.1 Auth
-- [ ] Cadastro com e-mail novo, apelido válido e senha ≥ 8 → perfil criado (trigger). *Parcial: o cadastro pelo celular criou conta e profile (BUG-002). Falta o caso "novo e-mail no PC".*
+- [x] Cadastro com e-mail novo, apelido válido e senha ≥ 8 → perfil criado (trigger). *(Verificado em 2026-10-20: 5 contas criadas pelo celular, `auth.users` = `profiles` = 7, todas confirmadas.)*
 - [ ] Apelido com < 3 ou > 20 caracteres, com caracteres de controle ou duplicado (mesmo variando maiúsc./minúsc.) → rejeitado com mensagem pt-BR.
 - [x] Login, logout e `router.refresh()` no header. *(BUG-005 verificado com sessão real em 3 estados.)*
 - [ ] Recuperação de senha: `/recuperar-senha` → e-mail → `/auth/callback` → `/redefinir-senha` → login com a nova senha. **Nunca executada.**
 - [ ] `next` de redirect só aceita caminho interno (testar `?next=https://evil.example`).
 - [ ] `/quiz` e `/resumo` sem sessão redirecionam para `/login?next=...`.
-- [ ] Login no Android (BUG-004 eliminado e **BUG-007 corrigido** em 2026-10-20 — o envio nativo do formulário disparava antes da hidratação; falta confirmar no celular).
+- [x] Login no Android. *(BUG-004 eliminado em 2026-10-20; BUG-007 corrigido e confirmado no celular no mesmo dia — ver `bug_log.md`.)*
 
 ### 3.2 Quiz (motor)
 - [ ] Sessão tem 10 questões, 2 por nível, em ordem crescente de nível; 4 opções rotuladas A–D.
@@ -153,7 +153,7 @@ Rodar contra dev com `npm run dev`. Executar o checklist de `pod.md` §12 e regi
 - [ ] Resposta em ~19 s conta; enviar a resposta logo após 20 s é computada como **erro** mesmo com o cliente mostrando tempo (validar com Network throttling/latência).
 - [ ] Feedback mostra correta, sua resposta e explicação; o intervalo de feedback **não** é cronometrado.
 - [ ] Sair da tela e voltar: nova sessão (sem retomada).
-- [ ] Completar 10 questões → `/resumo`.
+- [x] Completar 10 questões → `/resumo`. *(Verificado no celular em 2026-10-20: 10 `answer` + 10 `advance` no log, depois `/resumo` e `/ranking`.)*
 
 ### 3.3 Resumo e ranking
 - [ ] `/resumo` mostra placar, itens com resposta correta/sua resposta/explicação; questão não respondida aparece como **"Não respondida"**.
@@ -246,13 +246,13 @@ Rodar contra dev com `npm run dev`. Executar o checklist de `pod.md` §12 e regi
 
 ## 9. Checklist do usuário — em ordem de execução
 
-> O que **só você** pode fazer: dashboard, contas, revisão humana e decisões. Os itens 1, 2 e 4 já foram concluídos (2026-10-20); o item 3 destrava o BUG-002 e é o próximo.
+> O que **só você** pode fazer: dashboard, contas, revisão humana e decisões. Os itens 1, 2, 3 e 4 já foram concluídos (2026-10-20); o próximo é o restante do checklist E2E (item 5).
 
 | # | Ação | Onde | Tempo | Destrava |
 | --- | --- | --- | --- | --- |
 | 1 | ~~Rodar `scripts/verify-security.sql` e colar a saída~~ | — | — | ✅ **feito em 2026-10-20**, passou (P0.2) |
 | 2 | ~~Desligar **"Confirm email"**~~ | — | — | ✅ **feito em 2026-10-20** (BUG-004 verificado por API) |
-| 3 | Responder as **5 perguntas** do BUG-002 pelo celular | celular, `http://<ip-da-lan>:3000` | ~5 min | BUG-002 |
+| 3 | ~~Responder as **5 perguntas** do BUG-002 pelo celular~~ | — | — | ✅ **feito em 2026-10-20** — causa raiz no BUG-007, corrigido e confirmado |
 | 4 | ~~**Revisar as 200 questões** e preencher `meta.reviewed_by`~~ | — | — | ✅ **feito em 2026-10-20** (dry-run de produção exit 0) |
 | 5 | Rodar o **checklist manual E2E** do §3 | `npm run dev` + navegador | ~1–2 h | §3, F7 |
 | 6 | Medir **a11y e performance** do §5 | DevTools + Lighthouse | ~1 h | §5 |
@@ -262,7 +262,7 @@ Rodar contra dev com `npm run dev`. Executar o checklist de `pod.md` §12 e regi
 | 10 | `db push` + seed de produção + `verify-security.sql` **na produção** | terminal + dashboard | ~15 min | §6 |
 | 11 | Fechar os docs (P5) | local | ~30 min | §7 |
 
-**Sequenciamento:** 3 → 5 e 6 e 7 (em paralelo) → 8 → 9 → 10 → 11. Os itens 1, 2 e 4 estão concluídos.
+**Sequenciamento:** 5 e 6 e 7 (em paralelo) → 8 → 9 → 10 → 11. Os itens 1, 2, 3 e 4 estão concluídos.
 
 ---
 

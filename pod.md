@@ -7,7 +7,7 @@
 >
 > **Como ler este documento:** §1–§13 continuam sendo o desenho aprovado; §14 (fases), §15 (PD) e §19–§20 registram o que **já foi implementado** e o que falta. O trabalho restante, em ordem de prioridade e sem repetir o que está pronto, está em **`pod_v2.md`**.
 >
-> **Resumo executivo:** o código está escrito e compila (`typecheck`, `lint` e `build` passam). O projeto Supabase **dev** está migrado e semeado (5/5 migrations, 200 questões) e a **auditoria de RLS/grants passou** em 2026-10-20. Continuam **pendentes de verificação** o fluxo manual de auth/quiz/resumo/ranking (com o BUG-002 aberto), a acessibilidade/performance e o deploy (§12.1, §19).
+> **Resumo executivo:** o código está escrito e compila (`typecheck`, `lint` e `build` passam). O projeto Supabase **dev** está migrado e semeado (5/5 migrations, 200 questões) e a **auditoria de RLS/grants passou** em 2026-10-20. O fluxo manual de auth/quiz/resumo/ranking foi **verificado no PC e no celular** em 2026-10-20 (cadastro, login, 10 respostas, resumo e ranking; BUG-001 a BUG-007 fechados). Continuam **pendentes de verificação** a recuperação de senha, os demais itens do checklist manual, a acessibilidade/performance e o deploy (§12.1, §19).
 
 ## 0. Decisões fechadas nesta etapa
 
@@ -767,7 +767,7 @@ npm run build
 | **F0 — Sincronização** | `AGENTS.md` e skill alinhados à v1.2/autenticação | documentos sem contradição sobre login | ✅ concluído |
 | **F1 — Scaffold** | Next.js + TS + Tailwind, npm, lint, fontes, tokens, estrutura | `dev`, `typecheck`, `lint`, `build` passam | ✅ concluído — `typecheck`/`lint`/`build` passam |
 | **F2 — Banco** | migrations de schema/funções/RLS/catálogo (+ seed helpers) | RPCs e grants aplicados; RLS verificada | 🟡 **aplicado e auditado no dev** (5/5 migrations, 200 questões semeadas, `verify-security.sql` passou em 2026-10-20) |
-| **F3 — Auth** | cadastro/login/recuperação, trigger de perfil, proxy, logout | fluxo de auth manual completo | 🟡 código pronto; BUG-001/003/004/005 corrigidos e verificados; **BUG-002 aberto** |
+| **F3 — Auth** | cadastro/login/recuperação, trigger de perfil, proxy, logout | fluxo de auth manual completo | 🟡 cadastro e login verificados no PC e no celular (BUG-001 a BUG-007); recuperação de senha não testada |
 | **F4 — Motor** | `start`, `answer`, `advance`, `summary`, ranking | 10 questões, timer, abandono e ranking corretos | 🟡 código pronto; RPCs **exercitadas** (20 `question_views`; ranking com `dev-ana`/8) |
 | **F5 — UI** | home, auth, quiz, resumo, ranking conforme skill | responsivo, acessível, copy pt-BR | 🟡 código pronto; a11y/perf **não medidos** |
 | **F6 — Banco de questões** | 200 questões revisadas + seed validado | 40/nível, 13/13/14, 9 opções, revisão humana | ✅ 200 questões sem erro objetivo de rubrica (0 erros, 12 avisos via `npm run review`) e **revisão humana atestada** em 2026-10-20; dry-run de produção exit 0 |

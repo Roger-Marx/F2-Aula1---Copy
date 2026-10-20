@@ -18,12 +18,12 @@ Complementa (não substitui) `pod_v2.md` — lá estão as *pendências de traba
 | ID | Título | Sev. | Status |
 | --- | --- | --- | --- |
 | BUG-001 | Resultado do quiz não aparece no ranking (usuário sem `profile`) | S1 | Verificado |
-| BUG-002 | Login no Chrome Android não entra e o formulário volta vazio | S1 | Corrigido |
+| BUG-002 | Login no Chrome Android não entra e o formulário volta vazio | S1 | Verificado |
 | BUG-003 | Mensagem de erro do login não distingue e-mail não confirmado | S2 | Verificado |
 | BUG-004 | Confirmação de e-mail divergente: `config.toml` diz off, projeto dev exige on | S2 | Verificado |
 | BUG-005 | Logado, o header continua mostrando "Entrar" (e nenhum "Sair") | S2 | Verificado |
 | BUG-006 | Gate D26 furado: seed de produção passava com `reviewed_by = "Automático"` | S1 | Verificado |
-| BUG-007 | Envio nativo antes da hidratação recarrega a página e apaga os campos | S1 | Corrigido |
+| BUG-007 | Envio nativo antes da hidratação recarrega a página e apaga os campos | S1 | Verificado |
 
 ---
 
@@ -95,7 +95,7 @@ Agravante: `scripts/seed-dev-users.ts:45-48` **pula** usuários já existentes (
 
 ## BUG-002 — Login no Chrome Android não entra e o formulário volta vazio
 
-- **Severidade:** S1 · **Status:** Corrigido (2026-10-20 — ver BUG-007); falta confirmar no celular
+- **Severidade:** S1 · **Status:** Verificado (2026-10-20) — corrigido no BUG-007 e confirmado no celular
 - **Reportado por:** teste manual, 2026-10-19
 - **Ambiente:** Chrome para Android acessando `http://192.168.0.65:3000` (mesma rede, **sem HTTPS**)
 
@@ -122,6 +122,21 @@ Agravante: `scripts/seed-dev-users.ts:45-48` **pula** usuários já existentes (
 - **H2b (descartada):** autofill não explicaria a requisição extra no log do servidor.
 
 **Causa raiz confirmada (2026-10-20)** — corrigida no **BUG-007**. As cinco perguntas de diagnóstico que estavam pendentes ficaram respondidas pelo log do servidor: houve recarga da página (`GET /cadastro?` e `GET /login?`), não houve mensagem em vermelho e a conta nunca foi criada, porque o envio do formulário não chegou ao Supabase. O teste no PC funciona porque a hidratação termina antes do primeiro clique.
+
+**Verificado no celular (2026-10-20, após a correção do BUG-007):** entre a última ocorrência de submit nativo (linha 85 do log) e o fim da sessão de teste **não houve nenhuma requisição com query vazia**. O fluxo completo apareceu no log:
+
+```text
+GET  /cadastro                        (sem "?")
+GET  /api/nickname?value=pedro  200   ← só acontece dentro do handleSubmit
+GET  /quiz                      200   ← signup criou sessão e redirecionou
+POST /api/quiz/start            200
+POST /api/quiz/answer  ×10      200
+POST /api/quiz/advance ×10      200
+GET  /resumo                    200
+GET  /ranking                   200
+```
+
+Cadastro, login, quiz completo, resumo e ranking funcionaram pelo celular. Estado do banco depois do teste: `auth.users` = 7, `profiles` = 7, `quiz_sessions` = 8 (6 `completed`), `question_views` = 80. As 5 contas novas (`roger`, `abacaxi`, `queijo`, `pedro`, `Biazoca`) são dados de teste do usuário e ficaram todas confirmadas automaticamente, como esperado com a confirmação desligada.
 
 **Critério de aceite:** login funciona no Android via `http://<ip-da-lan>:3000` com usuário confirmado; falha por e-mail não confirmado mostra mensagem específica (BUG-003).
 
@@ -289,7 +304,7 @@ A lista de placeholders passou a incluir os valores que significam "não revisad
 
 ## BUG-007 — Envio nativo antes da hidratação recarrega a página e apaga os campos
 
-- **Severidade:** S1 · **Status:** Corrigido (2026-10-20) — pendente de confirmação no celular
+- **Severidade:** S1 · **Status:** Verificado (2026-10-20)
 - **Reportado por:** teste manual, 2026-10-20, Chrome Android em `http://192.168.0.65:3000`
 - **Onde:** `src/components/auth/{Signup,Login,Recovery,Reset}Form.tsx`; novo `src/lib/use-hydrated.ts`
 
@@ -315,10 +330,13 @@ GET /login? 200         ← idem
 | HTML servido de `/cadastro`, `/login` e `/recuperar-senha` | `<button type="submit" ... disabled="">` |
 | `npm run typecheck` | exit 0 |
 | `npm run lint` | exit 0 |
+| `npm run build` | exit 0 — 17 rotas, proxy presente |
 
 **Critério de aceite:** no celular, tocar em "Criar conta" e em "Entrar" gera **uma única** requisição à página (sem `?`) e o fluxo chega ao Supabase — sucesso vai para `/quiz`, erro mostra mensagem em vermelho **sem apagar** o que foi digitado.
 
-**Pendente:** confirmar no celular e rodar `npm run build`, que não foi executado nesta rodada porque o servidor de dev estava em uso pelo teste.
+**Verificado no celular (2026-10-20):** depois da correção, o fluxo completo passou pelo celular — `/cadastro` → validação de apelido (`/api/nickname`) → `/quiz` → 10 respostas → `/resumo` → `/ranking` — e **nenhuma** requisição com query vazia apareceu no log do servidor depois da correção. Detalhes em BUG-002.
+
+**`npm run build`:** rodado depois da verificação, com o servidor de dev parado; exit 0, 17 rotas, proxy presente.
 
 ---
 
