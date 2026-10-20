@@ -18,11 +18,12 @@ Complementa (não substitui) `pod_v2.md` — lá estão as *pendências de traba
 | ID | Título | Sev. | Status |
 | --- | --- | --- | --- |
 | BUG-001 | Resultado do quiz não aparece no ranking (usuário sem `profile`) | S1 | Verificado |
-| BUG-002 | Login no Chrome Android não entra e o formulário volta vazio | S1 | Aguardando informação |
+| BUG-002 | Login no Chrome Android não entra e o formulário volta vazio | S1 | Corrigido |
 | BUG-003 | Mensagem de erro do login não distingue e-mail não confirmado | S2 | Verificado |
 | BUG-004 | Confirmação de e-mail divergente: `config.toml` diz off, projeto dev exige on | S2 | Verificado |
 | BUG-005 | Logado, o header continua mostrando "Entrar" (e nenhum "Sair") | S2 | Verificado |
 | BUG-006 | Gate D26 furado: seed de produção passava com `reviewed_by = "Automático"` | S1 | Verificado |
+| BUG-007 | Envio nativo antes da hidratação recarrega a página e apaga os campos | S1 | Corrigido |
 
 ---
 
@@ -94,7 +95,7 @@ Agravante: `scripts/seed-dev-users.ts:45-48` **pula** usuários já existentes (
 
 ## BUG-002 — Login no Chrome Android não entra e o formulário volta vazio
 
-- **Severidade:** S1 · **Status:** Aguardando informação
+- **Severidade:** S1 · **Status:** Corrigido (2026-10-20 — ver BUG-007); falta confirmar no celular
 - **Reportado por:** teste manual, 2026-10-19
 - **Ambiente:** Chrome para Android acessando `http://192.168.0.65:3000` (mesma rede, **sem HTTPS**)
 
@@ -117,16 +118,10 @@ Agravante: `scripts/seed-dev-users.ts:45-48` **pula** usuários já existentes (
 **Hipóteses**
 
 - **H1 (ELIMINADA em 2026-10-20):** a conta usada no celular estava com e-mail **não confirmado** e o projeto exigia confirmação. O BUG-004 foi corrigido (`mailer_autoconfirm = true`) e o login por senha passou a funcionar por API; a conta `roger` foi **apagada** pelo usuário. Logo H1 não pode mais causar este sintoma — se ele reaparecer, é H2/H2b.
-- **H2 (explica os campos vazios, precisa de confirmação):** o formulário foi enviado **antes da hidratação do React**. Em dev os bundles são grandes e no celular via LAN a hidratação demora; antes dela, o clique em "Entrar" faz o **submit nativo**, que recarrega `/login` do zero. Os inputs não têm atributo `name` (`src/components/ui/TextField.tsx` repassa só `id`), por isso a recarga é "limpa" — nada vaza na URL.
-- **H2b (alternativa, mesma classe de sintoma):** autofill do Chrome Android preenchendo o DOM enquanto o estado React continua vazio (inputs controlados); no primeiro re-render os campos aparecem vazios e vale a validação `if (!email.trim() || !password)` → mensagem "Preencha e-mail e senha.".
+- **H2 (CONFIRMADA em 2026-10-20 — virou o BUG-007):** o formulário é enviado **antes da hidratação do React**. Antes dela o `onSubmit` não existe, o `preventDefault()` não roda e o `<Button type="submit">` dispara o envio nativo, recarregando a própria rota. Em dev os bundles são grandes e no celular via LAN a hidratação demora, o que abre uma janela grande o bastante para o toque. Prova: o log do servidor mostra `GET /cadastro` seguido de `GET /cadastro?`, e `GET /login` seguido de `GET /login?` — a requisição extra é o submit nativo, com query string vazia porque os inputs não têm `name` (`src/components/ui/TextField.tsx`). Nenhuma chamada ao Supabase acontece, por isso não aparece mensagem de erro: a conta nunca chega a ser tentada.
+- **H2b (descartada):** autofill não explicaria a requisição extra no log do servidor.
 
-**Informação necessária para fechar o diagnóstico**
-
-1. Depois de tocar em "Entrar", a URL mudou ou a página recarregou, ou ficou exatamente igual?
-2. Apareceu alguma mensagem em vermelho? Qual? Foi instantâneo ou demorou?
-3. As credenciais digitadas no celular eram da conta criada no PC ou da conta criada no próprio celular (`roger`)?
-4. O cadastro no celular mostrou a tela "Confirme seu e-mail"?
-5. Os campos apareceram vazios **logo após** o clique, ou só depois de você recarregar?
+**Causa raiz confirmada (2026-10-20)** — corrigida no **BUG-007**. As cinco perguntas de diagnóstico que estavam pendentes ficaram respondidas pelo log do servidor: houve recarga da página (`GET /cadastro?` e `GET /login?`), não houve mensagem em vermelho e a conta nunca foi criada, porque o envio do formulário não chegou ao Supabase. O teste no PC funciona porque a hidratação termina antes do primeiro clique.
 
 **Critério de aceite:** login funciona no Android via `http://<ip-da-lan>:3000` com usuário confirmado; falha por e-mail não confirmado mostra mensagem específica (BUG-003).
 
@@ -292,6 +287,41 @@ A lista de placeholders passou a incluir os valores que significam "não revisad
 
 ---
 
+## BUG-007 — Envio nativo antes da hidratação recarrega a página e apaga os campos
+
+- **Severidade:** S1 · **Status:** Corrigido (2026-10-20) — pendente de confirmação no celular
+- **Reportado por:** teste manual, 2026-10-20, Chrome Android em `http://192.168.0.65:3000`
+- **Onde:** `src/components/auth/{Signup,Login,Recovery,Reset}Form.tsx`; novo `src/lib/use-hydrated.ts`
+
+**Observado:** no celular, em `/cadastro`, tocar em "Criar conta" apaga os três campos, não mostra mensagem nenhuma e não cria a conta. Em `/login` o mesmo. No PC os dois fluxos funcionam.
+
+**Causa raiz (confirmada pelo log do servidor):** cada toque gera uma **segunda requisição para a mesma rota**, com query string vazia:
+
+```text
+GET /cadastro 200
+GET /cadastro? 200      ← submit nativo do formulário
+GET /login 200
+GET /login? 200         ← idem
+```
+
+`event.preventDefault()` só existe **depois** da hidratação do React. Antes dela, o `<Button type="submit">` provoca o envio nativo, o navegador navega para a própria rota e os inputs controlados perdem o estado. O `?` vazio existe porque os inputs não têm `name` — o que, por outro lado, impede que e-mail e senha vazem para a URL. **Nenhuma requisição ao Supabase é feita**: a conta nunca chega a ser tentada, e é por isso que não há mensagem de erro.
+
+**Correção aplicada:** hook `useHydrated()` (`src/lib/use-hydrated.ts`, com `useSyncExternalStore` e snapshots distintos para servidor e cliente) e, nos quatro formulários de auth, `disabled={loading || !hydrated}` no botão de envio. O HTML servido pelo servidor já sai com `disabled`, então o navegador bloqueia o envio nativo — inclusive o disparado pela tecla Enter, porque o botão padrão está desabilitado. Depois da hidratação o botão habilita e o fluxo volta ao normal.
+
+**Verificado por execução (2026-10-20):**
+
+| Checagem | Resultado |
+| --- | --- |
+| HTML servido de `/cadastro`, `/login` e `/recuperar-senha` | `<button type="submit" ... disabled="">` |
+| `npm run typecheck` | exit 0 |
+| `npm run lint` | exit 0 |
+
+**Critério de aceite:** no celular, tocar em "Criar conta" e em "Entrar" gera **uma única** requisição à página (sem `?`) e o fluxo chega ao Supabase — sucesso vai para `/quiz`, erro mostra mensagem em vermelho **sem apagar** o que foi digitado.
+
+**Pendente:** confirmar no celular e rodar `npm run build`, que não foi executado nesta rodada porque o servidor de dev estava em uso pelo teste.
+
+---
+
 ## Correções aplicadas
 
 | ID | Data | O que mudou | Verificado por |
@@ -301,6 +331,7 @@ A lista de placeholders passou a incluir os valores que significam "não revisad
 | BUG-003 | 2026-10-20 | `LoginForm` mapeia `error.code` (`email_not_confirmed` ≠ `invalid_credentials`) | códigos obtidos via API real (400 sem sessão / senha errada) |
 | BUG-005 | 2026-10-20 | `SiteHeader` decide por sessão (`viewer`), não por apelido | HTML real em 3 estados com sessão válida |
 | BUG-006 | 2026-10-20 | Gate D26 reprova `reviewed_by` de origem automática; seed de produção agora **falha fechado** | dry-run de produção exit 1 com a mensagem do D26; dry-run de dev segue passando |
+| BUG-007 | 2026-10-20 | `useHydrated()` + botão de envio desabilitado até a hidratação nos 4 formulários de auth | HTML servido com `disabled` em `/cadastro`, `/login` e `/recuperar-senha`; typecheck e lint exit 0 |
 
 ---
 

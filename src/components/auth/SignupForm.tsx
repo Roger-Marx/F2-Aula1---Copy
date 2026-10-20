@@ -9,6 +9,7 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { TextField } from "@/components/ui/TextField";
 import { hasSupabaseEnv } from "@/lib/env";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { useHydrated } from "@/lib/use-hydrated";
 
 const NICKNAME_INVALID = /[\u0000-\u001f\u007f]/;
 
@@ -20,6 +21,7 @@ export function SignupForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [confirmation, setConfirmation] = useState(false);
+  const hydrated = useHydrated();
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -169,7 +171,7 @@ export function SignupForm() {
           hint="Mínimo de 8 caracteres."
           required
         />
-        <Button type="submit" className="w-full" disabled={loading}>
+        <Button type="submit" className="w-full" disabled={loading || !hydrated}>
           {loading ? "Criando conta..." : "Criar conta"}
         </Button>
       </form>

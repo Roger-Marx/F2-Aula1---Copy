@@ -9,6 +9,7 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { TextField } from "@/components/ui/TextField";
 import { hasSupabaseEnv } from "@/lib/env";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { useHydrated } from "@/lib/use-hydrated";
 
 export function ResetForm() {
   const router = useRouter();
@@ -16,6 +17,7 @@ export function ResetForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const hydrated = useHydrated();
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -105,7 +107,7 @@ export function ResetForm() {
           hint="Mínimo de 8 caracteres."
           required
         />
-        <Button type="submit" className="w-full" disabled={loading}>
+        <Button type="submit" className="w-full" disabled={loading || !hydrated}>
           {loading ? "Salvando..." : "Salvar nova senha"}
         </Button>
       </form>

@@ -143,7 +143,7 @@ Rodar contra dev com `npm run dev`. Executar o checklist de `pod.md` §12 e regi
 - [ ] Recuperação de senha: `/recuperar-senha` → e-mail → `/auth/callback` → `/redefinir-senha` → login com a nova senha. **Nunca executada.**
 - [ ] `next` de redirect só aceita caminho interno (testar `?next=https://evil.example`).
 - [ ] `/quiz` e `/resumo` sem sessão redirecionam para `/login?next=...`.
-- [ ] Login no Android (BUG-004 eliminado em 2026-10-20; falta a confirmação pela tela e as respostas do BUG-002).
+- [ ] Login no Android (BUG-004 eliminado e **BUG-007 corrigido** em 2026-10-20 — o envio nativo do formulário disparava antes da hidratação; falta confirmar no celular).
 
 ### 3.2 Quiz (motor)
 - [ ] Sessão tem 10 questões, 2 por nível, em ordem crescente de nível; 4 opções rotuladas A–D.

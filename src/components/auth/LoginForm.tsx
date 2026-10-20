@@ -9,6 +9,7 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { TextField } from "@/components/ui/TextField";
 import { hasSupabaseEnv } from "@/lib/env";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { useHydrated } from "@/lib/use-hydrated";
 
 // Mensagens por código do Supabase Auth. O fallback é genérico de propósito:
 // "E-mail ou senha inválidos." só vale para credenciais realmente inválidas.
@@ -38,6 +39,7 @@ export function LoginForm({
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const hydrated = useHydrated();
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -116,7 +118,7 @@ export function LoginForm({
           onChange={(event) => setPassword(event.target.value)}
           required
         />
-        <Button type="submit" className="w-full" disabled={loading}>
+        <Button type="submit" className="w-full" disabled={loading || !hydrated}>
           {loading ? "Entrando..." : "Entrar"}
         </Button>
       </form>

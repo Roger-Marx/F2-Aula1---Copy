@@ -8,12 +8,14 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { TextField } from "@/components/ui/TextField";
 import { hasSupabaseEnv } from "@/lib/env";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { useHydrated } from "@/lib/use-hydrated";
 
 export function RecoveryForm() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const hydrated = useHydrated();
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -99,7 +101,7 @@ export function RecoveryForm() {
           onChange={(event) => setEmail(event.target.value)}
           required
         />
-        <Button type="submit" className="w-full" disabled={loading}>
+        <Button type="submit" className="w-full" disabled={loading || !hydrated}>
           {loading ? "Enviando..." : "Enviar link"}
         </Button>
       </form>
