@@ -11,13 +11,14 @@ Retome o desenvolvimento do OpenCode Quiz a partir do estado atual.
 
 **Leia antes de agir:** `AGENTS.md` (estado do repo, comandos, regras), `pod_v2.md` (o que falta, prioridade P0→P5), `pod.md` §12.1 e §19 (evidências e snapshot), `prd.md` §10 (rubric das questões). Precedência: `SECURITY.md` > `prd.md` > `pod.md` > `pod_v2.md` > `AGENTS.md`.
 
-**Ponto de partida:** o Supabase já está configurado e vinculado, mas o banco remoto está **vazio** — falta aplicar as migrations. Comece por `pod_v2.md` §1 (P0), na ordem P0.1 → P0.2 → P0.3. Não refaça F0/F1 nem o que já está marcado como feito.
+**Ponto de partida (2026-10-20):** o projeto Supabase **dev** está migrado (5/5), semeado (200 questões), a RLS foi auditada e as 200 questões têm revisão humana registrada. O que falta está em `pod_v2.md` §9: teste do BUG-002 no celular, checklist manual E2E, a11y/perf, decisões DA3/DA4/DA5 e o deploy (F8). Não refaça o que já está marcado como feito.
 
 **Entradas que só eu posso dar — pergunte antes de precisar delas:**
 
-1. O **nome do revisor humano** para `meta.reviewed_by` em `supabase/seed/questions.json` (hoje `"Automático"`, que contraria o gate D26). Só troque com o nome que eu informar.
-2. Autorização para o **commit inicial** (repo sem commits; git local, sem remoto).
-3. Se este projeto Supabase é **dev** ou **produção** — define se `npm run seed:dev-users` entra no fluxo.
+1. Autorização para **cada commit** (o repositório já está publicado em `main`, com branch protegida).
+2. As **decisões DA3, DA4 e DA5** (`pod_v2.md` §8).
+3. Dados de **produção**: criação dos projetos Supabase e Vercel e as chaves correspondentes.
+4. Respostas do **BUG-002** sobre o formulário em branco no Android.
 
 **Ao concluir cada item:** atualize os checkboxes correspondentes em `pod_v2.md` e registre a evidência (comando + resultado real). Se algo falhar, mostre a mensagem e corrija por **nova** migration — nunca editando migration já aplicada.
 

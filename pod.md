@@ -723,7 +723,7 @@ npm run build
 | `npm run lint` | passou (`eslint .`, sem avisos) |
 | `npm run build` | passou (Next.js 16.4.2; 17 rotas + proxy) |
 | `npm run seed -- --dry-run --env=dev` | passou — 200 questões; 40/nível; 13/13/14 por nível |
-| `npm run seed -- --dry-run --env=production` | **falhou de propósito** — “Seed de produção ainda está pendente de revisão humana” (gate D26) |
+| `npm run seed -- --dry-run --env=production` | **passou** (exit 0) em 2026-10-20, depois de `meta.reviewed_by = "Roger_Marx"`. Antes disso falhava de propósito — “Seed de produção ainda está pendente de revisão humana” (gate D26, ver BUG-006) |
 | `npm run review -- --flags` (2026-10-20) | 200 questões, **0 erros** de rubrica, **12 avisos** (4 “correta longa demais”, 8 “distrator por exclusão”) |
 | `scripts/verify-security.sql` (2026-10-20) | **passou** — 9/9 tabelas com RLS, **0** policies, `anon` negado em `question_options`/`quiz_sessions` e nas RPCs de sessão, `authenticated` negado em `session_options`, **17/17** `security definer` com `search_path = ""`, 200 questões ativas, 0 com forma inválida |
 | Sondas HTTP com a chave `anon` (2026-10-20) | leitura de todas as tabelas e chamada de todas as RPCs de sessão → **401/42501**; `rpc_public_ranking` e `rpc_check_nickname` → 200 |
@@ -770,8 +770,8 @@ npm run build
 | **F3 — Auth** | cadastro/login/recuperação, trigger de perfil, proxy, logout | fluxo de auth manual completo | 🟡 código pronto; BUG-001/003/004/005 corrigidos e verificados; **BUG-002 aberto** |
 | **F4 — Motor** | `start`, `answer`, `advance`, `summary`, ranking | 10 questões, timer, abandono e ranking corretos | 🟡 código pronto; RPCs **exercitadas** (20 `question_views`; ranking com `dev-ana`/8) |
 | **F5 — UI** | home, auth, quiz, resumo, ranking conforme skill | responsivo, acessível, copy pt-BR | 🟡 código pronto; a11y/perf **não medidos** |
-| **F6 — Banco de questões** | 200 questões revisadas + seed validado | 40/nível, 13/13/14, 9 opções, revisão humana | 🟡 200 rascunhos **sem erro objetivo de rubrica** (0 erros, 12 avisos via `npm run review`); **revisão humana pendente** |
-| **F7 — Verificação** | typecheck, lint, build, SQL e checklist manual | evidências registradas; D56 atendido | 🟡 parcial: `typecheck`/`lint`/`build`/dry-run ✅; **SQL e checklist manual pendentes** |
+| **F6 — Banco de questões** | 200 questões revisadas + seed validado | 40/nível, 13/13/14, 9 opções, revisão humana | ✅ 200 questões sem erro objetivo de rubrica (0 erros, 12 avisos via `npm run review`) e **revisão humana atestada** em 2026-10-20; dry-run de produção exit 0 |
+| **F7 — Verificação** | typecheck, lint, build, SQL e checklist manual | evidências registradas; D56 atendido | 🟡 parcial: `typecheck`/`lint`/`build`/review/SQL ✅ (D56 atendido no dev); **checklist manual pendente** |
 | **F8 — Deploy** | Supabase + Vercel + checklist | produção validada | ⛔ **não iniciado** |
 | **Git/GitHub** | versionamento, remote e higiene de branch | repositório no ar, `main` protegida | ✅ concluído 2026-10-20 (`main`, 3 commits, force-push bloqueado) |
 
@@ -848,7 +848,7 @@ npm run build
 ## 17. Definição de pronto
 
 - [ ] RF1–RF16 atendidos; D24–D65 aplicáveis respeitados.
-- [ ] 200 questões ativas, 40/nível, 13/13/14, 9 opções, explicação; revisão humana registrada.
+- [x] 200 questões ativas, 40/nível, 13/13/14, 9 opções, explicação; revisão humana registrada em 2026-10-20 (`meta.reviewed_by`).
 - [ ] Sessão sempre com 10 questões, 2/nível, 3/3/4 assuntos, 4 alternativas A–D.
 - [ ] Timer de 20 s no servidor; resposta após o prazo é erro; feedback sem cronômetro.
 - [ ] Sorteio estável; refresh inicia nova sessão; abandonada não entra no ranking.
@@ -908,7 +908,7 @@ npm run build
 
 **Correções aplicadas nesta rodada (fora do rascunho original):** sentinela de TTL (PD36), `answered` no resumo (PD37), opções 2×2 (PD38), estados de erro + `error.tsx` (PD39), limpeza de eyebrows/marcadores (PD40), HTTP 400 para input inválido (PD41), nomes de exibição do prd (PD42), cookies `Secure` + desvio `HttpOnly` (PD43), CSRF de localhost só fora de produção (PD44), `minimum_password_length` + matcher do proxy (PD45), e remoção do campo de confirmação de senha em `/redefinir-senha`.
 
-**Evidência:** §12.1. **Riscos abertos:** revisão humana das 200 questões; verificação do desvio `HttpOnly` (decidido em DA1, falta o texto em `SECURITY.md`); checklist manual de E2E; a11y/performance; deploy. Auditoria de RLS **fechada** em 2026-10-20 (`verify-security.sql` passou no dev).
+**Evidência:** §12.1. **Riscos abertos:** verificação do desvio `HttpOnly` (decidido em DA1, falta o texto em `SECURITY.md`); checklist manual de E2E; a11y/performance; deploy. Auditoria de RLS **fechada** em 2026-10-20 (`verify-security.sql` passou no dev) e **revisão humana das 200 questões concluída** na mesma data (`meta.reviewed_by` preenchido, dry-run de produção exit 0).
 
 ## 20. Trabalho pendente
 

@@ -102,7 +102,7 @@ Currently verified locally (2026-10-20):
 - `npm run lint` — passes
 - `npm run build` — passes (17 routes, proxy present)
 - `npm run seed -- --dry-run --env=dev` — passes: 200 questions, 40/level, 13/13/14 per level
-- `npm run seed -- --dry-run --env=production` — **now fails closed**, as it should: `meta.reviewed_by` is `"Automático"` and the seed gate rejects it (see Pending #4)
+- `npm run seed -- --dry-run --env=production` — **passes** (exit 0): 200 questions, 40/level, 13/13/14 per level. `meta.reviewed_by` is `"Roger_Marx"` (human attestation, 2026-10-20), so the D26 gate is open. It **fails closed** again if the field goes back to a placeholder.
 - `npm run review -- --flags` — 200 questions, **0 rubric errors**, **12 warnings** (all human judgment: 4 "correct answer too long", 8 "distractor by exclusion")
 - Answer key is **not** in the question payload: `build_question_payload` (`20261019000200_functions.sql:85`) projects only `sessionQuestionId`/`position`/`total`/`prompt`/`options[{label,body}]`/`deadlineAt`/`serverNow`; `is_correct` lives in `session_options` but is never projected, and is compared only inside `rpc_submit_answer`. `is_correct` appears in no file under `src/`.
 - `oq_quiz_session` cookie is `httpOnly: true`
@@ -132,7 +132,7 @@ Caveats to keep honest: there is still no `psql` and no Docker on this machine, 
 1. ~~`npx supabase db push`~~ — **done** (2026-10-19; confirmed by `migration list --linked`).
 2. ~~`npm run seed -- --env=dev`~~ — **done** (2026-10-19; 200 questions, idempotent).
 3. ~~`scripts/verify-security.sql`~~ — **done** (2026-10-20, passed via Management API; see Verification). Re-run it in **production** once that project exists.
-4. `meta.reviewed_by` in `supabase/seed/questions.json` is `"Automático"` — **owner: user** (the human reviewer, D26). The seed gate now rejects it (fixed 2026-10-20), so the production dry-run fails until a real name is filled in. Use `npm run review -- --level=N --full` to review.
+4. ~~`meta.reviewed_by` in `supabase/seed/questions.json`~~ — **done** (2026-10-20): `"Roger_Marx"`, `reviewed_at` `"2026-10-20"`; production dry-run exits 0. The human review is attested by the user (D26); the agent did not approve the questions.
 5. Manual E2E — **owner: user** (browser). BUG-001, BUG-003, BUG-004 and BUG-005 fixed and verified 2026-10-20; BUG-004 was proven by API (signup returns a session, login works), so the remaining step is doing it **through the UI**, on desktop and on Android. Still open: **BUG-002** (needs the user's answers about the blank Android form — **owner: user**; H1 is now eliminated by the BUG-004 fix, leaving H2/H2b). Then password recovery, a11y/perf and deploy.
 6. ~~Initial commit~~ — **done** (2026-10-20, on explicit authorization): `main` on GitHub, `origin` connected, branch protected against force-push.
 

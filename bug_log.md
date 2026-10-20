@@ -288,7 +288,7 @@ A lista de placeholders passou a incluir os valores que significam "não revisad
 | `npm run seed -- --dry-run --env=dev` | passava | passa (exit 0) — o gate só se aplica a produção |
 | `npm run typecheck` / `lint` / `build` | — | passam (exit 0) |
 
-**Nota:** corrigir o gate não substitui a revisão humana. `meta.reviewed_by` continua `"Automático"` em `supabase/seed/questions.json` e precisa ser preenchido com o nome do revisor real (P0.3 / D26) — ver `pod_v2.md` §2 e §9.
+**Nota:** corrigir o gate não substitui a revisão humana. **Atualização (2026-10-20):** `meta.reviewed_by` foi preenchido com `"Roger_Marx"` e `reviewed_at` com `"2026-10-20"`; o dry-run de produção passou com exit 0. A revisão é uma atestação do usuário (P0.3 / D26) — ver `pod_v2.md` §2 e §9.
 
 ---
 

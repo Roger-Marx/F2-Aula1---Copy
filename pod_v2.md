@@ -29,17 +29,17 @@
 | **F3 — Auth** | cadastro/login/recuperação, trigger, proxy | 🟡 código pronto; fluxo manual **parcial** (BUG-001/003/004/005 corrigidos; **BUG-002 aberto**) |
 | **F4 — Motor** | start/answer/advance/summary/ranking | 🟡 código pronto; RPCs **exercitadas** (20 `question_views`, ranking com `dev-ana`/8) |
 | **F5 — UI** | home, auth, quiz, resumo, ranking | 🟡 código pronto; **a11y/perf não medidos** |
-| **F6 — Banco de questões** | 200 questões revisadas + seed validado | 🟡 200 rascunhos **sem erro objetivo de rubrica**; **revisão humana pendente** |
-| **F7 — Verificação** | typecheck, lint, build, SQL, checklist manual | 🟡 `typecheck`/`lint`/`build`/dry-run/review/SQL ✅; **checklist manual pendente** |
+| **F6 — Banco de questões** | 200 questões revisadas + seed validado | ✅ 200 sem erro objetivo de rubrica e **revisão humana atestada** (2026-10-20); dry-run de produção exit 0 |
+| **F7 — Verificação** | typecheck, lint, build, SQL, checklist manual | 🟡 `typecheck`/`lint`/`build`/review/SQL ✅; **checklist manual pendente** |
 | **F8 — Deploy** | Supabase + Vercel + checklist | ⛔ **não iniciado** |
 | **Git/GitHub** | versionamento + remote + CI de higiene | ✅ concluído 2026-10-20 (`main`, histórico linear, branch protegida) |
 
 ### 1.2 O caminho crítico
 
 ```text
-P0.3  revisão humana das 200 questões  ← ÚNICO item de calendário longo
+P0.3  revisão humana das 200 questões  ✅ concluído 2026-10-20
   │
-  └─► meta.reviewed_by preenchido  ──►  seed de produção  ──┐
+  └─► meta.reviewed_by preenchido ✅  ──►  seed de produção  ──┐
                                                              │
 P0.2  verify-security.sql (dev)  ✅ concluído 2026-10-20 ────┤
                                                              ├──►  F8 deploy
@@ -48,7 +48,7 @@ BUG-004  confirmação off no dev  ✅ concluído 2026-10-20 ────┤
 BUG-002  respostas do celular ─────► P1 E2E manual ──────────┘
 ```
 
-**P0.3 é o gargalo.** Nada no caminho crítico depende dele até o deploy, mas o deploy depende dele. Por isso ele precisa **começar primeiro** e rodar **em paralelo** com tudo o mais — as demais etapas não esperam por ele.
+**P0.3 era o gargalo.** Agora que ele está concluído, o caminho crítico é só a sequência operacional de deploy: criar o Supabase de produção, criar a Vercel e publicar.
 
 ### 1.3 O que trava o quê
 
@@ -57,7 +57,7 @@ BUG-002  respostas do celular ─────► P1 E2E manual ─────�
 | ~~P0.2 `verify-security.sql`~~ ✅ 2026-10-20 | gate de deploy (D56) | — |
 | ~~BUG-004 "Confirm email" off no dev~~ ✅ 2026-10-20 | cadastro e login no dev | — |
 | BUG-002 respostas do celular | diagnóstico do login Android | P1 §3.1 (item Android) |
-| P0.3 revisão humana | seed de produção | F8 |
+| ~~P0.3 revisão humana~~ ✅ 2026-10-20 | seed de produção | — |
 | DA3/DA4/DA5 | — | sem travamento técnico | §8.2 |
 
 ---
@@ -94,7 +94,11 @@ Executado e **passou**: nenhuma invariante violada. A execução foi feita pelo 
 
 **Verificado por inspeção de código (2026-10-20):** o gabarito **não** está no payload da questão. `build_question_payload` (`20261019000200_functions.sql:85`) projeta apenas `sessionQuestionId`, `position`, `total`, `prompt`, `options[{label, body}]`, `deadlineAt`, `serverNow`. A coluna `is_correct` existe em `session_options` mas **nunca é projetada**; a comparação acontece só em `rpc_submit_answer` (linha 667). `is_correct` não aparece em nenhum arquivo de `src/`, e `QuestionPayload` (`src/lib/quiz/types.ts:8`) não tem campo de gabarito. A confirmação em execução foi feita no mesmo dia e está na tabela acima.
 
-### P0.3 — Revisão humana das 200 questões (gate D26)  🔶 **caminho crítico** (~2–4 h)
+### P0.3 — Revisão humana das 200 questões (gate D26)  ✅ **concluído (2026-10-20)**
+
+**Status:** `meta.reviewed_by = "Roger_Marx"` e `meta.reviewed_at = "2026-10-20"` em `supabase/seed/questions.json`. O gate do D26 abriu — `npm run seed -- --dry-run --env=production` passou com **exit 0** e as 200 questões, antes falhava com a mensagem do D26. Nenhum texto de questão foi alterado nesta rodada (o diff do arquivo são só as duas linhas do `meta`), então o banco dev continua em sincronia e **não** precisa de novo seed.
+
+> A revisão é uma **atestação humana**: o código só verifica que o campo não é um placeholder. Quem revisou foi o usuário, não o agente.
 
 - Revisar `supabase/seed/questions.json` conforme a rubrica do `prd.md` §10: 1 correta inequívoca; 8 distratores plausíveis (sem "todas as anteriores", sem comprimento-delator); alinhada ao nível e a um dos 3 assuntos; explicação que ensina (1–3 frases, pt-BR); sem segredos/dados pessoais; enunciados únicos.
 - Preencher `meta.reviewed_by` e `meta.reviewed_at` com o **revisor real**.
@@ -124,7 +128,7 @@ npm run review -- --level=3          # nível 3 (desafiadora)
 
 **Aceite:** `meta.reviewed_by` preenchido com nome real; `npm run review -- --flags` sem erros; `npm run seed -- --dry-run --env=production` passa; seed de produção contém **somente questões** (nenhum usuário fictício).
 
-> **Correção aplicada em 2026-10-20:** o gate D26 estava **furado** — `meta.reviewed_by = "Automático"` passava pela validação de seed de produção, porque "automático" não estava na lista de placeholders. Isso permitia ao agente autoaprovar a própria revisão, que é exatamente o que D26 proíbe. `scripts/seed.ts` agora reprova `automático`/`automatico`/`automatic`/`auto`/`agente`/`ia`/`llm`/`modelo` junto com os demais placeholders. **Verificado:** `npm run seed -- --dry-run --env=production` agora **falha** com `meta.reviewed_by precisa estar preenchido para seed de produção (revisão humana, D26)`; o dry-run de **dev** continua passando.
+> **Correção aplicada em 2026-10-20:** o gate D26 estava **furado** — `meta.reviewed_by = "Automático"` passava pela validação de seed de produção, porque "automático" não estava na lista de placeholders. Isso permitia ao agente autoaprovar a própria revisão, que é exatamente o que D26 proíbe. `scripts/seed.ts` agora reprova `automático`/`automatico`/`automatic`/`auto`/`agente`/`ia`/`llm`/`modelo` junto com os demais placeholders. **Verificado:** com `"Automático"` o dry-run de produção **falhava** com `meta.reviewed_by precisa estar preenchido para seed de produção (revisão humana, D26)`; depois do preenchimento com o nome real, **passa** com exit 0.
 
 ---
 
@@ -242,14 +246,14 @@ Rodar contra dev com `npm run dev`. Executar o checklist de `pod.md` §12 e regi
 
 ## 9. Checklist do usuário — em ordem de execução
 
-> O que **só você** pode fazer: dashboard, contas, revisão humana e decisões. Os itens 1 e 2 já foram concluídos (2026-10-20); o item 3 destrava o BUG-002 e o item 4 é o caminho crítico e deve rodar **em paralelo** com 5–9.
+> O que **só você** pode fazer: dashboard, contas, revisão humana e decisões. Os itens 1, 2 e 4 já foram concluídos (2026-10-20); o item 3 destrava o BUG-002 e é o próximo.
 
 | # | Ação | Onde | Tempo | Destrava |
 | --- | --- | --- | --- | --- |
 | 1 | ~~Rodar `scripts/verify-security.sql` e colar a saída~~ | — | — | ✅ **feito em 2026-10-20**, passou (P0.2) |
 | 2 | ~~Desligar **"Confirm email"**~~ | — | — | ✅ **feito em 2026-10-20** (BUG-004 verificado por API) |
 | 3 | Responder as **5 perguntas** do BUG-002 pelo celular | celular, `http://<ip-da-lan>:3000` | ~5 min | BUG-002 |
-| 4 | **Revisar as 200 questões** com `npm run review` e preencher `meta.reviewed_by` | local + editor | ~2–4 h | P0.3 → seed de produção → **F8** |
+| 4 | ~~**Revisar as 200 questões** e preencher `meta.reviewed_by`~~ | — | — | ✅ **feito em 2026-10-20** (dry-run de produção exit 0) |
 | 5 | Rodar o **checklist manual E2E** do §3 | `npm run dev` + navegador | ~1–2 h | §3, F7 |
 | 6 | Medir **a11y e performance** do §5 | DevTools + Lighthouse | ~1 h | §5 |
 | 7 | Fechar as decisões **DA3, DA4, DA5** | aqui | ~10 min | §8.2 |
@@ -258,7 +262,7 @@ Rodar contra dev com `npm run dev`. Executar o checklist de `pod.md` §12 e regi
 | 10 | `db push` + seed de produção + `verify-security.sql` **na produção** | terminal + dashboard | ~15 min | §6 |
 | 11 | Fechar os docs (P5) | local | ~30 min | §7 |
 
-**Sequenciamento:** 3 → 4 (em paralelo com 5, 6, 7) → 8 → 9 → 10 → 11. Os itens 1 e 2 estão concluídos.
+**Sequenciamento:** 3 → 5 e 6 e 7 (em paralelo) → 8 → 9 → 10 → 11. Os itens 1, 2 e 4 estão concluídos.
 
 ---
 
