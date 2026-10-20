@@ -758,17 +758,18 @@ npm run build
 
 ## 14. Fases de implementação
 
-| Fase | Entrega | Critério de saída | Status (2026-10-19) |
+| Fase | Entrega | Critério de saída | Status (2026-10-20) |
 | --- | --- | --- | --- |
 | **F0 — Sincronização** | `AGENTS.md` e skill alinhados à v1.2/autenticação | documentos sem contradição sobre login | ✅ concluído |
 | **F1 — Scaffold** | Next.js + TS + Tailwind, npm, lint, fontes, tokens, estrutura | `dev`, `typecheck`, `lint`, `build` passam | ✅ concluído — `typecheck`/`lint`/`build` passam |
-| **F2 — Banco** | migrations de schema/funções/RLS/catálogo (+ seed helpers) | RPCs e grants aplicados; RLS verificada | 🟡 escrito; **não aplicado nem verificado** em Supabase |
-| **F3 — Auth** | cadastro/login/recuperação, trigger de perfil, proxy, logout | fluxo de auth manual completo | 🟡 código pronto; fluxo manual não executado |
-| **F4 — Motor** | `start`, `answer`, `advance`, `summary`, ranking | 10 questões, timer, abandono e ranking corretos | 🟡 código pronto; RPCs não executadas |
-| **F5 — UI** | home, auth, quiz, resumo, ranking conforme skill | responsivo, acessível, copy pt-BR | 🟡 código pronto; a11y/perf não medidos |
-| **F6 — Banco de questões** | 200 questões revisadas + seed validado | 40/nível, 13/13/14, 9 opções, revisão humana | 🟡 200 rascunhos válidos; **revisão humana pendente** |
-| **F7 — Verificação** | typecheck, lint, build, SQL e checklist manual | evidências registradas; D56 atendido | 🟡 parcial: só `typecheck`/`lint`/`build`/dry-run (§12.1) |
-| **F8 — Deploy** | Supabase + Vercel + checklist | produção validada | ⛔ não iniciado |
+| **F2 — Banco** | migrations de schema/funções/RLS/catálogo (+ seed helpers) | RPCs e grants aplicados; RLS verificada | 🟡 **aplicado no dev** (5/5 migrations, 200 questões semeadas); **RLS ainda não auditada** (`verify-security.sql` pendente) |
+| **F3 — Auth** | cadastro/login/recuperação, trigger de perfil, proxy, logout | fluxo de auth manual completo | 🟡 código pronto; BUG-001/003/005 corrigidos e verificados; **BUG-002 e BUG-004 abertos** |
+| **F4 — Motor** | `start`, `answer`, `advance`, `summary`, ranking | 10 questões, timer, abandono e ranking corretos | 🟡 código pronto; RPCs **exercitadas** (20 `question_views`; ranking com `dev-ana`/8) |
+| **F5 — UI** | home, auth, quiz, resumo, ranking conforme skill | responsivo, acessível, copy pt-BR | 🟡 código pronto; a11y/perf **não medidos** |
+| **F6 — Banco de questões** | 200 questões revisadas + seed validado | 40/nível, 13/13/14, 9 opções, revisão humana | 🟡 200 rascunhos **sem erro objetivo de rubrica** (0 erros, 12 avisos via `npm run review`); **revisão humana pendente** |
+| **F7 — Verificação** | typecheck, lint, build, SQL e checklist manual | evidências registradas; D56 atendido | 🟡 parcial: `typecheck`/`lint`/`build`/dry-run ✅; **SQL e checklist manual pendentes** |
+| **F8 — Deploy** | Supabase + Vercel + checklist | produção validada | ⛔ **não iniciado** |
+| **Git/GitHub** | versionamento, remote e higiene de branch | repositório no ar, `main` protegida | ✅ concluído 2026-10-20 (`main`, 3 commits, force-push bloqueado) |
 
 **Dependências:** F2 antes de F3/F4; F6 pode correr em paralelo a F3–F5, mas é o caminho crítico (revisão humana). F5 depende de F3/F4; F8 depende de F7.
 
@@ -820,7 +821,7 @@ npm run build
 | PD40 | Removidos rótulos `uppercase`/`tracking-*` das “eyebrows” (sentence case) e os marcadores decorativos `01/02/03` da home; `uppercase` fica só no cabeçalho da tabela de ranking. |
 | PD41 | `INVALID_INPUT`/`INVALID_NICKNAME` retornam **HTTP 400** (antes caíam no default 409). |
 | PD42 | Catálogo usa nomes de exibição do `prd.md` (Média/Desafiadora/Difícil/Expert; Features e Produtividade; Boas práticas de uso) mantendo **slugs estáveis**; documentado em `catalog.sql` e `DRAFT-BRIEF.md`. |
-| PD43 | **Desvio de segurança documentado:** cookies de auth do `@supabase/ssr` são `httpOnly: false` (exigência do client browser); `Secure` explícito em produção e `SameSite=Lax`. Pendente revisar/justificar (`pod_v2.md`). Não declarar conformidade total com `HttpOnly`. |
+| PD43 | **Desvio de segurança documentado:** cookies de auth do `@supabase/ssr` são `httpOnly: false` (exigência do client browser); `Secure` explícito em produção e `SameSite=Lax`. **Risco aceito em DA1 (2026-10-19)**: não mudar o fluxo de auth; falta apenas o texto de justify em `SECURITY.md`/README. Não declarar conformidade total com `HttpOnly`. |
 | PD44 | CSRF: localhost aceito na checagem de `Origin` **somente fora de produção**; em produção valem a origem da requisição e `NEXT_PUBLIC_SITE_URL`. |
 | PD45 | `minimum_password_length = 8` no `[auth]` do `supabase/config.toml`; proxy com matcher excluindo `/api/*` e `/auth/callback` para não renovar sessão em dobro. |
 
@@ -868,7 +869,7 @@ npm run build
 
 ## 19. Snapshot da implementação (2026-10-19)
 
-**Estado:** código completo e compilando; **nada verificado contra Supabase real**. Snapshot do repositório:
+**Estado:** código completo e compilando; migrations **aplicadas** no projeto dev e 200 questões semeadas. Snapshot do repositório:
 
 ```text
 .
@@ -903,7 +904,7 @@ npm run build
 
 **Correções aplicadas nesta rodada (fora do rascunho original):** sentinela de TTL (PD36), `answered` no resumo (PD37), opções 2×2 (PD38), estados de erro + `error.tsx` (PD39), limpeza de eyebrows/marcadores (PD40), HTTP 400 para input inválido (PD41), nomes de exibição do prd (PD42), cookies `Secure` + desvio `HttpOnly` (PD43), CSRF de localhost só fora de produção (PD44), `minimum_password_length` + matcher do proxy (PD45), e remoção do campo de confirmação de senha em `/redefinir-senha`.
 
-**Evidência:** §12.1. **Riscos abertos:** revisão humana das 200 questões; revisão de segurança do desvio `HttpOnly`; todas as verificações que exigem ambiente real.
+**Evidência:** §12.1. **Riscos abertos:** revisão humana das 200 questões; auditoria de RLS (`verify-security.sql`); verificação do desvio `HttpOnly` (decidido em DA1, falta o texto em `SECURITY.md`); checklist manual de E2E; a11y/performance; deploy.
 
 ## 20. Trabalho pendente
 

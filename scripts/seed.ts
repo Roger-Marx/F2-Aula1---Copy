@@ -140,6 +140,16 @@ function validateSeed(seed: z.infer<typeof seedSchema>, seedEnv: string) {
     "todo",
     "tbd",
     "placeholder",
+    // D26 exige revisão HUMANA. Um campo preenchido pelo agente (ou por IA)
+    // não é revisão humana, então precisa reprovar o gate como todo resto.
+    "automático",
+    "automatico",
+    "automatic",
+    "auto",
+    "agente",
+    "ia",
+    "llm",
+    "modelo",
   ]);
 
   if (seedEnv === "production" && placeholders.has(reviewed)) {

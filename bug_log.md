@@ -22,6 +22,7 @@ Complementa (não substitui) `pod_v2.md` — lá estão as *pendências de traba
 | BUG-003 | Mensagem de erro do login não distingue e-mail não confirmado | S2 | Verificado |
 | BUG-004 | Confirmação de e-mail divergente: `config.toml` diz off, projeto dev exige on | S2 | Aberto |
 | BUG-005 | Logado, o header continua mostrando "Entrar" (e nenhum "Sair") | S2 | Verificado |
+| BUG-006 | Gate D26 furado: seed de produção passava com `reviewed_by = "Automático"` | S1 | Verificado |
 
 ---
 
@@ -234,6 +235,43 @@ O estado do meio é exatamente o do defeito original: antes da correção, ele r
 
 ---
 
+## BUG-006 — Gate D26 furado: seed de produção passava com `reviewed_by = "Automático"`
+
+- **Severidade:** S1 · **Status:** Verificado (2026-10-20)
+- **Arquivo:** `scripts/seed.ts:133-149` (lista de placeholders do gate de produção)
+
+**Observado**
+
+`supabase/seed/questions.json` traz `meta.reviewed_by = "Automático"`. A validação de seed de produção (`validateSeed`) só reprova quando o valor normalizado está na lista de placeholders:
+
+```ts
+const placeholders = new Set([
+  "", "pendente", "pendente de revisão", "a revisar",
+  "revisar", "todo", "tbd", "placeholder",
+]);
+if (seedEnv === "production" && placeholders.has(reviewed)) { throw ... }
+```
+
+`"Automático"` **não** estava na lista. Resultado: `npm run seed -- --dry-run --env=production` **passava**, e o gate D26 ("agente rascunha, humano revisa/aprova") podia ser satisfeito pelo próprio agente que redigiu as questões. O gate era apenas cosmético.
+
+**Impacto:** a barreira que separa "rascunho do agente" de "aprovado por humano" não existia de fato. Um seed de produção com revisão automática passaria e o `prd.md` D26 seria violado sem deixar rastro.
+
+**Correção aplicada (2026-10-20)** — `scripts/seed.ts`
+
+A lista de placeholders passou a incluir os valores que significam "não revisado por humano": `automático`, `automatico`, `automatic`, `auto`, `agente`, `ia`, `llm`, `modelo` — além dos placeholders existentes. A comparação continua sobre o valor em minúsculas e sem espaços nas pontas.
+
+**Verificado**
+
+| Cenário | Antes | Depois |
+| --- | --- | --- |
+| `npm run seed -- --dry-run --env=production` (com `reviewed_by = "Automático"`) | passava | **falha** com `meta.reviewed_by precisa estar preenchido para seed de produção (revisão humana, D26)` — exit 1 |
+| `npm run seed -- --dry-run --env=dev` | passava | passa (exit 0) — o gate só se aplica a produção |
+| `npm run typecheck` / `lint` / `build` | — | passam (exit 0) |
+
+**Nota:** corrigir o gate não substitui a revisão humana. `meta.reviewed_by` continua `"Automático"` em `supabase/seed/questions.json` e precisa ser preenchido com o nome do revisor real (P0.3 / D26) — ver `pod_v2.md` §2 e §9.
+
+---
+
 ## Correções aplicadas
 
 | ID | Data | O que mudou | Verificado por |
@@ -241,6 +279,7 @@ O estado do meio é exatamente o do defeito original: antes da correção, ele r
 | BUG-001 | 2026-10-20 | `scripts/seed-dev-users.ts` repara profile ausente e falha alto se o trigger não rodar; backfill aplicado nos 2 usuários de dev | `rpc_public_ranking` com `dev-ana`/8; 2ª execução sem duplicar; typecheck, lint e build (EXIT=0) |
 | BUG-003 | 2026-10-20 | `LoginForm` mapeia `error.code` (`email_not_confirmed` ≠ `invalid_credentials`) | códigos obtidos via API real (400 sem sessão / senha errada) |
 | BUG-005 | 2026-10-20 | `SiteHeader` decide por sessão (`viewer`), não por apelido | HTML real em 3 estados com sessão válida |
+| BUG-006 | 2026-10-20 | Gate D26 reprova `reviewed_by` de origem automática; seed de produção agora **falha fechado** | dry-run de produção exit 1 com a mensagem do D26; dry-run de dev segue passando |
 
 ---
 

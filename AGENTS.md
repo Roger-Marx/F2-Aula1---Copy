@@ -7,7 +7,7 @@
 - Visual system: `.opencode/skills/frontend-design/SKILL.md` (glass blue/lilac, Sora + JetBrains Mono). Load it before changing UI.
 - `npm run typecheck`, `npm run lint` and `npm run build` pass. The hosted **dev** Supabase project (`tcpmvnxjegitfktdbcjo`, `.env.local` ready, CLI authenticated) is **migrated** (5/5) with the prd display names in the catalogue, and the **200 questions are seeded** (200 active, 1,800 options, 40/level, 13/13/14; idempotent on a second run — verified 2026-10-19). Manual E2E started the same day: 3 auth users (one unconfirmed, created from Android), one completed session (score 8, 10/10 answered), 20 question views. **Defects live in `bug_log.md`**: BUG-001 (user without a `profiles` row is invisible in the ranking), BUG-003 (login error message) and BUG-005 (header showing "Entrar" while logged in) are **fixed and verified 2026-10-20**; BUG-002 (Android login) awaits the user's answers and BUG-004 (dev e-mail confirmation is ON) awaits a dashboard decision. RLS/policy audit remains **unverified**.
 - **No automated test suite** (project decision). Do not add Vitest/Playwright unless the user asks.
-- Git is live: branch `main`, initial commit `5c6a730`, remote `origin` = `https://github.com/Roger-Marx/F2-Aula1---Copy`. Commit identity is the GitHub noreply address `210554545+Roger-Marx@users.noreply.github.com` (set **locally**, not globally). **DA2 decided (2026-10-20): the repo is intentionally PUBLIC** — the user accepted that `supabase/seed/questions.json` exposes the answer key because the project is didactic. This supersedes the old "must be private" rule. Do not "fix" it back to private, and do not warn again about the answer key.
+- Git is live: branch `main`, initial commit `5c6a730`, remote `origin` = `https://github.com/Roger-Marx/F2-Aula1---Copy`. Commit identity is the GitHub noreply address `210554545+Roger-Marx@users.noreply.github.com` (set **locally**, not globally). **DA6 decided (2026-10-20): the repo is intentionally PUBLIC** — the user accepted that `supabase/seed/questions.json` exposes the answer key because the project is didactic. This supersedes the old "must be private" rule. Do not "fix" it back to private, and do not warn again about the answer key.
   - Consequence to respect: **no credential may ever enter the history.** `.env.local` (service role key) stays ignored; only `.env.example` placeholders are committed. The `tcpmvnxjegitfktdbcjo` project ref appears in the docs — that is the **dev** project and a ref is not a credential.
   - Residual risk accepted along with it: the **dev** Supabase project has e-mail confirmation OFF (BUG-004), so strangers can sign up on it. Keep dev data non-sensitive and never point `.env.local` at production.
 - **`main` has branch protection enabled** (applied 2026-10-20, verified): force pushes are **blocked** (GitHub returns `422 Cannot force-push to this branch`), branch deletion is blocked, and linear history is required. `enforce_admins` is `false` and there is **no** pull-request requirement, so solo work stays friction-free while a normal `git push` is unaffected.
@@ -67,7 +67,7 @@ The layout differs from `pod.md` §3 on purpose: there is no `validation/schemas
 - Email confirmation **off in dev**, **on in production**. `profiles` is created by a trigger on `auth.users`; nickname is unique (case-insensitive), 3–20 chars, immutable in v1.
 - Login is required to play; the ranking is public. The email is never exposed or logged; the ranking shows nickname only.
 - `/quiz` and `/resumo` require a session; the proxy refreshes it and protects both routes, and is excluded from `/api/*` and `/auth/callback` (those handlers refresh the session themselves). Authorization always uses `getUser()`, never `getSession()`.
-- **Known deviation:** `@supabase/ssr` auth cookies are `httpOnly: false` (the browser client must read them; `HttpOnly` would break the current flow). `Secure` is set explicitly in production and `SameSite=Lax` is kept. The quiz cookie `oq_quiz_session` **is** `HttpOnly`. Do not claim full `HttpOnly` compliance. **DA1 decided (2026-10-19): the risk is accepted** — do not re-open without a new decision. Residual weakness to keep in mind: the CSP uses `script-src 'unsafe-inline'`. Still to record in `pod.md` PD43, which currently says "pending".
+- **Known deviation:** `@supabase/ssr` auth cookies are `httpOnly: false` (the browser client must read them; `HttpOnly` would break the current flow). `Secure` is set explicitly in production and `SameSite=Lax` is kept. The quiz cookie `oq_quiz_session` **is** `HttpOnly`. Do not claim full `HttpOnly` compliance. **DA1 decided (2026-10-19): the risk is accepted** — do not re-open without a new decision. Residual weakness to keep in mind: the CSP uses `script-src 'unsafe-inline'`. Recorded in `pod.md` PD43; only the justify text in `SECURITY.md`/README is still missing.
 
 ## Non-obvious quiz rules (easy to get wrong)
 
@@ -96,13 +96,17 @@ The layout differs from `pod.md` §3 on purpose: there is no `validation/schemas
 
 Report only checks actually executed.
 
-Currently verified locally (2026-10-19):
+Currently verified locally (2026-10-20):
 
 - `npm run typecheck` — passes
 - `npm run lint` — passes
 - `npm run build` — passes (17 routes, proxy present)
 - `npm run seed -- --dry-run --env=dev` — passes: 200 questions, 40/level, 13/13/14 per level
-- `npm run seed -- --dry-run --env=production` — now **passes**, but only cosmetically: `meta.reviewed_by` is `"Automático"`, which bypasses the D26 gate without naming a reviewer (see Pending #3)
+- `npm run seed -- --dry-run --env=production` — **now fails closed**, as it should: `meta.reviewed_by` is `"Automático"` and the seed gate rejects it (see Pending #4)
+- `npm run review -- --flags` — 200 questions, **0 rubric errors**, **12 warnings** (all human judgment: 4 "correct answer too long", 8 "distractor by exclusion")
+- Answer key is **not** in the question payload: `build_question_payload` (`20261019000200_functions.sql:85`) projects only `sessionQuestionId`/`position`/`total`/`prompt`/`options[{label,body}]`/`deadlineAt`/`serverNow`; `is_correct` lives in `session_options` but is never projected, and is compared only inside `rpc_submit_answer`. `is_correct` appears in no file under `src/`.
+- `oq_quiz_session` cookie is `httpOnly: true`
+- Git: `main` clean and in sync with `origin/main`; branch protection verified to reject a force push (`422 Cannot force-push to this branch`)
 
 Remote checks executed (read-only, 2026-10-19):
 
@@ -111,18 +115,18 @@ Remote checks executed (read-only, 2026-10-19):
 - catalogue read back from the DB: levels Fácil/Média/Desafiadora/Difícil/Expert; subjects Fundamentos OpenCode e CLI / Features e Produtividade / Boas práticas de uso
 - anon is denied on every table (`42501 permission denied`) and its API spec exposes 0 tables / 0 RPCs; it can call only `rpc_public_ranking` (`{top:[],me:null}`) and `rpc_check_nickname`, and `rpc_start_session` as anon returns `42501`
 - **data seeded**: `questions` = 200 (all `is_active`), `question_options` = 1,800, 200 unique `external_id`; a second `npm run seed -- --env=dev` left the counts unchanged (idempotent); sampled questions have 9 options with exactly 1 correct
-- still empty: `profiles` = 0, `quiz_sessions` = 0, `question_views` = 0
+- as of 2026-10-20: `profiles` = 3, `quiz_sessions` = 2 (1 `completed` com score 8, 1 `in_progress`), `question_views` = 20
 
-Not verifiable from this machine: `scripts/verify-security.sql` (RLS enabled + zero policies + `search_path` audit) — there is no `psql`, and `supabase db dump` fails without Docker. Use the dashboard SQL Editor.
+Not verifiable from this machine: `scripts/verify-security.sql` (RLS enabled + zero policies + `search_path` audit) — there is no `psql`, and `supabase db dump` fails without Docker. Use the dashboard SQL Editor; the script is self-verifying (it raises on each violation and ends with a `NOTICE: OK: ...`).
 
-**Pending, in order** (commands and acceptance criteria in `pod_v2.md` §1):
+**Pending, in order** (commands, owners and acceptance criteria in `pod_v2.md` sections 1 and 9):
 
 1. ~~`npx supabase db push`~~ — **done** (2026-10-19; confirmed by `migration list --linked`).
 2. ~~`npm run seed -- --env=dev`~~ — **done** (2026-10-19; 200 questions, idempotent).
-3. `scripts/verify-security.sql` via the dashboard SQL Editor — keep the output as evidence.
-4. `meta.reviewed_by` in `supabase/seed/questions.json` is `"Automático"`, which passes the validator but defeats the D26 gate; replace it with the real reviewer name before any production seed.
-5. Manual E2E — started 2026-10-19; **BUG-001, BUG-003 and BUG-005 fixed and verified 2026-10-20**. Still open: BUG-002 (needs the user's answers about the blank Android form) and BUG-004 (turn off dev e-mail confirmation in the dashboard). Re-test, then a11y/perf and deploy.
-6. Initial commit — only with user authorization.
+3. `scripts/verify-security.sql` via the dashboard SQL Editor — **owner: user** (~5 min). Keep the output as evidence.
+4. `meta.reviewed_by` in `supabase/seed/questions.json` is `"Automático"` — **owner: user** (the human reviewer, D26). The seed gate now rejects it (fixed 2026-10-20), so the production dry-run fails until a real name is filled in. Use `npm run review -- --level=N --full` to review.
+5. Manual E2E — **owner: user** (browser). BUG-001, BUG-003 and BUG-005 fixed and verified 2026-10-20. Still open: BUG-004 (turn off dev e-mail confirmation in the dashboard — **owner: user**) and BUG-002 (needs the user's answers about the blank Android form — **owner: user**). Then a11y/perf and deploy.
+6. ~~Initial commit~~ — **done** (2026-10-20, on explicit authorization): `main` on GitHub, `origin` connected, branch protected against force-push.
 
 Still not executed end-to-end: the Android login (BUG-002), password recovery, Lighthouse/a11y, performance measurement, deploy.
 

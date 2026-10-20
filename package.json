@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "seed": "tsx scripts/seed.ts",
-    "seed:dev-users": "tsx scripts/seed-dev-users.ts"
+    "seed:dev-users": "tsx scripts/seed-dev-users.ts",
+    "review": "tsx scripts/review-questions.ts"
   },
   "engines": {
     "node": ">=22"
