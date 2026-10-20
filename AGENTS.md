@@ -50,6 +50,7 @@ src/components/{ui,auth,layout,quiz,ranking}/
 src/lib/api.ts           jsonOk/jsonError, isSameOrigin (CSRF), rpcErrorResponse, rpcPayloadError
 src/lib/env.ts           env presence + required accessors
 src/lib/validation.ts    Zod schemas for route input
+src/lib/use-hydrated.ts  hydration flag; keeps auth submit buttons disabled pre-hydration (BUG-007)
 src/lib/quiz/{types,errors}.ts   payload types + error codes/messages/status
 src/lib/auth/{viewer,redirect}.ts
 src/lib/supabase/{server,client}.ts   anon key + cookies only
@@ -66,6 +67,7 @@ The layout differs from `pod.md` §3 on purpose: there is no `validation/schemas
 - Supabase Auth **email + password**, minimum 8 characters (also set in `supabase/config.toml`). Recovery included; no OAuth/magic link.
 - Email confirmation **off in dev**, **on in production**. `profiles` is created by a trigger on `auth.users`; nickname is unique (case-insensitive), 3–20 chars, immutable in v1.
 - Login is required to play; the ranking is public. The email is never exposed or logged; the ranking shows nickname only.
+- **Hydration guard (BUG-007):** all four auth forms keep the submit button `disabled` until `useHydrated()` returns true. Before hydration `onSubmit` does not exist, so a native submit reloads the route and wipes the controlled inputs. Do not remove the guard, and do not add `name` attributes to the inputs (that would put credentials in the URL on a native submit).
 - `/quiz` and `/resumo` require a session; the proxy refreshes it and protects both routes, and is excluded from `/api/*` and `/auth/callback` (those handlers refresh the session themselves). Authorization always uses `getUser()`, never `getSession()`.
 - **Known deviation:** `@supabase/ssr` auth cookies are `httpOnly: false` (the browser client must read them; `HttpOnly` would break the current flow). `Secure` is set explicitly in production and `SameSite=Lax` is kept. The quiz cookie `oq_quiz_session` **is** `HttpOnly`. Do not claim full `HttpOnly` compliance. **DA1 decided (2026-10-19): the risk is accepted** — do not re-open without a new decision. Residual weakness to keep in mind: the CSP uses `script-src 'unsafe-inline'`. Recorded in `pod.md` PD43; only the justify text in `SECURITY.md`/README is still missing.
 
