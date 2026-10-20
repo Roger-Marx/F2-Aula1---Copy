@@ -7,7 +7,7 @@
 >
 > **Como ler este documento:** §1–§13 continuam sendo o desenho aprovado; §14 (fases), §15 (PD) e §19–§20 registram o que **já foi implementado** e o que falta. O trabalho restante, em ordem de prioridade e sem repetir o que está pronto, está em **`pod_v2.md`**.
 >
-> **Resumo executivo:** o código está escrito e compila (`typecheck`, `lint` e `build` passam). Nada foi executado contra um projeto Supabase real: migrations, RLS, RPCs, fluxo de auth/quiz/resumo/ranking, acessibilidade e deploy seguem **pendentes de verificação** (§12.1, §19).
+> **Resumo executivo:** o código está escrito e compila (`typecheck`, `lint` e `build` passam). O projeto Supabase **dev** está migrado e semeado (5/5 migrations, 200 questões) e a **auditoria de RLS/grants passou** em 2026-10-20. Continuam **pendentes de verificação** o fluxo manual de auth/quiz/resumo/ranking (com o BUG-002 aberto), a acessibilidade/performance e o deploy (§12.1, §19).
 
 ## 0. Decisões fechadas nesta etapa
 
@@ -715,7 +715,7 @@ npm run build
 
 **Registro:** relatar apenas o que foi executado, com comando/evidência (SECURITY §4). Não afirmar teste sem execução.
 
-### 12.1 Evidência executada (2026-10-19)
+### 12.1 Evidência executada (2026-10-19 e 2026-10-20)
 
 | Comando | Resultado |
 | --- | --- |
@@ -724,8 +724,12 @@ npm run build
 | `npm run build` | passou (Next.js 16.4.2; 17 rotas + proxy) |
 | `npm run seed -- --dry-run --env=dev` | passou — 200 questões; 40/nível; 13/13/14 por nível |
 | `npm run seed -- --dry-run --env=production` | **falhou de propósito** — “Seed de produção ainda está pendente de revisão humana” (gate D26) |
+| `npm run review -- --flags` (2026-10-20) | 200 questões, **0 erros** de rubrica, **12 avisos** (4 “correta longa demais”, 8 “distrator por exclusão”) |
+| `scripts/verify-security.sql` (2026-10-20) | **passou** — 9/9 tabelas com RLS, **0** policies, `anon` negado em `question_options`/`quiz_sessions` e nas RPCs de sessão, `authenticated` negado em `session_options`, **17/17** `security definer` com `search_path = ""`, 200 questões ativas, 0 com forma inválida |
+| Sondas HTTP com a chave `anon` (2026-10-20) | leitura de todas as tabelas e chamada de todas as RPCs de sessão → **401/42501**; `rpc_public_ranking` e `rpc_check_nickname` → 200 |
+| Auth do projeto dev (2026-10-20) | `mailer_autoconfirm = true`, `external.email = true`, `password_min_length = 8`; signup devolve sessão com `email_confirmed_at`; login 200; senha de 7 caracteres → 422 |
 
-**Não executado (pendente):** `supabase db push`; `scripts/verify-security.sql`; fluxo manual de auth/quiz/resumo/ranking; Lighthouse/a11y (D63); medição de start (< 300 ms p95, D62); deploy (§13). Não há projeto Supabase vinculado, `psql`, Docker ou Supabase CLI autenticado neste ambiente. Ver `pod_v2.md`.
+**Não executado (pendente):** fluxo manual de auth/quiz/resumo/ranking; Lighthouse/a11y (D63); medição de start (< 300 ms p95, D62); deploy (§13). Já executados desde a primeira versão deste snapshot: `supabase db push` (5/5, 2026-10-19) e `scripts/verify-security.sql` (2026-10-20 — passou; ver `bug_log.md` e `pod_v2.md` P0.2). Ver `pod_v2.md`.
 
 ## 13. Deploy
 
@@ -762,8 +766,8 @@ npm run build
 | --- | --- | --- | --- |
 | **F0 — Sincronização** | `AGENTS.md` e skill alinhados à v1.2/autenticação | documentos sem contradição sobre login | ✅ concluído |
 | **F1 — Scaffold** | Next.js + TS + Tailwind, npm, lint, fontes, tokens, estrutura | `dev`, `typecheck`, `lint`, `build` passam | ✅ concluído — `typecheck`/`lint`/`build` passam |
-| **F2 — Banco** | migrations de schema/funções/RLS/catálogo (+ seed helpers) | RPCs e grants aplicados; RLS verificada | 🟡 **aplicado no dev** (5/5 migrations, 200 questões semeadas); **RLS ainda não auditada** (`verify-security.sql` pendente) |
-| **F3 — Auth** | cadastro/login/recuperação, trigger de perfil, proxy, logout | fluxo de auth manual completo | 🟡 código pronto; BUG-001/003/005 corrigidos e verificados; **BUG-002 e BUG-004 abertos** |
+| **F2 — Banco** | migrations de schema/funções/RLS/catálogo (+ seed helpers) | RPCs e grants aplicados; RLS verificada | 🟡 **aplicado e auditado no dev** (5/5 migrations, 200 questões semeadas, `verify-security.sql` passou em 2026-10-20) |
+| **F3 — Auth** | cadastro/login/recuperação, trigger de perfil, proxy, logout | fluxo de auth manual completo | 🟡 código pronto; BUG-001/003/004/005 corrigidos e verificados; **BUG-002 aberto** |
 | **F4 — Motor** | `start`, `answer`, `advance`, `summary`, ranking | 10 questões, timer, abandono e ranking corretos | 🟡 código pronto; RPCs **exercitadas** (20 `question_views`; ranking com `dev-ana`/8) |
 | **F5 — UI** | home, auth, quiz, resumo, ranking conforme skill | responsivo, acessível, copy pt-BR | 🟡 código pronto; a11y/perf **não medidos** |
 | **F6 — Banco de questões** | 200 questões revisadas + seed validado | 40/nível, 13/13/14, 9 opções, revisão humana | 🟡 200 rascunhos **sem erro objetivo de rubrica** (0 erros, 12 avisos via `npm run review`); **revisão humana pendente** |
@@ -904,7 +908,7 @@ npm run build
 
 **Correções aplicadas nesta rodada (fora do rascunho original):** sentinela de TTL (PD36), `answered` no resumo (PD37), opções 2×2 (PD38), estados de erro + `error.tsx` (PD39), limpeza de eyebrows/marcadores (PD40), HTTP 400 para input inválido (PD41), nomes de exibição do prd (PD42), cookies `Secure` + desvio `HttpOnly` (PD43), CSRF de localhost só fora de produção (PD44), `minimum_password_length` + matcher do proxy (PD45), e remoção do campo de confirmação de senha em `/redefinir-senha`.
 
-**Evidência:** §12.1. **Riscos abertos:** revisão humana das 200 questões; auditoria de RLS (`verify-security.sql`); verificação do desvio `HttpOnly` (decidido em DA1, falta o texto em `SECURITY.md`); checklist manual de E2E; a11y/performance; deploy.
+**Evidência:** §12.1. **Riscos abertos:** revisão humana das 200 questões; verificação do desvio `HttpOnly` (decidido em DA1, falta o texto em `SECURITY.md`); checklist manual de E2E; a11y/performance; deploy. Auditoria de RLS **fechada** em 2026-10-20 (`verify-security.sql` passou no dev).
 
 ## 20. Trabalho pendente
 

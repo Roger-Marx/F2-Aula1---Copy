@@ -20,7 +20,7 @@ Complementa (não substitui) `pod_v2.md` — lá estão as *pendências de traba
 | BUG-001 | Resultado do quiz não aparece no ranking (usuário sem `profile`) | S1 | Verificado |
 | BUG-002 | Login no Chrome Android não entra e o formulário volta vazio | S1 | Aguardando informação |
 | BUG-003 | Mensagem de erro do login não distingue e-mail não confirmado | S2 | Verificado |
-| BUG-004 | Confirmação de e-mail divergente: `config.toml` diz off, projeto dev exige on | S2 | Aberto |
+| BUG-004 | Confirmação de e-mail divergente: `config.toml` diz off, projeto dev exige on | S2 | Verificado |
 | BUG-005 | Logado, o header continua mostrando "Entrar" (e nenhum "Sair") | S2 | Verificado |
 | BUG-006 | Gate D26 furado: seed de produção passava com `reviewed_by = "Automático"` | S1 | Verificado |
 
@@ -116,7 +116,7 @@ Agravante: `scripts/seed-dev-users.ts:45-48` **pula** usuários já existentes (
 
 **Hipóteses**
 
-- **H1 (alta confiança, explica o login recusado):** a conta usada no celular está com e-mail **não confirmado** e o projeto exige confirmação. Ver BUG-004.
+- **H1 (ELIMINADA em 2026-10-20):** a conta usada no celular estava com e-mail **não confirmado** e o projeto exigia confirmação. O BUG-004 foi corrigido (`mailer_autoconfirm = true`) e o login por senha passou a funcionar por API; a conta `roger` foi **apagada** pelo usuário. Logo H1 não pode mais causar este sintoma — se ele reaparecer, é H2/H2b.
 - **H2 (explica os campos vazios, precisa de confirmação):** o formulário foi enviado **antes da hidratação do React**. Em dev os bundles são grandes e no celular via LAN a hidratação demora; antes dela, o clique em "Entrar" faz o **submit nativo**, que recarrega `/login` do zero. Os inputs não têm atributo `name` (`src/components/ui/TextField.tsx` repassa só `id`), por isso a recarga é "limpa" — nada vaza na URL.
 - **H2b (alternativa, mesma classe de sintoma):** autofill do Chrome Android preenchendo o DOM enquanto o estado React continua vazio (inputs controlados); no primeiro re-render os campos aparecem vazios e vale a validação `if (!email.trim() || !password)` → mensagem "Preencha e-mail e senha.".
 
@@ -163,7 +163,7 @@ Manter pt-BR, sentence case, sem emojis e **sem ecoar o e-mail**.
 
 ## BUG-004 — Confirmação de e-mail divergente: `config.toml` diz off, projeto dev exige on
 
-- **Severidade:** S2 · **Status:** Aberto (depende de decisão/configuração sua)
+- **Severidade:** S2 · **Status:** Verificado (2026-10-20)
 - **Onde:** `supabase/config.toml:41` × configuração do projeto hospedado
 
 **Observado:** `supabase/config.toml` tem `enable_confirmations = false` (e o pod.md §7.2 / D45 dizem que **dev** é sem confirmação), mas o projeto dev hospedado responde `mailer_autoconfirm: false` → **exige confirmação**. O `config.toml` vale apenas para a stack **local** (`supabase start`), que não é usada aqui; o projeto hospedado é governado pelo dashboard.
@@ -173,6 +173,26 @@ Manter pt-BR, sentence case, sem emojis e **sem ecoar o e-mail**.
 **Correção proposta:** no dashboard, Authentication → Sign In / Providers → Email → desligar **"Confirm email"** no dev (alinha com o D45); manter **ligado** em produção. Registrar a decisão.
 
 **Critério de aceite:** em dev, cadastro + login funcionam sem depender de e-mail; em produção, a confirmação permanece obrigatória.
+
+**Correção aplicada (2026-10-20)** — configuração do projeto dev, via Management API (`PATCH /v1/projects/tcpmvnxjegitfktdbcjo/config/auth`)
+
+- `mailer_autoconfirm`: `false → true` — em dev a confirmação deixa de ser exigida, alinhando com o D45.
+- `site_url` segue `http://localhost:3000`, `disable_signup` segue `false`, `password_min_length` segue `8`.
+- Mantido o `config.toml` como está: ele vale só para a stack local e documenta a intenção; o projeto hospedado é governado pelo dashboard/API.
+
+**Nota de operação (erro de toggle, corrigido no mesmo dia):** na primeira tentativa, o toggle desligado no dashboard foi **"Enable email provider"** em vez de **"Confirm email"**. O projeto ficou com `external.email = false`, o que derruba **cadastro, login e recuperação de senha por completo** — inclusive os usuários de dev, que já estavam confirmados. Foi detectado ao ler `/auth/v1/settings` logo depois da mudança e revertido pela API. Sem impacto em produção (o projeto afetado é o dev). Os dois toggles ficam na mesma tela e têm nomes parecidos: um desliga o provedor inteiro, o outro só a exigência de confirmação.
+
+**Verificado por API (não pela tela), em 2026-10-20**
+
+- `/auth/v1/settings` → `external.email = true`, `mailer_autoconfirm = true`, `disable_signup = false`.
+- Cadastro público de um usuário descartável (apagado em seguida): HTTP 200, `access_token` presente e `user.email_confirmed_at` já preenchido — o cadastro **nasce com sessão**, sem e-mail.
+- Login com a mesma senha: HTTP 200, `token_type = bearer`.
+- Senha de 7 caracteres: recusada com HTTP 422 — `password_min_length = 8` vale no servidor.
+- Após a limpeza: `auth.users = 2`, `profiles = 2` (`dev-ana`, `dev-bruno`), sem linhas órfãs.
+
+**Correção de premissa:** o Management API expõe `minimum_password_length` como campo derivado que volta vazio; o valor real está em `password_min_length` e **já era `8`**. O D44 nunca esteve violado no servidor — o `if (password.length < 8)` em `SignupForm.tsx:49` e `ResetForm.tsx:34` é defesa em profundidade, não a única barreira.
+
+**Pendente:** repetir cadastro e login **pela tela**, no PC e no Android, na rodada de teste manual — é o que fecha o BUG-002 junto. Em produção a confirmação deve permanecer **ligada** (D45); o projeto de produção ainda não existe.
 
 ---
 
@@ -277,6 +297,7 @@ A lista de placeholders passou a incluir os valores que significam "não revisad
 | ID | Data | O que mudou | Verificado por |
 | --- | --- | --- | --- |
 | BUG-001 | 2026-10-20 | `scripts/seed-dev-users.ts` repara profile ausente e falha alto se o trigger não rodar; backfill aplicado nos 2 usuários de dev | `rpc_public_ranking` com `dev-ana`/8; 2ª execução sem duplicar; typecheck, lint e build (EXIT=0) |
+| BUG-004 | 2026-10-20 | Projeto dev com `mailer_autoconfirm = true` (confirmação desligada); o toggle "Enable email provider" desligado por engano foi revertido | `/auth/v1/settings` (`external.email=true`, `mailer_autoconfirm=true`); signup 200 já com sessão; login 200; senha de 7 caracteres recusada (422) |
 | BUG-003 | 2026-10-20 | `LoginForm` mapeia `error.code` (`email_not_confirmed` ≠ `invalid_credentials`) | códigos obtidos via API real (400 sem sessão / senha errada) |
 | BUG-005 | 2026-10-20 | `SiteHeader` decide por sessão (`viewer`), não por apelido | HTML real em 3 estados com sessão válida |
 | BUG-006 | 2026-10-20 | Gate D26 reprova `reviewed_by` de origem automática; seed de produção agora **falha fechado** | dry-run de produção exit 1 com a mensagem do D26; dry-run de dev segue passando |
@@ -287,7 +308,7 @@ A lista de placeholders passou a incluir os valores que significam "não revisad
 
 - **Profiles faltantes:** ~~`dev-ana` e `dev-bruno` (sem profile desde 19:09)~~ — **reparado em 2026-10-20** por `seed:dev-users`; o ranking já mostra `dev-ana` com 8.
 - **Sessão aberta:** `53650d93…` (`in_progress`, 1 respondida, 20:39) — será abandonada automaticamente (TTL *lazy*) no próximo `start`; não é defeito.
-- **Conta não confirmada:** apelido `roger`, criada 20:27:18 — não conseguirá logar enquanto o BUG-004 estiver como está.
+- **Conta não confirmada:** ~~apelido `roger`, criada 20:27:18~~ — **removida pelo usuário em 2026-10-20**. Com o BUG-004 corrigido, esse bloqueio deixou de existir; restam `dev-ana` e `dev-bruno`, ambas confirmadas. Estado conferido: `auth.users = 2`, `profiles = 2`, sem linhas órfãs.
 
 ## Comportamentos esperados (não são bugs)
 
@@ -297,4 +318,23 @@ A lista de placeholders passou a incluir os valores que significam "não revisad
 
 ## Verificações pendentes relacionadas
 
-O `scripts/verify-security.sql` (RLS on + zero policies + `search_path`) continua não executado — sem `psql` local e `supabase db dump` exige Docker. Fechar pelo SQL Editor do dashboard. Detalhes em `pod_v2.md` §1 (P0.2).
+~~O `scripts/verify-security.sql` continua não executado.~~ **Executado em 2026-10-20** contra o projeto dev. Não havia `psql` local e `supabase db dump` exige Docker, então o script rodou **verbatim** pelo Management API do Supabase (`POST /v1/projects/tcpmvnxjegitfktdbcjo/database/query`), autenticado com o token que o CLI já mantinha no Credential Manager. O script é somente leitura (`select`, `has_*_privilege` e `raise`), sem DDL ou DML.
+
+**Resultado: passou** — nenhuma exceção levantada, e os valores medidos confirmam cada invariante:
+
+| Verificação | Medido |
+| --- | --- |
+| Tabelas `public` com RLS desabilitado | 0 (9/9 com RLS) |
+| Policies em `public` | 0 (deny-all) |
+| `anon` com `SELECT` em `question_options` / `quiz_sessions` | `false` / `false` |
+| `authenticated` com `SELECT` em `session_options` | `false` |
+| `anon` com `EXECUTE` em `rpc_start_session` | `false` |
+| `anon` com `EXECUTE` em `rpc_public_ranking` / `rpc_check_nickname` | `true` / `true` |
+| `authenticated` com `EXECUTE` em `rpc_submit_answer` | `true` |
+| `authenticated` com `EXECUTE` em `select_session_questions` (interna) | `false` |
+| Funções `security definer` **sem** `search_path` fixo | 0 (17/17 com `search_path = ""`) |
+| Questões ativas / com forma inválida (9 opções, 1 correta) | 200 / 0 |
+
+**Sondas HTTP como `anon`** (a perspectiva de quem tenta ler o gabarito): `question_options`, `questions`, `quiz_sessions`, `session_options`, `profiles` e `question_views`, além de `rpc_submit_answer`, `rpc_advance`, `rpc_get_summary`, `rpc_my_profile`, `rpc_start_session` e `seed_question` → **todas 401/42501**. `rpc_public_ranking` e `rpc_check_nickname` → 200, como previsto.
+
+**Ressalvas honestas:** (a) a execução foi por API, não pelo SQL Editor, e as mensagens `NOTICE` não são devolvidas por esse endpoint — o "passou" é inferido da ausência de exceção, corroborada pela tabela acima; (b) o runner usado ficou em diretório temporário, **fora do repositório**, sem adicionar dependência ao projeto; (c) falta reexecutar em **produção** quando o projeto existir. O caminho reproduzível e recomendado continua sendo o SQL Editor do dashboard.

@@ -25,27 +25,27 @@
 | --- | --- | --- |
 | **F0 — Sincronização** | docs alinhados à v1.2 | ✅ concluído |
 | **F1 — Scaffold** | Next/TS/Tailwind, lint, tokens | ✅ concluído |
-| **F2 — Banco** | migrations + seed no dev | 🟡 **aplicado** (5/5, 200 questões); **RLS ainda não auditada** |
-| **F3 — Auth** | cadastro/login/recuperação, trigger, proxy | 🟡 código pronto; fluxo manual **parcial** (3 defeitos corrigidos; BUG-002/004 abertos) |
+| **F2 — Banco** | migrations + seed no dev | ✅ **aplicado e auditado** (5/5, 200 questões; `verify-security.sql` passou em 2026-10-20) |
+| **F3 — Auth** | cadastro/login/recuperação, trigger, proxy | 🟡 código pronto; fluxo manual **parcial** (BUG-001/003/004/005 corrigidos; **BUG-002 aberto**) |
 | **F4 — Motor** | start/answer/advance/summary/ranking | 🟡 código pronto; RPCs **exercitadas** (20 `question_views`, ranking com `dev-ana`/8) |
 | **F5 — UI** | home, auth, quiz, resumo, ranking | 🟡 código pronto; **a11y/perf não medidos** |
 | **F6 — Banco de questões** | 200 questões revisadas + seed validado | 🟡 200 rascunhos **sem erro objetivo de rubrica**; **revisão humana pendente** |
-| **F7 — Verificação** | typecheck, lint, build, SQL, checklist manual | 🟡 `typecheck`/`lint`/`build`/dry-run ✅; **SQL e checklist manual pendentes** |
+| **F7 — Verificação** | typecheck, lint, build, SQL, checklist manual | 🟡 `typecheck`/`lint`/`build`/dry-run/review/SQL ✅; **checklist manual pendente** |
 | **F8 — Deploy** | Supabase + Vercel + checklist | ⛔ **não iniciado** |
-| **Git/GitHub** | versionamento + remote + CI de higiene | ✅ concluído 2026-10-20 (`main`, 3 commits, branch protegida) |
+| **Git/GitHub** | versionamento + remote + CI de higiene | ✅ concluído 2026-10-20 (`main`, histórico linear, branch protegida) |
 
 ### 1.2 O caminho crítico
 
 ```text
 P0.3  revisão humana das 200 questões  ← ÚNICO item de calendário longo
   │
-  ├─► meta.reviewed_by preenchido  ──►  seed de produção  ──┐
-  │                                                            │
-P0.2  verify-security.sql (dev) ──────────────────────────────┤
-  │                                                            ├──►  F8 deploy
-BUG-004  desligar "Confirm email" no dev ──┐                   │
-  │                                         ├──►  P1 E2E manual ─┘
-BUG-002  responder 5 perguntas do celular ─┘
+  └─► meta.reviewed_by preenchido  ──►  seed de produção  ──┐
+                                                             │
+P0.2  verify-security.sql (dev)  ✅ concluído 2026-10-20 ────┤
+                                                             ├──►  F8 deploy
+BUG-004  confirmação off no dev  ✅ concluído 2026-10-20 ────┤
+                                                             │
+BUG-002  respostas do celular ─────► P1 E2E manual ──────────┘
 ```
 
 **P0.3 é o gargalo.** Nada no caminho crítico depende dele até o deploy, mas o deploy depende dele. Por isso ele precisa **começar primeiro** e rodar **em paralelo** com tudo o mais — as demais etapas não esperam por ele.
@@ -54,8 +54,8 @@ BUG-002  responder 5 perguntas do celular ─┘
 
 | Pendência | Destrava | Bloqueia |
 | --- | --- | --- |
-| P0.2 `verify-security.sql` | gate de deploy (D56) | F8, §4 P2.3–P2.6 |
-| BUG-004 "Confirm email" off no dev | cadastro e login no dev | BUG-002, P1 §3.1 |
+| ~~P0.2 `verify-security.sql`~~ ✅ 2026-10-20 | gate de deploy (D56) | — |
+| ~~BUG-004 "Confirm email" off no dev~~ ✅ 2026-10-20 | cadastro e login no dev | — |
 | BUG-002 respostas do celular | diagnóstico do login Android | P1 §3.1 (item Android) |
 | P0.3 revisão humana | seed de produção | F8 |
 | DA3/DA4/DA5 | — | sem travamento técnico | §8.2 |
@@ -68,20 +68,31 @@ BUG-002  responder 5 perguntas do celular ─┘
 
 **Status: ✅ concluído (2026-10-19).** Projeto dev `tcpmvnxjegitfktdbcjo` vinculado; **5/5 migrations aplicadas** (`migration list --linked`); catálogo com os nomes do `prd.md`; seed executado duas vezes → 200 questões ativas, 1.800 opções (`200×9`), 40 por nível, 13/13/14 por nível, 200 `external_id` únicos, amostra com 9 opções e 1 correta. `seed:dev-users` executado (3 usuários, 3 profiles).
 
-### P0.2 — Checagens SQL de segurança  🔶 **depende de 1 ação sua** (~5 min)
+### P0.2 — Checagens SQL de segurança  ✅ **concluído (2026-10-20)**
 
-```bash
-# NO SQL EDITOR DO DASHBOARD (https://supabase.com/dashboard → projeto dev → SQL Editor)
-# Cole o conteúdo de scripts/verify-security.sql e execute.
-```
+Executado e **passou**: nenhuma invariante violada. A execução foi feita pelo **Management API** do Supabase (`POST /v1/projects/tcpmvnxjegitfktdbcjo/database/query`), autenticada com o token que o CLI já mantinha no Credential Manager. Esta máquina continua sem `psql` e sem Docker — o caminho do SQL Editor era o previsto, mas não foi necessário. O script rodou **verbatim** e é somente leitura (`select`, `has_*_privilege`, `raise`), sem DDL nem DML.
 
-O script é **auto-verificável**: cada violante levanta exceção, e o fim imprime `NOTICE: OK: RLS deny-all, grants e invariantes do banco validados.` Se aparecer a exceção, algo quebrou e o texto indica o quê.
+**Evidência:**
 
-> Por que o SQL Editor e não `psql`: esta máquina não tem `psql` e `supabase db dump` exige Docker. O script roda como `postgres`, que é o papel padrão do SQL Editor.
+| Verificação | Medido |
+| --- | --- |
+| Tabelas `public` com RLS desabilitado | 0 (9/9 com RLS) |
+| Policies em `public` | 0 (deny-all) |
+| `anon` com `SELECT` em `question_options` / `quiz_sessions` | `false` / `false` |
+| `authenticated` com `SELECT` em `session_options` | `false` |
+| `anon` com `EXECUTE` em `rpc_start_session` | `false` |
+| `anon` com `EXECUTE` em `rpc_public_ranking` / `rpc_check_nickname` | `true` / `true` |
+| `authenticated` com `EXECUTE` em `select_session_questions` (interna) | `false` |
+| Funções `security definer` **sem** `search_path` fixo | 0 (17/17 com `search_path = ""`) |
+| Questões ativas / com forma inválida (9 opções, 1 correta) | 200 / 0 |
 
-**Aceite (D56):** RLS habilitado em todas as tabelas e **zero policies**; `anon`/`authenticated` **não** leem `question_options`/`is_correct`; `anon` não executa RPCs de sessão (só ranking/checagem de apelido); cada questão ativa tem 9 opções e 1 correta; toda função `security definer` tem `search_path` fixo. **Registrar a saída como evidência** (colar no `bug_log.md` ou no `pod.md` §12.1).
+**Sondas HTTP como `anon`** (a perspectiva de quem tenta ler o gabarito): leitura de `question_options`, `questions`, `quiz_sessions`, `session_options`, `profiles` e `question_views`, além de `rpc_submit_answer`, `rpc_advance`, `rpc_get_summary`, `rpc_my_profile`, `rpc_start_session` e `seed_question` → **todas 401/42501**. Só `rpc_public_ranking` e `rpc_check_nickname` responderam 200, como previsto.
 
-**Verificado por inspeção de código (2026-10-20):** o gabarito **não** está no payload da questão. `build_question_payload` (`20261019000200_functions.sql:85`) projeta apenas `sessionQuestionId`, `position`, `total`, `prompt`, `options[{label, body}]`, `deadlineAt`, `serverNow`. A coluna `is_correct` existe em `session_options` mas **nunca é projetada**; a comparação acontece só em `rpc_submit_answer` (linha 667). `is_correct` não aparece em nenhum arquivo de `src/`, e `QuestionPayload` (`src/lib/quiz/types.ts:8`) não tem campo de gabarito. **Falta apenas a confirmação em execução (este item).**
+**Ressalvas:** (a) o endpoint não devolve `NOTICE`, então "passou" significa "não levantou exceção", corroborado pela tabela acima; (b) o runner ficou em diretório temporário **fora do repo**, sem adicionar dependência; (c) **produção ainda precisa da sua própria execução**. A saída está registrada em `bug_log.md` §"Verificações pendentes relacionadas".
+
+**Aceite (D56):** atendido no dev — RLS em todas as tabelas e **zero policies**; `anon`/`authenticated` **não** leem `question_options`/`is_correct`; `anon` não executa RPCs de sessão (só ranking/checagem de apelido); cada questão ativa tem 9 opções e 1 correta; toda função `security definer` tem `search_path` fixo.
+
+**Verificado por inspeção de código (2026-10-20):** o gabarito **não** está no payload da questão. `build_question_payload` (`20261019000200_functions.sql:85`) projeta apenas `sessionQuestionId`, `position`, `total`, `prompt`, `options[{label, body}]`, `deadlineAt`, `serverNow`. A coluna `is_correct` existe em `session_options` mas **nunca é projetada**; a comparação acontece só em `rpc_submit_answer` (linha 667). `is_correct` não aparece em nenhum arquivo de `src/`, e `QuestionPayload` (`src/lib/quiz/types.ts:8`) não tem campo de gabarito. A confirmação em execução foi feita no mesmo dia e está na tabela acima.
 
 ### P0.3 — Revisão humana das 200 questões (gate D26)  🔶 **caminho crítico** (~2–4 h)
 
@@ -128,7 +139,7 @@ Rodar contra dev com `npm run dev`. Executar o checklist de `pod.md` §12 e regi
 - [ ] Recuperação de senha: `/recuperar-senha` → e-mail → `/auth/callback` → `/redefinir-senha` → login com a nova senha. **Nunca executada.**
 - [ ] `next` de redirect só aceita caminho interno (testar `?next=https://evil.example`).
 - [ ] `/quiz` e `/resumo` sem sessão redirecionam para `/login?next=...`.
-- [ ] Login no Android (depende de BUG-004 e BUG-002).
+- [ ] Login no Android (BUG-004 eliminado em 2026-10-20; falta a confirmação pela tela e as respostas do BUG-002).
 
 ### 3.2 Quiz (motor)
 - [ ] Sessão tem 10 questões, 2 por nível, em ordem crescente de nível; 4 opções rotuladas A–D.
@@ -231,12 +242,12 @@ Rodar contra dev com `npm run dev`. Executar o checklist de `pod.md` §12 e regi
 
 ## 9. Checklist do usuário — em ordem de execução
 
-> O que **só você** pode fazer: dashboard, contas, revisão humana e decisões. Os itens 1–3 destravam o resto; o item 4 é o caminho crítico e deve rodar **em paralelo** com 5–9.
+> O que **só você** pode fazer: dashboard, contas, revisão humana e decisões. Os itens 1 e 2 já foram concluídos (2026-10-20); o item 3 destrava o BUG-002 e o item 4 é o caminho crítico e deve rodar **em paralelo** com 5–9.
 
 | # | Ação | Onde | Tempo | Destrava |
 | --- | --- | --- | --- | --- |
-| 1 | Rodar `scripts/verify-security.sql` e **colar a saída** | Dashboard Supabase dev → SQL Editor | ~5 min | P0.2, §4, gate de deploy |
-| 2 | Desligar **"Confirm email"** | Dashboard dev → Authentication → Sign In / Providers → Email | ~2 min | BUG-004 → BUG-002, cadastro no dev |
+| 1 | ~~Rodar `scripts/verify-security.sql` e colar a saída~~ | — | — | ✅ **feito em 2026-10-20**, passou (P0.2) |
+| 2 | ~~Desligar **"Confirm email"**~~ | — | — | ✅ **feito em 2026-10-20** (BUG-004 verificado por API) |
 | 3 | Responder as **5 perguntas** do BUG-002 pelo celular | celular, `http://<ip-da-lan>:3000` | ~5 min | BUG-002 |
 | 4 | **Revisar as 200 questões** com `npm run review` e preencher `meta.reviewed_by` | local + editor | ~2–4 h | P0.3 → seed de produção → **F8** |
 | 5 | Rodar o **checklist manual E2E** do §3 | `npm run dev` + navegador | ~1–2 h | §3, F7 |
@@ -247,7 +258,7 @@ Rodar contra dev com `npm run dev`. Executar o checklist de `pod.md` §12 e regi
 | 10 | `db push` + seed de produção + `verify-security.sql` **na produção** | terminal + dashboard | ~15 min | §6 |
 | 11 | Fechar os docs (P5) | local | ~30 min | §7 |
 
-**Sequenciamento:** 1 → 2 → 3 → 4 (em paralelo com 5, 6, 7) → 8 → 9 → 10 → 11.
+**Sequenciamento:** 3 → 4 (em paralelo com 5, 6, 7) → 8 → 9 → 10 → 11. Os itens 1 e 2 estão concluídos.
 
 ---
 
