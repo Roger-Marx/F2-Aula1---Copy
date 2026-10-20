@@ -1,0 +1,730 @@
+{
+  "meta": {
+    "version": 1,
+    "reviewed_by": "PENDENTE — revisão humana",
+    "reviewed_at": "2026-10-19",
+    "source": "documentação oficial do OpenCode"
+  },
+  "questions": [
+    {
+      "externalId": "FUND-F5-001",
+      "level": "especialista",
+      "subject": "fundamentos",
+      "prompt": "Ao modelar ameaças de um fluxo em que o OpenCode lê arquivos do repositório, saída de comandos e páginas web, qual premissa sobre confiança é mais adequada?",
+      "explanation": "O limite de confiança separa quem define políticas (usuário, configuração e AGENTS.md revisado) do conteúdo ingerido (arquivos, issues, web e MCP). Este último pode carregar texto adversário e deve ser tratado como dado, não como ordem.",
+      "options": [
+        { "body": "Arquivos versionados são confiáveis por definição, pois passaram por revisão de código.", "correct": false },
+        { "body": "Saídas de ferramentas herdam a confiança do modelo que as solicitou.", "correct": false },
+        { "body": "Todo conteúdo ingerido é dado não confiável e não deve ter autoridade para redefinir instruções, permissões ou segredos.", "correct": true },
+        { "body": "Apenas texto digitado diretamente pelo usuário pode conter instruções maliciosas.", "correct": false },
+        { "body": "Páginas web são o único vetor relevante; arquivos locais não podem carregar injeção de prompt.", "correct": false },
+        { "body": "O modelo distingue nativamente instruções legítimas de conteúdo adversário, dispensando controles externos.", "correct": false },
+        { "body": "Compartilhar a sessão elimina o risco, porque torna todo o conteúdo auditável.", "correct": false },
+        { "body": "Usar um provedor conhecido transfere a confiança do conteúdo para o provedor.", "correct": false },
+        { "body": "Comentários de código são descartados pelo parser e, por isso, não influenciam o modelo.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F5-002",
+      "level": "especialista",
+      "subject": "fundamentos",
+      "prompt": "Um agente precisa apenas inspecionar código para responder a uma pergunta. Qual configuração reduz melhor o impacto de uma injeção de prompt?",
+      "explanation": "Menor privilégio limita o que uma instrução maliciosa consegue fazer mesmo quando o modelo é convencido. Se a tarefa é só leitura, escrita e shell não precisam estar disponíveis.",
+      "options": [
+        { "body": "Aumentar a temperatura para o modelo ficar menos previsível.", "correct": false },
+        { "body": "Conceder todas as ferramentas e confiar na instrução de nunca obedecer a comandos maliciosos.", "correct": false },
+        { "body": "Executar o agente como administrador para evitar falhas de permissão no meio da análise.", "correct": false },
+        { "body": "Desativar o AGENTS.md para o agente não receber regras conflitantes.", "correct": false },
+        { "body": "Permitir leitura e negar escrita e execução de shell, combinando menor privilégio com revisão humana das conclusões.", "correct": true },
+        { "body": "Usar o modelo maior, pois modelos maiores são imunes a injeção de prompt.", "correct": false },
+        { "body": "Habilitar compartilhamento automático para que terceiros possam revisar em tempo real.", "correct": false },
+        { "body": "Manter todas as ferramentas, mas registrar um log depois da execução.", "correct": false },
+        { "body": "Remover o .gitignore para o agente enxergar o repositório completo.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F5-003",
+      "level": "especialista",
+      "subject": "fundamentos",
+      "prompt": "Um agente precisa rodar testes que leem .env.local. Qual prática limita melhor a exposição de segredos?",
+      "explanation": "O processo de teste deve receber só o necessário, e o arquivo de segredos não deve entrar no versionamento nem no contexto do modelo. Segredo em contexto pode ser repetido, logado ou compartilhado.",
+      "options": [
+        { "body": "Colar o conteúdo do .env.local no prompt para o agente entender a configuração.", "correct": false },
+        { "body": "Desativar o .gitignore para o agente enxergar todos os arquivos do projeto.", "correct": false },
+        { "body": "Guardar os segredos no AGENTS.md, que é lido automaticamente pelo agente.", "correct": false },
+        { "body": "Fornecer apenas as variáveis necessárias ao processo de teste e manter o arquivo fora do versionamento e do contexto do modelo.", "correct": true },
+        { "body": "Enviar os segredos em um comando export no chat e depois apagar a mensagem.", "correct": false },
+        { "body": "Habilitar compartilhamento automático de sessão para ter auditoria dos valores usados.", "correct": false },
+        { "body": "Mover os segredos para comentários no opencode.json versionado.", "correct": false },
+        { "body": "Usar o mesmo segredo de produção no ambiente de testes para simplificar.", "correct": false },
+        { "body": "Confiar que o modelo não repete valores presentes no contexto.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F5-004",
+      "level": "especialista",
+      "subject": "fundamentos",
+      "prompt": "Em um pipeline que usa opencode run, uma chamada de ferramenta atinge uma regra de permissão ask. Qual é a consequência esperada?",
+      "explanation": "O modo não interativo não tem quem aprove a solicitação, então a chamada não deve prosseguir de forma silenciosa. Automação precisa declarar permissões explícitas e previsíveis para o job.",
+      "options": [
+        { "body": "A permissão é aprovada automaticamente porque o modo é não interativo.", "correct": false },
+        { "body": "O OpenCode converte ask em allow apenas para ferramentas de leitura.", "correct": false },
+        { "body": "O comando é executado e a aprovação é solicitada no próximo turno.", "correct": false },
+        { "body": "O job entra em modo plan e continua sem executar a ferramenta.", "correct": false },
+        { "body": "A chamada é repetida com outro modelo até obter aprovação.", "correct": false },
+        { "body": "Sem humano para aprovar, a chamada não deve prosseguir; o job precisa de permissões explícitas e determinísticas.", "correct": true },
+        { "body": "O OpenCode encerra com sucesso e ignora silenciosamente a ferramenta.", "correct": false },
+        { "body": "A regra ask é substituída pela permissão global do usuário logado.", "correct": false },
+        { "body": "O servidor de CI assina a aprovação usando a chave do provedor.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F5-005",
+      "level": "especialista",
+      "subject": "fundamentos",
+      "prompt": "Qual é o risco central ao expor opencode serve em uma interface de rede além do localhost?",
+      "explanation": "O servidor permite conduzir sessões e acionar ferramentas no ambiente do host. Sem autenticação e isolamento, qualquer cliente que alcance a porta pode operar o agente.",
+      "options": [
+        { "body": "O servidor apenas publica a documentação estática do projeto.", "correct": false },
+        { "body": "Ele expõe somente a lista de modelos disponíveis, sem acesso a arquivos.", "correct": false },
+        { "body": "A API pode iniciar sessões e executar ferramentas no host; sem autenticação e isolamento, terceiros podem operar o agente.", "correct": true },
+        { "body": "O tráfego é criptografado automaticamente, o que dispensa controle de acesso.", "correct": false },
+        { "body": "Cada requisição exige a chave do provedor, então a exposição é inofensiva.", "correct": false },
+        { "body": "O servidor desabilita ferramentas por padrão quando escuta em rede.", "correct": false },
+        { "body": "Usar uma porta não usual é suficiente para impedir acesso não autorizado.", "correct": false },
+        { "body": "O modo servidor é equivalente a um build estático da interface web.", "correct": false },
+        { "body": "Redes locais são confiáveis por definição e não precisam de autenticação.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F5-006",
+      "level": "especialista",
+      "subject": "fundamentos",
+      "prompt": "Ao automatizar o OpenCode via SDK ou servidor HTTP, qual controle preserva melhor o limite de confiança?",
+      "explanation": "A API é uma superfície de execução: quem a chama pode criar sessões e acionar ferramentas. Autenticação, autorização e escopo por sessão impedem que um cliente ganhe poderes de outro.",
+      "options": [
+        { "body": "Publicar a API na internet com uma URL longa e difícil de adivinhar.", "correct": false },
+        { "body": "Autenticar e autorizar quem chama a API e restringir as permissões e ferramentas disponíveis a cada sessão criada.", "correct": true },
+        { "body": "Passar chaves de service role na query string para simplificar o roteamento.", "correct": false },
+        { "body": "Confiar em qualquer requisição que chegue por localhost, inclusive via proxy reverso.", "correct": false },
+        { "body": "Desabilitar logs para que credenciais não apareçam no histórico.", "correct": false },
+        { "body": "Reutilizar uma única sessão para todos os tenants, reduzindo custo de contexto.", "correct": false },
+        { "body": "Deixar o modelo recusar chamadas não autorizadas em vez de validar no servidor.", "correct": false },
+        { "body": "Habilitar todas as ferramentas para evitar falhas de automação.", "correct": false },
+        { "body": "Versionar um token compartilhado no repositório para o SDK consumir.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F5-007",
+      "level": "especialista",
+      "subject": "fundamentos",
+      "prompt": "Sobre determinismo em execuções do agente, qual afirmação é correta?",
+      "explanation": "Temperatura baixa reduz a variação, mas não elimina fatores externos como versão do modelo, provedor, contexto e resultados de ferramentas. Determinismo absoluto não é garantido só por configuração.",
+      "options": [
+        { "body": "Temperatura zero garante saída byte a byte idêntica em qualquer execução.", "correct": false },
+        { "body": "O mesmo prompt sempre produz a mesma resposta, independentemente do modelo.", "correct": false },
+        { "body": "Desabilitar o formatador é o que garante determinismo nas edições.", "correct": false },
+        { "body": "Definir uma seed torna a saída idêntica entre provedores diferentes.", "correct": false },
+        { "body": "A versão do modelo é irrelevante para reproduzir um comportamento observado.", "correct": false },
+        { "body": "Temperatura baixa reduz variação, mas não garante saída idêntica, pois provedores, versões de modelo, contexto e ferramentas variam.", "correct": true },
+        { "body": "Saídas de ferramentas não afetam a resposta, pois ficam fora do contexto do modelo.", "correct": false },
+        { "body": "Um cache de respostas garante determinismo mesmo com contexto diferente.", "correct": false },
+        { "body": "Somente a temperatura influencia a variação; todo o resto é determinístico.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F5-008",
+      "level": "especialista",
+      "subject": "fundamentos",
+      "prompt": "Para auditar uma alteração feita pelo agente, qual conjunto de evidências é mais útil?",
+      "explanation": "Auditoria exige reconstruir o que foi pedido, o que foi executado e o que mudou. O diff e os checks ligam a conversa ao artefato efetivamente entregue.",
+      "options": [
+        { "body": "Apenas a mensagem final do agente resumindo o que ele diz ter feito.", "correct": false },
+        { "body": "Uma captura de tela da TUI no momento da conclusão.", "correct": false },
+        { "body": "O nome do modelo usado e a contagem de tokens da sessão.", "correct": false },
+        { "body": "O link público de compartilhamento da sessão, sem o diff.", "correct": false },
+        { "body": "A exportação do chat, mesmo sem os arquivos alterados.", "correct": false },
+        { "body": "O horário de início e de fim da execução, isoladamente.", "correct": false },
+        { "body": "A reação de aprovação registrada por um revisor no chat.", "correct": false },
+        { "body": "Registro da sessão e dos comandos executados, diff revisado e checks rodados, associados ao commit resultante.", "correct": true },
+        { "body": "Somente o hash do commit final, sem o contexto da sessão.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F5-009",
+      "level": "especialista",
+      "subject": "fundamentos",
+      "prompt": "Qual é o limite de confiança correto ao instalar um plugin de terceiros no OpenCode?",
+      "explanation": "Plugins podem adicionar ferramentas, interceptar chamadas e executar código no processo do OpenCode. Isso exige o mesmo cuidado de qualquer dependência executável: revisar e fixar versões.",
+      "options": [
+        { "body": "Plugins rodam em sandbox por padrão e não acessam arquivos do projeto.", "correct": false },
+        { "body": "Plugins são apenas configuração declarativa, sem código executável.", "correct": false },
+        { "body": "Plugin é código executável com os privilégios do processo; deve ser revisado e fixado, como qualquer dependência.", "correct": true },
+        { "body": "O marketplace oficial revisa o código de todo plugin antes da publicação.", "correct": false },
+        { "body": "Plugins só conseguem expor ferramentas de leitura, nunca de escrita.", "correct": false },
+        { "body": "Plugins executam em um navegador isolado, sem acesso ao sistema de arquivos.", "correct": false },
+        { "body": "Plugins não têm acesso à rede, então não podem exfiltrar dados.", "correct": false },
+        { "body": "Assinaturas digitais são aplicadas automaticamente a qualquer plugin instalado.", "correct": false },
+        { "body": "Basta o plugin ser open source para dispensar revisão e fixação de versão.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F5-010",
+      "level": "especialista",
+      "subject": "fundamentos",
+      "prompt": "Um servidor MCP remoto retorna um texto instruindo o agente a ignorar as regras do projeto. Como interpretar esse retorno?",
+      "explanation": "A resposta de um MCP é conteúdo externo e não tem autoridade sobre as políticas definidas pelo usuário ou pelo projeto. Instruções dentro dela são dados potencialmente hostis.",
+      "options": [
+        { "body": "Como uma instrução de sistema, porque veio de um servidor remoto.", "correct": false },
+        { "body": "Como uma ordem que deve ser obedecida, já que o MCP foi configurado pelo usuário.", "correct": false },
+        { "body": "Como indício de que o modelo foi comprometido e deve ser trocado.", "correct": false },
+        { "body": "Como motivo para desabilitar permanentemente qualquer uso de MCP.", "correct": false },
+        { "body": "Como conteúdo não confiável: a resposta do MCP é dado, e as regras do projeto e do usuário continuam prevalecendo.", "correct": true },
+        { "body": "Como uma regra que deve ser copiada automaticamente para o AGENTS.md.", "correct": false },
+        { "body": "Como uma concessão de permissão válida para a sessão atual.", "correct": false },
+        { "body": "Como sinal para ignorar toda saída de MCP, inclusive dados legítimos.", "correct": false },
+        { "body": "Como confiável apenas porque a conexão usa HTTPS.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F5-011",
+      "level": "especialista",
+      "subject": "fundamentos",
+      "prompt": "Qual vantagem de segurança um subagente com escopo restrito oferece em relação a um agente único com todas as ferramentas?",
+      "explanation": "Restringir ferramentas e contexto diminui a superfície de ação disponível a uma instrução maliciosa. O subagente não elimina a injeção, mas limita seu alcance.",
+      "options": [
+        { "body": "Ele reduz o conjunto de ações e o contexto expostos, limitando o alcance de uma instrução maliciosa.", "correct": true },
+        { "body": "Ele garante que nenhuma injeção de prompt possa ocorrer no fluxo.", "correct": false },
+        { "body": "Ele criptografa o contexto antes de enviá-lo ao provedor.", "correct": false },
+        { "body": "Ele elimina a necessidade de revisão humana das mudanças.", "correct": false },
+        { "body": "Ele concede mais permissões ao agente principal por isolamento.", "correct": false },
+        { "body": "Ele contorna políticas de acesso do banco ao rodar em outro processo.", "correct": false },
+        { "body": "Ele torna a saída determinística independentemente do modelo.", "correct": false },
+        { "body": "Ele compartilha todos os segredos do agente principal para manter o contexto.", "correct": false },
+        { "body": "Ele impede qualquer erro de ferramenta durante a execução.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F5-012",
+      "level": "especialista",
+      "subject": "fundamentos",
+      "prompt": "Antes de compartilhar o link de uma sessão do OpenCode, qual verificação é mais crítica?",
+      "explanation": "O compartilhamento pode expor o transcript inteiro, incluindo trechos de código, saídas de comandos e dados pessoais. A revisão deve ocorrer antes de tornar o link público.",
+      "options": [
+        { "body": "Confirmar qual modelo foi usado e se ele está atualizado.", "correct": false },
+        { "body": "Verificar se o tema visual da sessão está consistente.", "correct": false },
+        { "body": "Garantir que a sessão foi iniciada em modo plan.", "correct": false },
+        { "body": "Desabilitar o formatador para reduzir o tamanho do transcript.", "correct": false },
+        { "body": "Renomear a sessão com um título que não revele o projeto.", "correct": false },
+        { "body": "Limpar o scrollback do terminal antes de gerar o link.", "correct": false },
+        { "body": "Revisar se o transcript contém segredos, dados pessoais ou saída de ferramentas que não devem ser públicos.", "correct": true },
+        { "body": "Conferir a contagem de tokens para estimar o custo do compartilhamento.", "correct": false },
+        { "body": "Checar a página de status do provedor antes de compartilhar.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F5-013",
+      "level": "especialista",
+      "subject": "fundamentos",
+      "prompt": "O que muda no modelo de ameaças quando o agente usa um provedor de modelo externo?",
+      "explanation": "Chamadas a provedores externos enviam o contexto necessário para a inferência, que pode incluir código e saídas de ferramentas. Isso cria um limite de confiança adicional sujeito à política do provedor.",
+      "options": [
+        { "body": "Nada muda, pois todo o processamento permanece local ao repositório.", "correct": false },
+        { "body": "Apenas o texto do prompt é enviado; arquivos e saídas de ferramentas nunca saem do host.", "correct": false },
+        { "body": "A criptografia em trânsito impede que o provedor leia o conteúdo enviado.", "correct": false },
+        { "body": "Como o provedor já vê o código, não é preciso redigir segredos antes do envio.", "correct": false },
+        { "body": "Provedores externos não podem registrar requisições por questões contratuais.", "correct": false },
+        { "body": "Somente metadados de uso são transmitidos, nunca trechos de arquivos.", "correct": false },
+        { "body": "O comportamento é equivalente a um modelo local, desde que a latência seja baixa.", "correct": false },
+        { "body": "As chaves de API deixam de ser relevantes porque o provedor controla o acesso.", "correct": false },
+        { "body": "O contexto enviado, incluindo trechos de código e saídas de ferramentas, sai do ambiente local e fica sujeito à política do provedor.", "correct": true }
+      ]
+    },
+    {
+      "externalId": "CONF-F5-001",
+      "level": "especialista",
+      "subject": "configuracao",
+      "prompt": "Qual combinação de configuração expressa melhor defesa em profundidade contra comandos destrutivos em um agente de automação?",
+      "explanation": "Defesa em profundidade combina barreiras independentes: permissão restritiva, ambiente descartável e credenciais mínimas. Depender de uma única instrução no prompt deixa o controle frágil.",
+      "options": [
+        { "body": "Instruir no prompt que o agente nunca execute comandos destrutivos.", "correct": false },
+        { "body": "Permitir tudo e revisar os comandos somente depois da execução.", "correct": false },
+        { "body": "Criar um alias para rm que peça confirmação no shell do host.", "correct": false },
+        { "body": "Negar explicitamente padrões perigosos na permissão de shell e, ainda assim, executar o agente em ambiente descartável com credenciais mínimas.", "correct": true },
+        { "body": "Desabilitar o shell por completo e manter a escrita de arquivos liberada.", "correct": false },
+        { "body": "Aumentar o timeout das ferramentas para dar tempo de revisar cada comando.", "correct": false },
+        { "body": "Usar sempre o agente plan, que nunca executa ferramentas.", "correct": false },
+        { "body": "Confiar no modelo principal e reservar permissões restritas ao small_model.", "correct": false },
+        { "body": "Registrar todos os comandos em log e considerar isso suficiente.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F5-002",
+      "level": "especialista",
+      "subject": "configuracao",
+      "prompt": "Como evitar gravar um token em texto claro no opencode.json de um servidor MCP remoto?",
+      "explanation": "A substituição de variáveis de ambiente mantém o segredo fora do arquivo versionado. O valor fica no ambiente do processo, que deve ser protegido e rotacionável.",
+      "options": [
+        { "body": "Usar a sintaxe {{env.NOME_DA_VARIAVEL}} dentro do campo de headers.", "correct": false },
+        { "body": "Escrever process.env.NOME_DA_VARIAVEL, pois o JSON é avaliado como JavaScript.", "correct": false },
+        { "body": "Usar $NOME_DA_VARIAVEL diretamente no valor do header.", "correct": false },
+        { "body": "Usar a sintaxe %NOME_DA_VARIAVEL%, comum em arquivos de ambiente do Windows.", "correct": false },
+        { "body": "Referenciar a variável de ambiente pela substituição suportada, como {env:NOME_DA_VARIAVEL}, mantendo o valor fora do arquivo versionado.", "correct": true },
+        { "body": "Codificar o token em base64 e colocá-lo na URL do servidor.", "correct": false },
+        { "body": "Colocar o token em um comentário do arquivo, que não é lido em tempo de execução.", "correct": false },
+        { "body": "Apontar {file:.env} para o arquivo inteiro e deixar o servidor escolher o valor.", "correct": false },
+        { "body": "Versionar o token no repositório privado, já que o acesso é restrito.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F5-003",
+      "level": "especialista",
+      "subject": "configuracao",
+      "prompt": "Qual opção de configuração ajuda a impedir compartilhamento acidental de sessões em um repositório sensível?",
+      "explanation": "Desabilitar o compartilhamento remove a possibilidade de geração de links públicos por padrão. Definir como manual ainda deixa a ação disponível e depende de disciplina do usuário.",
+      "options": [
+        { "body": "Definir share como false no arquivo de configuração.", "correct": false },
+        { "body": "Definir share como disabled na configuração aplicável.", "correct": true },
+        { "body": "Definir sharing como none no bloco de privacidade.", "correct": false },
+        { "body": "Definir private como true no bloco de sessão.", "correct": false },
+        { "body": "Definir telemetry como false para impedir links públicos.", "correct": false },
+        { "body": "Definir session como local no bloco de armazenamento.", "correct": false },
+        { "body": "Definir public como false no bloco de interface.", "correct": false },
+        { "body": "Definir link como off nas preferências do projeto.", "correct": false },
+        { "body": "Definir share como manual, pois isso já bloqueia qualquer publicação.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F5-004",
+      "level": "especialista",
+      "subject": "configuracao",
+      "prompt": "Um agente customizado de revisão não deve alterar arquivos. Qual configuração é mais adequada?",
+      "explanation": "O controle eficaz é remover as capacidades de mutação, não apenas descrever a intenção. Negar comandos de shell que escrevem complementa a restrição das ferramentas de edição.",
+      "options": [
+        { "body": "Definir temperature zero para o agente não sentir vontade de editar.", "correct": false },
+        { "body": "Escrever na description que o agente é somente leitura.", "correct": false },
+        { "body": "Definir mode como subagent e manter todas as ferramentas.", "correct": false },
+        { "body": "Apontar o agente para o small_model, que não edita arquivos.", "correct": false },
+        { "body": "Remover o AGENTS.md para evitar instruções de escrita.", "correct": false },
+        { "body": "Definir share como disabled para impedir alterações.", "correct": false },
+        { "body": "Renomear o agente para review-readonly e confiar no nome.", "correct": false },
+        { "body": "Desabilitar as ferramentas de escrita e edição e negar comandos de shell que mutam o repositório.", "correct": true },
+        { "body": "Definir permission como allow e revisar o diff depois.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F5-005",
+      "level": "especialista",
+      "subject": "configuracao",
+      "prompt": "Ao configurar um MCP local que precisa de uma credencial, qual prática é correta?",
+      "explanation": "Variáveis de ambiente mantêm a credencial fora do comando versionado e permitem rotação sem alterar o repositório. O processo do MCP recebe apenas o necessário.",
+      "options": [
+        { "body": "Embutir a credencial nos argumentos do comando para facilitar a depuração.", "correct": false },
+        { "body": "Colocar a credencial no prompt do agente para ele repassar ao servidor.", "correct": false },
+        { "body": "Passar a credencial por variável de ambiente no processo do servidor MCP, sem embuti-la no comando versionado.", "correct": true },
+        { "body": "Registrar a credencial no AGENTS.md, que é o local de configuração do projeto.", "correct": false },
+        { "body": "Incluir a credencial na URL do servidor como parâmetro de consulta.", "correct": false },
+        { "body": "Versionar o arquivo .env junto com a configuração do MCP.", "correct": false },
+        { "body": "Deixar a credencial em um plugin de terceiros para centralizar o acesso.", "correct": false },
+        { "body": "Habilitar compartilhamento de sessão para o servidor obter a credencial.", "correct": false },
+        { "body": "Desabilitar todas as variáveis de ambiente e usar apenas o valor padrão.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F5-006",
+      "level": "especialista",
+      "subject": "configuracao",
+      "prompt": "Regras globais e regras do projeto entram em conflito sobre uma permissão. Como tratar o conflito?",
+      "explanation": "A configuração efetiva é mesclada com precedência do projeto sobre o global. Ainda assim, o resultado deve ser validado, pois o repositório passa a controlar parte do comportamento do agente.",
+      "options": [
+        { "body": "A configuração global sempre prevalece, pois é definida pelo usuário.", "correct": false },
+        { "body": "A regra vence pela ordem alfabética das chaves no arquivo mesclado.", "correct": false },
+        { "body": "O AGENTS.md sempre perde para a configuração, independentemente do escopo.", "correct": false },
+        { "body": "O modelo escolhe qual regra seguir com base no contexto da tarefa.", "correct": false },
+        { "body": "A camada de projeto prevalece sobre a global na configuração mesclada, então a regra do repositório deve ser revisada como parte do limite de confiança.", "correct": true },
+        { "body": "Nenhuma das regras se aplica até que o provedor resolva o conflito.", "correct": false },
+        { "body": "A configuração do usuário sempre sobrepõe a do projeto por ser mais específica.", "correct": false },
+        { "body": "O provedor do modelo define a precedência por meio da chave de API.", "correct": false },
+        { "body": "Basta remover as duas regras e deixar o padrão do OpenCode decidir.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F5-007",
+      "level": "especialista",
+      "subject": "configuracao",
+      "prompt": "Qual consideração de segurança se aplica ao definir small_model para tarefas auxiliares?",
+      "explanation": "O modelo auxiliar também recebe contexto para executar sua tarefa, então o mesmo cuidado de provedor e redação se aplica. Ele não é automaticamente local nem isento de política de dados.",
+      "options": [
+        { "body": "O modelo auxiliar também recebe contexto; é preciso avaliar o provedor e o que será enviado, não só o modelo principal.", "correct": true },
+        { "body": "O small_model nunca vê código, apenas metadados de sessão.", "correct": false },
+        { "body": "O small_model sempre roda localmente, mesmo quando o principal é remoto.", "correct": false },
+        { "body": "Tarefas auxiliares não têm custo nem implicações de privacidade.", "correct": false },
+        { "body": "O small_model ignora as permissões configuradas para o agente principal.", "correct": false },
+        { "body": "O small_model não consegue usar ferramentas, então não há risco de ação.", "correct": false },
+        { "body": "Definir small_model é equivalente a definir o modelo principal.", "correct": false },
+        { "body": "O small_model não aparece em logs porque suas chamadas são internas.", "correct": false },
+        { "body": "Basta o small_model ser mais barato para dispensar revisão de dados.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F5-008",
+      "level": "especialista",
+      "subject": "configuracao",
+      "prompt": "Por que a formatação automática após edições importa para a auditoria de mudanças?",
+      "explanation": "O formatador pode reescrever trechos que o agente não alterou logicamente. Se o diff não for revisado por completo, essas mudanças ficam ocultas e dificultam atribuir responsabilidade.",
+      "options": [
+        { "body": "Porque o formatador desabilita o git durante a sessão.", "correct": false },
+        { "body": "Porque a formatação criptografa os arquivos alterados.", "correct": false },
+        { "body": "Porque o formatador troca o modelo usado na sessão.", "correct": false },
+        { "body": "Porque a formatação concede permissões adicionais ao agente.", "correct": false },
+        { "body": "Porque o formatador remove comentários e reduz o contexto.", "correct": false },
+        { "body": "Porque a formatação só executa em pipelines de CI, nunca localmente.", "correct": false },
+        { "body": "Ela altera arquivos além da edição lógica, então o diff revisado deve incluir essas mudanças para não mascará-las.", "correct": true },
+        { "body": "Porque a formatação impede a execução de testes depois da edição.", "correct": false },
+        { "body": "Porque o formatador reinicia a sessão e apaga o histórico.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F5-009",
+      "level": "especialista",
+      "subject": "configuracao",
+      "prompt": "Qual é o benefício de declarar $schema em um arquivo opencode.json?",
+      "explanation": "O schema permite validação e autocomplete no editor, reduzindo erros de digitação em chaves e valores. Ele não aplica permissões nem autentica nada em tempo de execução.",
+      "options": [
+        { "body": "Aplicar permissões de ferramentas em tempo de execução.", "correct": false },
+        { "body": "Autenticar o usuário junto ao provedor de modelo.", "correct": false },
+        { "body": "Baixar e instalar plugins automaticamente.", "correct": false },
+        { "body": "Criptografar os segredos presentes no arquivo.", "correct": false },
+        { "body": "Fixar a versão do modelo usada em todas as sessões.", "correct": false },
+        { "body": "Ativar telemetria de uso por padrão.", "correct": false },
+        { "body": "Validar segredos contra o cofre do sistema operacional.", "correct": false },
+        { "body": "Criar um backup automático da configuração a cada edição.", "correct": false },
+        { "body": "Oferecer validação e autocomplete no editor, reduzindo erros em chaves de configuração sensíveis.", "correct": true }
+      ]
+    },
+    {
+      "externalId": "CONF-F5-010",
+      "level": "especialista",
+      "subject": "configuracao",
+      "prompt": "Por que opencode.jsonc pode ser preferível a opencode.json em configurações revisadas por humanos?",
+      "explanation": "Comentários permitem registrar a justificativa de uma permissão ou exceção ao lado da regra. Isso melhora a revisão sem alterar o comportamento em tempo de execução.",
+      "options": [
+        { "body": "Porque o formato jsonc criptografa os valores sensíveis.", "correct": false },
+        { "body": "Porque jsonc aceita YAML e dispensa o schema.", "correct": false },
+        { "body": "Porque comentários bypassam a validação de permissões.", "correct": false },
+        { "body": "Porque aceita comentários, permitindo justificar escolhas de permissão e risco diretamente no arquivo.", "correct": true },
+        { "body": "Porque jsonc mescla configurações automaticamente sem precedência.", "correct": false },
+        { "body": "Porque o formato desabilita o compartilhamento de sessão.", "correct": false },
+        { "body": "Porque comentários são executados como código na inicialização.", "correct": false },
+        { "body": "Porque o arquivo fica menor e mais rápido de carregar.", "correct": false },
+        { "body": "Porque jsonc não precisa de validação de sintaxe.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F5-011",
+      "level": "especialista",
+      "subject": "configuracao",
+      "prompt": "Um plugin intercepta chamadas de ferramenta por meio de hooks. Qual risco deve ser avaliado antes de habilitá-lo?",
+      "explanation": "Hooks podem observar e modificar a execução, incluindo argumentos e decisões de bloqueio. Por isso o plugin precisa ser tratado como código confiável e revisado.",
+      "options": [
+        { "body": "O plugin afeta apenas a aparência da interface, sem tocar em ferramentas.", "correct": false },
+        { "body": "O plugin não consegue modificar argumentos, apenas registrar eventos.", "correct": false },
+        { "body": "O plugin roda em sandbox e não pode ampliar permissões.", "correct": false },
+        { "body": "O plugin é sempre somente leitura por definição do formato.", "correct": false },
+        { "body": "O plugin só funciona em modo plan e não executa ações.", "correct": false },
+        { "body": "Ele pode alterar argumentos, bloquear ou ampliar ações, então seu código precisa ser confiável e revisado.", "correct": true },
+        { "body": "Plugins são desabilitados automaticamente em produção pelo OpenCode.", "correct": false },
+        { "body": "Plugins só podem formatar arquivos, nunca interceptar ferramentas.", "correct": false },
+        { "body": "Como o plugin é opcional, não precisa passar por revisão de segurança.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F5-012",
+      "level": "especialista",
+      "subject": "configuracao",
+      "prompt": "Por que fixar modelo e configuração por agente ajuda em pipelines automatizados?",
+      "explanation": "Fixar esses elementos reduz a variabilidade entre execuções e facilita comparar resultados. Isso apoia reprodução e auditoria, mas não garante determinismo absoluto.",
+      "options": [
+        { "body": "Porque garante saída idêntica em todas as execuções, independentemente do contexto.", "correct": false },
+        { "body": "Reduz variabilidade entre execuções e torna mais fácil reproduzir e auditar o comportamento observado.", "correct": true },
+        { "body": "Porque elimina a necessidade de testes automatizados no pipeline.", "correct": false },
+        { "body": "Porque diminui automaticamente as permissões do agente.", "correct": false },
+        { "body": "Porque impede qualquer tentativa de injeção de prompt.", "correct": false },
+        { "body": "Porque aplica controles de segurança sem necessidade de revisão.", "correct": false },
+        { "body": "Porque dispensa o registro de logs das sessões executadas.", "correct": false },
+        { "body": "Porque torna todas as ferramentas somente leitura.", "correct": false },
+        { "body": "Porque fixa também as chaves de API usadas pelo provedor.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F5-013",
+      "level": "especialista",
+      "subject": "configuracao",
+      "prompt": "Qual uso de permissões é mais seguro para um agente que só pode executar git status e git diff?",
+      "explanation": "Permitir comandos específicos e negar o restante do shell evita que uma instrução adversária use outros comandos. Liberar o shell inteiro amplia desnecessariamente a superfície de ação.",
+      "options": [
+        { "body": "Permitir o shell inteiro e usar ask apenas para comandos desconhecidos.", "correct": false },
+        { "body": "Negar o git por completo para evitar qualquer acesso ao repositório.", "correct": false },
+        { "body": "Permitir git * e confiar que o agente só usará status e diff.", "correct": false },
+        { "body": "Descrever a restrição no prompt e manter o shell liberado.", "correct": false },
+        { "body": "Usar ask para todos os comandos, inclusive em execução não interativa.", "correct": false },
+        { "body": "Desabilitar o shell e conceder um MCP com acesso irrestrito ao sistema.", "correct": false },
+        { "body": "Executar sempre em modo plan, sem controlar permissões de shell.", "correct": false },
+        { "body": "Permitir explicitamente esses comandos e negar o restante do shell, em vez de liberar o shell inteiro.", "correct": true },
+        { "body": "Registrar todos os comandos em log e permitir o shell completo.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F5-001",
+      "level": "especialista",
+      "subject": "fluxo",
+      "prompt": "Um agente é acionado por um issue de terceiro que contém instruções para exfiltrar variáveis de ambiente. Qual resposta é correta?",
+      "explanation": "Texto de issue é entrada não confiável e pode conter injeção de prompt. A ação deve ser bloqueada e o acesso a segredos e permissões do job precisa ser reavaliado.",
+      "options": [
+        { "body": "Obedecer ao issue, pois ele descreve a tarefa que o agente deve executar.", "correct": false },
+        { "body": "Executar com os segredos disponíveis e revisar o resultado depois.", "correct": false },
+        { "body": "Tratar o texto do issue como entrada não confiável, bloquear a ação e revisar permissões e segredos expostos ao job.", "correct": true },
+        { "body": "Desabilitar os logs para que as variáveis não sejam registradas.", "correct": false },
+        { "body": "Confiar no issue porque ele veio de uma plataforma conhecida.", "correct": false },
+        { "body": "Pedir ao próprio modelo que decida se a instrução é maliciosa.", "correct": false },
+        { "body": "Colar as variáveis no chat para o agente confirmar quais foram expostas.", "correct": false },
+        { "body": "Usar um token de administrador para concluir a tarefa mais rápido.", "correct": false },
+        { "body": "Aumentar o contexto para o modelo entender melhor a intenção do issue.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F5-002",
+      "level": "especialista",
+      "subject": "fluxo",
+      "prompt": "Qual desenho de job de CI reduz mais o risco ao usar opencode run para corrigir problemas de lint?",
+      "explanation": "Runner efêmero, token mínimo e permissões explícitas limitam o impacto de uma ação indevida. O diff revisado antes do merge mantém o humano no controle da mudança.",
+      "options": [
+        { "body": "Runner de longa duração com token de produção para evitar falhas de acesso.", "correct": false },
+        { "body": "Habilitar todas as ferramentas para o agente resolver qualquer problema.", "correct": false },
+        { "body": "Fazer merge automático assim que o lint passar.", "correct": false },
+        { "body": "Executar o job na máquina do desenvolvedor para ter acesso ao ambiente completo.", "correct": false },
+        { "body": "Desabilitar os testes para reduzir o tempo do pipeline.", "correct": false },
+        { "body": "Executar em runner efêmero, com token de escopo mínimo, permissões explícitas e diff revisado antes do merge.", "correct": true },
+        { "body": "Compartilhar publicamente a sessão para auditoria em tempo real.", "correct": false },
+        { "body": "Persistir as credenciais no runner para acelerar execuções futuras.", "correct": false },
+        { "body": "Usar um PAT de administrador para garantir acesso a todos os repositórios.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F5-003",
+      "level": "especialista",
+      "subject": "fluxo",
+      "prompt": "Após suspeitar que um segredo foi incluído no contexto e compartilhado, qual é a primeira ação?",
+      "explanation": "Rotacionar ou revogar remove a validade do segredo antes que ele seja usado. Limpar mensagens ou histórico não desfaz uma exposição já ocorrida.",
+      "options": [
+        { "body": "Revogar ou rotacionar o segredo e depois investigar o alcance da exposição e limpar os artefatos.", "correct": true },
+        { "body": "Apagar apenas a mensagem do chat e considerar o incidente resolvido.", "correct": false },
+        { "body": "Renomear a variável de ambiente para o valor antigo deixar de funcionar.", "correct": false },
+        { "body": "Reiniciar o agente para limpar o contexto em memória.", "correct": false },
+        { "body": "Desabilitar o modelo que participou da sessão.", "correct": false },
+        { "body": "Editar o histórico do git sem trocar a credencial.", "correct": false },
+        { "body": "Aguardar a expiração natural do token sem nenhuma ação.", "correct": false },
+        { "body": "Trocar a senha do usuário e manter o segredo original.", "correct": false },
+        { "body": "Ignorar o caso se o link de compartilhamento não tiver sido acessado.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F5-004",
+      "level": "especialista",
+      "subject": "fluxo",
+      "prompt": "Qual prática reduz conflitos ao rodar vários agentes em paralelo no mesmo repositório?",
+      "explanation": "Worktrees ou branches isoladas evitam que agentes sobrescrevam o trabalho uns dos outros. A integração por revisão mantém o controle sobre o que entra no branch principal.",
+      "options": [
+        { "body": "Executar todos os agentes na mesma árvore de trabalho para compartilhar o contexto.", "correct": false },
+        { "body": "Desabilitar o git durante a execução para evitar commits parciais.", "correct": false },
+        { "body": "Usar uma única sessão compartilhada por todos os agentes.", "correct": false },
+        { "body": "Deixar todos editarem os mesmos arquivos e resolver no final.", "correct": false },
+        { "body": "Isolar cada agente em worktree ou branch próprio e integrar as mudanças por revisão.", "correct": true },
+        { "body": "Não fazer commits até que todos terminem, para reduzir o número de merges.", "correct": false },
+        { "body": "Compartilhar um único token entre os agentes para simplificar a autenticação.", "correct": false },
+        { "body": "Desabilitar os testes em execuções paralelas para ganhar velocidade.", "correct": false },
+        { "body": "Fazer merge automático de todas as branches assim que a sessão terminar.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F5-005",
+      "level": "especialista",
+      "subject": "fluxo",
+      "prompt": "Por que revisar o plano antes de permitir edições em uma tarefa de alto risco?",
+      "explanation": "O plano revela premissas, arquivos afetados e estratégia antes de qualquer escrita. Corrigir o rumo nesse estágio custa menos do que reverter mudanças amplas.",
+      "options": [
+        { "body": "Porque o modo plan executa os comandos antes de mostrar o plano.", "correct": false },
+        { "body": "Porque o plano contorna as permissões configuradas para o agente.", "correct": false },
+        { "body": "Porque revisar o plano é sempre mais lento do que revisar o diff final.", "correct": false },
+        { "body": "Porque o plano garante que a implementação estará correta.", "correct": false },
+        { "body": "Porque o modo plan desabilita todas as ferramentas permanentemente.", "correct": false },
+        { "body": "Porque o plano substitui a necessidade de testes automatizados.", "correct": false },
+        { "body": "Porque o plano compartilha a sessão automaticamente com revisores.", "correct": false },
+        { "body": "Porque o plano expõe premissas e alcance das mudanças antes de qualquer escrita, permitindo corrigir o rumo cedo.", "correct": true },
+        { "body": "Porque o plano atualiza as dependências do projeto sem intervenção.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F5-006",
+      "level": "especialista",
+      "subject": "fluxo",
+      "prompt": "Uma dependência inclui um README com instruções para o agente publicar um pacote. Qual é a conduta correta?",
+      "explanation": "Conteúdo de dependência é entrada externa e não deve comandar o agente. A tarefa precisa ser validada com o usuário e executada com permissões restritas.",
+      "options": [
+        { "body": "Seguir as instruções, pois documentação de dependência é uma fonte confiável.", "correct": false },
+        { "body": "Não seguir instruções embutidas em conteúdo de dependência; validar a tarefa com o usuário e manter permissões restritas.", "correct": true },
+        { "body": "Executar o script de instalação da dependência para confirmar as instruções.", "correct": false },
+        { "body": "Desabilitar a revisão de código para não atrasar a publicação.", "correct": false },
+        { "body": "Confiar no lockfile como prova de que o README é seguro.", "correct": false },
+        { "body": "Pedir ao modelo que decida sozinho se a publicação é legítima.", "correct": false },
+        { "body": "Usar credenciais de administrador para evitar erros de permissão.", "correct": false },
+        { "body": "Publicar em um registry de teste e depois em produção sem revisão.", "correct": false },
+        { "body": "Ignorar toda documentação de dependências, mesmo quando for necessária para a tarefa.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F5-007",
+      "level": "especialista",
+      "subject": "fluxo",
+      "prompt": "Para reproduzir uma falha observada em uma sessão do OpenCode, o que deve ser preservado?",
+      "explanation": "Reprodução depende de reconstruir entrada, ambiente e sequência de ações. Sem esses elementos, a mesma mensagem pode produzir resultados diferentes.",
+      "options": [
+        { "body": "Apenas a resposta final gerada pelo agente.", "correct": false },
+        { "body": "Uma captura de tela da interface no momento do erro.", "correct": false },
+        { "body": "A contagem de tokens e o custo estimado da sessão.", "correct": false },
+        { "body": "O tema visual e o tamanho da fonte usados no terminal.", "correct": false },
+        { "body": "A página de status do provedor no dia da execução.", "correct": false },
+        { "body": "O link de compartilhamento, mesmo sem o prompt e as ferramentas usadas.", "correct": false },
+        { "body": "Prompt, versão do modelo e da configuração, arquivos relevantes e sequência de ferramentas e saídas.", "correct": true },
+        { "body": "Somente a temperatura configurada no agente.", "correct": false },
+        { "body": "Somente o sistema operacional e a versão do terminal.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F5-008",
+      "level": "especialista",
+      "subject": "fluxo",
+      "prompt": "Qual é o papel de ask em permissões durante um fluxo interativo?",
+      "explanation": "ask cria um ponto de aprovação humana antes de uma ação sensível. Isso permite revisar o comando e o contexto em vez de confiar apenas no comportamento do modelo.",
+      "options": [
+        { "body": "Aprovar automaticamente a ação para não interromper o fluxo.", "correct": false },
+        { "body": "Bloquear a ferramenta permanentemente naquela sessão.", "correct": false },
+        { "body": "Registrar a ação em log sem pedir confirmação.", "correct": false },
+        { "body": "Exigir aprovação humana antes da ação, criando um ponto de controle para operações sensíveis.", "correct": true },
+        { "body": "Delegar a decisão ao modelo, que avalia o risco do comando.", "correct": false },
+        { "body": "Desabilitar a ferramenta até o fim da sessão.", "correct": false },
+        { "body": "Forçar a execução em modo plan, sem ferramentas de escrita.", "correct": false },
+        { "body": "Criptografar os argumentos do comando antes de executá-lo.", "correct": false },
+        { "body": "Criar um snapshot do repositório antes de permitir a ação.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F5-009",
+      "level": "especialista",
+      "subject": "fluxo",
+      "prompt": "Em automação sem humano, por que deny é preferível a ask para ações perigosas?",
+      "explanation": "deny falha de forma previsível e não depende de uma resposta que nunca virá. ask pressupõe um interlocutor e pode deixar o pipeline parado ou se comportar de modo inesperado.",
+      "options": [
+        { "body": "Porque deny é sempre mais rápido de executar que allow.", "correct": false },
+        { "body": "Porque deny gera mais logs do que ask em todos os casos.", "correct": false },
+        { "body": "Porque deny contorna o modelo e executa a ação diretamente.", "correct": false },
+        { "body": "Porque ask criptografa a solicitação e impede a leitura pelo operador.", "correct": false },
+        { "body": "Porque deny aprova automaticamente ações de leitura.", "correct": false },
+        { "body": "Porque ask executa a ação em segundo plano quando não há resposta.", "correct": false },
+        { "body": "Porque deny remove a ferramenta da documentação do agente.", "correct": false },
+        { "body": "Porque ask é ignorado em qualquer ambiente de CI.", "correct": false },
+        { "body": "Porque deny falha de forma previsível, enquanto ask não tem quem responda e pode travar o pipeline.", "correct": true }
+      ]
+    },
+    {
+      "externalId": "FLUX-F5-010",
+      "level": "especialista",
+      "subject": "fluxo",
+      "prompt": "Uma ferramenta retorna uma saída enorme e o agente passa a ignorar partes relevantes. Qual medida é mais adequada?",
+      "explanation": "Contexto limitado faz o modelo perder detalhes quando recebe volume excessivo. Filtrar a saída e dividir a investigação preserva os trechos que importam.",
+      "options": [
+        { "body": "Aumentar a temperatura para o modelo explorar melhor a saída.", "correct": false },
+        { "body": "Desabilitar a ferramenta que produziu a saída.", "correct": false },
+        { "body": "Limitar ou filtrar a saída e dividir a investigação em passos, em vez de despejar tudo no contexto.", "correct": true },
+        { "body": "Colar novamente a saída inteira para reforçar a informação.", "correct": false },
+        { "body": "Trocar por um modelo maior, sem alterar o volume de contexto.", "correct": false },
+        { "body": "Desligar as permissões para o agente acessar mais arquivos.", "correct": false },
+        { "body": "Compartilhar a sessão para que outra pessoa leia a saída completa.", "correct": false },
+        { "body": "Executar sem checks e confiar no resumo automático.", "correct": false },
+        { "body": "Ignorar a saída e responder com base apenas no prompt inicial.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F5-011",
+      "level": "especialista",
+      "subject": "fluxo",
+      "prompt": "Qual hábito de revisão detecta melhor uma alteração indevida feita por injeção de prompt?",
+      "explanation": "A injeção pode produzir mudanças fora do escopo solicitado, inclusive em arquivos não mencionados. Ler o diff completo expõe essas alterações que um resumo pode omitir.",
+      "options": [
+        { "body": "Confiar no resumo que o agente escreve ao final da tarefa.", "correct": false },
+        { "body": "Verificar apenas o nome do commit e a mensagem associada.", "correct": false },
+        { "body": "Rodar os testes e considerar aprovado se todos passarem.", "correct": false },
+        { "body": "Conferir se o tema visual da sessão permaneceu o mesmo.", "correct": false },
+        { "body": "Aprovar por tempo: se a sessão demorou pouco, o risco é menor.", "correct": false },
+        { "body": "Ler o diff completo, incluindo arquivos não previstos, antes de aceitar a mudança.", "correct": true },
+        { "body": "Comparar apenas a contagem de tokens da execução.", "correct": false },
+        { "body": "Pedir ao mesmo agente que aprove a própria alteração.", "correct": false },
+        { "body": "Revisar somente o primeiro arquivo alterado.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F5-012",
+      "level": "especialista",
+      "subject": "fluxo",
+      "prompt": "Um PR de contribuidor externo altera o AGENTS.md para permitir comandos de rede. Como tratar essa mudança?",
+      "explanation": "AGENTS.md influencia o comportamento do agente e, portanto, é código sensível. Regras de um contribuidor não devem ser executadas antes de revisão e aprovação.",
+      "options": [
+        { "body": "Revisar a mudança como código sensível e não executar o agente com essas regras antes da aprovação.", "correct": true },
+        { "body": "Tratar o AGENTS.md como documentação inofensiva e fazer merge direto.", "correct": false },
+        { "body": "Fazer merge primeiro e revisar as regras depois.", "correct": false },
+        { "body": "Rodar o CI com segredos para validar as novas regras de rede.", "correct": false },
+        { "body": "Aprovar automaticamente se os testes existentes passarem.", "correct": false },
+        { "body": "Ignorar o AGENTS.md em PRs externos e manter as regras antigas em produção.", "correct": false },
+        { "body": "Pedir ao modelo que decida se a mudança é segura.", "correct": false },
+        { "body": "Aplicar a mudança somente após o merge, para não bloquear o contribuidor.", "correct": false },
+        { "body": "Renomear o arquivo para evitar que o agente o leia.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F5-013",
+      "level": "especialista",
+      "subject": "fluxo",
+      "prompt": "Qual sequência combina melhor contenção e recuperação após um agente executar um comando destrutivo?",
+      "explanation": "Conter significa parar a ação e isolar o ambiente; recuperar significa restaurar o estado e corrigir a causa. Revisar as permissões evita que o incidente se repita.",
+      "options": [
+        { "body": "Continuar a sessão para o agente desfazer o comando por conta própria.", "correct": false },
+        { "body": "Apagar os logs para reduzir o impacto da exposição.", "correct": false },
+        { "body": "Aumentar as permissões para o agente conseguir reparar o estrago.", "correct": false },
+        { "body": "Executar o mesmo comando novamente para confirmar o resultado.", "correct": false },
+        { "body": "Interromper a sessão, isolar o ambiente, restaurar de backup ou versionamento e revisar as permissões que permitiram a ação.", "correct": true },
+        { "body": "Desabilitar o git para impedir que o incidente seja registrado.", "correct": false },
+        { "body": "Trocar o modelo usado e manter as permissões originais.", "correct": false },
+        { "body": "Ignorar o ocorrido se os testes continuarem passando.", "correct": false },
+        { "body": "Compartilhar a sessão publicamente para obter ajuda sem revisar o conteúdo.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F5-014",
+      "level": "especialista",
+      "subject": "fluxo",
+      "prompt": "Um MCP de terceiro pode ler o repositório e enviar resultados ao fornecedor. Qual decisão é mais defensável?",
+      "explanation": "O servidor MCP amplia o limite de confiança para outro fornecedor. Avaliar o contrato de dados e reduzir o acesso é mais seguro do que confiar apenas no transporte.",
+      "options": [
+        { "body": "Confiar no servidor porque a conexão usa HTTPS.", "correct": false },
+        { "body": "Habilitar todas as ferramentas do MCP para não perder funcionalidade.", "correct": false },
+        { "body": "Desabilitar os logs para que os dados não sejam registrados localmente.", "correct": false },
+        { "body": "Fornecer uma credencial de service role para o MCP funcionar sem restrições.", "correct": false },
+        { "body": "Usar o token de produção para garantir que o MCP acesse todos os recursos.", "correct": false },
+        { "body": "Compartilhar a sessão para que o fornecedor veja o contexto completo.", "correct": false },
+        { "body": "Deixar o modelo decidir se o envio de dados é aceitável.", "correct": false },
+        { "body": "Avaliar o contrato de dados e o escopo do servidor, preferindo servidores locais ou com acesso mínimo quando houver segredos.", "correct": true },
+        { "body": "Instalar o MCP sem revisão, já que ele é apenas uma fonte de leitura.", "correct": false }
+      ]
+    }
+  ]
+}

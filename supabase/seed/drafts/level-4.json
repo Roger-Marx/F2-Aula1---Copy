@@ -1,0 +1,730 @@
+{
+  "meta": {
+    "version": 1,
+    "reviewed_by": "PENDENTE — revisão humana",
+    "reviewed_at": "2026-10-19",
+    "source": "documentação oficial do OpenCode"
+  },
+  "questions": [
+    {
+      "externalId": "FUND-F4-001",
+      "level": "avancado",
+      "subject": "fundamentos",
+      "prompt": "Em uma sessão do OpenCode, o modelo precisa inspecionar arquivos e executar um comando de teste. Qual mecanismo permite que ele faça isso?",
+      "explanation": "O OpenCode atua como intermediário: o modelo pede uma ferramenta, o runtime executa e devolve o resultado, e as permissões decidem se a chamada pode prosseguir. Isso mantém o modelo isolado do sistema operacional.",
+      "options": [
+        { "body": "O modelo recebe acesso direto ao sistema de arquivos e executa comandos sem intermediação.", "correct": false },
+        { "body": "O OpenCode executa automaticamente todos os comandos do projeto ao abrir a sessão.", "correct": false },
+        { "body": "O modelo compila o projeto em memória e simula a saída dos comandos.", "correct": false },
+        { "body": "O modelo solicita chamadas de ferramentas; o OpenCode as executa e devolve o resultado, respeitando as permissões.", "correct": true },
+        { "body": "As ferramentas são executadas apenas pelo usuário, e o modelo só pode sugerir comandos no chat.", "correct": false },
+        { "body": "O repositório é enviado ao provedor, que executa os comandos em um ambiente remoto.", "correct": false },
+        { "body": "A execução depende exclusivamente de plugins de terceiros, pois o núcleo não oferece ferramentas.", "correct": false },
+        { "body": "O modelo só consegue ler arquivos se o conteúdo for colado manualmente no prompt.", "correct": false },
+        { "body": "Permissões controlam apenas o custo dos modelos e não interferem nas ferramentas.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F4-002",
+      "level": "avancado",
+      "subject": "fundamentos",
+      "prompt": "O que caracteriza o ciclo de execução de um agente no OpenCode?",
+      "explanation": "O agente repete um ciclo em que o modelo responde, pode pedir ferramentas e recebe os resultados antes de continuar. O ciclo termina quando a tarefa é concluída ou o agente decide parar.",
+      "options": [
+        { "body": "Uma única requisição ao modelo, sem retorno de resultados de ferramentas.", "correct": false },
+        { "body": "A execução de todos os comandos do projeto antes da primeira resposta.", "correct": false },
+        { "body": "Um ciclo restrito ao modo plan, sem uso de ferramentas.", "correct": false },
+        { "body": "O treinamento do modelo com o código do repositório.", "correct": false },
+        { "body": "A divisão da conversa em várias sessões independentes a cada mensagem.", "correct": false },
+        { "body": "A aplicação de formatação automática depois de cada edição.", "correct": false },
+        { "body": "A execução de ferramentas apenas quando o usuário digita um comando de barra.", "correct": false },
+        { "body": "A alternância entre respostas do modelo e execuções de ferramentas até concluir a tarefa ou parar.", "correct": true },
+        { "body": "A compactação do contexto a cada chamada de ferramenta.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F4-003",
+      "level": "avancado",
+      "subject": "fundamentos",
+      "prompt": "Por que sessões longas podem exigir compactação de contexto?",
+      "explanation": "A janela de contexto é finita, e o histórico acumulado compete com instruções, arquivos e resultados de ferramentas. A compactação resume parte do histórico para preservar a continuidade sem estourar o limite.",
+      "options": [
+        { "body": "Porque o modelo precisa ser reiniciado quando o histórico cresce.", "correct": false },
+        { "body": "Porque a janela de contexto é limitada e o histórico acumulado pode não caber, prejudicando a continuidade.", "correct": true },
+        { "body": "Porque a compactação reduz o custo de armazenamento em disco das sessões.", "correct": false },
+        { "body": "Porque o histórico longo impede o funcionamento das permissões.", "correct": false },
+        { "body": "Porque o OpenCode apaga arquivos antigos para liberar espaço em disco.", "correct": false },
+        { "body": "Porque a compactação é necessária para compartilhar uma sessão.", "correct": false },
+        { "body": "Porque o modelo deixa de reconhecer o formato provider/model.", "correct": false },
+        { "body": "Porque cada ferramenta exige um contexto separado e ilimitado.", "correct": false },
+        { "body": "Porque o contexto precisa ser convertido em AGENTS.md antes de continuar.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F4-004",
+      "level": "avancado",
+      "subject": "fundamentos",
+      "prompt": "Qual é a vantagem de as sessões serem persistidas e associadas a um servidor local?",
+      "explanation": "O histórico fica fora do processo da interface, o que permite retomar, listar e compartilhar sessões. Isso também possibilita que clientes diferentes acessem a mesma sessão.",
+      "options": [
+        { "body": "Garantir que o modelo não cometa erros em tarefas longas.", "correct": false },
+        { "body": "Dispensar a configuração de provedor e modelo.", "correct": false },
+        { "body": "Executar o modelo diretamente no navegador, sem servidor.", "correct": false },
+        { "body": "Impedir qualquer acesso do agente aos arquivos do projeto.", "correct": false },
+        { "body": "Eliminar a necessidade de permissões por ferramenta.", "correct": false },
+        { "body": "Permitir retomar, listar e compartilhar sessões, mantendo o histórico fora do processo da interface.", "correct": true },
+        { "body": "Armazenar credenciais de provider no histórico da conversa.", "correct": false },
+        { "body": "Tornar a janela de contexto ilimitada.", "correct": false },
+        { "body": "Substituir o AGENTS.md por um registro automático de sessões.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F4-005",
+      "level": "avancado",
+      "subject": "fundamentos",
+      "prompt": "Para que serve o arquivo AGENTS.md em um projeto?",
+      "explanation": "O AGENTS.md concentra instruções duráveis, como convenções de código, comandos de teste e restrições do repositório. Essas regras são carregadas para orientar o agente durante o trabalho.",
+      "options": [
+        { "body": "Registrar instruções e convenções que o agente deve seguir ao trabalhar naquele repositório.", "correct": true },
+        { "body": "Definir o schema do banco de dados do projeto.", "correct": false },
+        { "body": "Guardar as chaves de API usadas pelos provedores.", "correct": false },
+        { "body": "Listar os modelos disponíveis para cada provedor.", "correct": false },
+        { "body": "Substituir o arquivo opencode.json na configuração do projeto.", "correct": false },
+        { "body": "Compilar o projeto antes de cada sessão.", "correct": false },
+        { "body": "Gerenciar os hooks do Git e as mensagens de commit.", "correct": false },
+        { "body": "Servir como banco de dados das sessões compartilhadas.", "correct": false },
+        { "body": "Definir os atalhos de teclado da interface.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F4-006",
+      "level": "avancado",
+      "subject": "fundamentos",
+      "prompt": "No fluxo do OpenCode, qual é o papel típico do agente plan antes de uma alteração relevante?",
+      "explanation": "O agente plan é voltado a análise e planejamento e não deve aplicar edições. Ele permite revisar a abordagem antes de executar a mudança com um agente que edita, como o build.",
+      "options": [
+        { "body": "Aplicar as edições diretamente, sem revisão, para ganhar tempo.", "correct": false },
+        { "body": "Executar migrações de banco de dados antes de qualquer análise.", "correct": false },
+        { "body": "Ignorar as permissões configuradas para agilizar o plano.", "correct": false },
+        { "body": "Gerar o commit final e enviar as alterações ao repositório remoto.", "correct": false },
+        { "body": "Apagar a sessão atual depois de produzir o plano.", "correct": false },
+        { "body": "Substituir o agente build em todas as tarefas de edição.", "correct": false },
+        { "body": "Analisar o código e propor um plano, sem aplicar edições, para que a execução seja revisada antes.", "correct": true },
+        { "body": "Executar apenas comandos de shell, sem ler arquivos.", "correct": false },
+        { "body": "Configurar o formatter e o LSP do projeto.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F4-007",
+      "level": "avancado",
+      "subject": "fundamentos",
+      "prompt": "O que o formato provider/model representa na configuração do OpenCode?",
+      "explanation": "O identificador combina o provedor responsável pela inferência com o modelo específico a ser usado. Isso permite trocar de modelo sem alterar o restante da configuração do agente.",
+      "options": [
+        { "body": "O caminho absoluto do arquivo de configuração global.", "correct": false },
+        { "body": "Uma permissão granular aplicada a comandos de shell.", "correct": false },
+        { "body": "A escolha conjunta do provedor e do modelo usado pelo agente.", "correct": true },
+        { "body": "O identificador da sessão ativa no servidor local.", "correct": false },
+        { "body": "O nome do plugin responsável por adicionar ferramentas.", "correct": false },
+        { "body": "O tipo de servidor MCP, local ou remoto.", "correct": false },
+        { "body": "O tema visual aplicado à interface.", "correct": false },
+        { "body": "A versão do schema usada no opencode.jsonc.", "correct": false },
+        { "body": "O diretório onde as skills do projeto são carregadas.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F4-008",
+      "level": "avancado",
+      "subject": "fundamentos",
+      "prompt": "Qual é a função das permissões allow, ask e deny?",
+      "explanation": "Cada permissão define o grau de intervenção do usuário antes de uma ação. allow executa, ask pede confirmação e deny impede a chamada, o que permite ajustar o equilíbrio entre autonomia e controle.",
+      "options": [
+        { "body": "allow apenas para leitura, ask apenas para escrita e deny para executar comandos.", "correct": false },
+        { "body": "Controlar o custo de cada modelo durante a sessão.", "correct": false },
+        { "body": "Definir a lista de ferramentas disponíveis para o agente.", "correct": false },
+        { "body": "Escolher entre agente primário e subagente.", "correct": false },
+        { "body": "Selecionar o provedor de modelo usado na sessão.", "correct": false },
+        { "body": "Registrar auditoria de todas as chamadas em disco.", "correct": false },
+        { "body": "Habilitar ou desabilitar plugins de terceiros.", "correct": false },
+        { "body": "Configurar o tempo máximo de execução de uma ferramenta.", "correct": false },
+        { "body": "Controlar, respectivamente, execução automática, confirmação do usuário e bloqueio de uma ação.", "correct": true }
+      ]
+    },
+    {
+      "externalId": "FUND-F4-009",
+      "level": "avancado",
+      "subject": "fundamentos",
+      "prompt": "O que os snapshots de uma sessão permitem fazer após uma alteração ruim?",
+      "explanation": "Os snapshots registram o estado do trabalho ao longo da sessão e servem de base para desfazer mudanças. Assim, é possível voltar a um ponto anterior sem refazer todo o trabalho manualmente.",
+      "options": [
+        { "body": "Restaurar o último backup do banco de dados do projeto.", "correct": false },
+        { "body": "Reverter o modelo para uma versão anterior do provedor.", "correct": false },
+        { "body": "Redefinir todas as permissões para o padrão de fábrica.", "correct": false },
+        { "body": "Apagar permanentemente o repositório e cloná-lo novamente.", "correct": false },
+        { "body": "Reverter o estado do trabalho para um ponto anterior e continuar a partir dele.", "correct": true },
+        { "body": "Recarregar o AGENTS.md e ignorar as alterações feitas.", "correct": false },
+        { "body": "Desfazer apenas o compartilhamento público da sessão.", "correct": false },
+        { "body": "Cancelar a assinatura do provedor de modelos.", "correct": false },
+        { "body": "Reiniciar o servidor MCP que forneceu as ferramentas.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F4-010",
+      "level": "avancado",
+      "subject": "fundamentos",
+      "prompt": "Ao compartilhar uma sessão, qual risco precisa ser considerado?",
+      "explanation": "Uma sessão compartilhada pode expor mensagens, resultados de ferramentas e trechos de código. Por isso, segredos e dados pessoais devem ser removidos ou evitados antes de gerar um link público.",
+      "options": [
+        { "body": "O modelo é permanentemente removido da conta.", "correct": false },
+        { "body": "As permissões do projeto são desativadas automaticamente.", "correct": false },
+        { "body": "Os arquivos locais passam a ser criptografados pelo OpenCode.", "correct": false },
+        { "body": "A chave do provedor é rotacionada sem aviso.", "correct": false },
+        { "body": "O histórico da sessão é apagado do servidor local.", "correct": false },
+        { "body": "O link compartilhado impede qualquer cópia do conteúdo.", "correct": false },
+        { "body": "O agente passa a ignorar o AGENTS.md.", "correct": false },
+        { "body": "O conteúdo da conversa e das ferramentas pode ficar visível publicamente, incluindo dados sensíveis.", "correct": true },
+        { "body": "O compartilhamento só funciona se o repositório for público.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F4-011",
+      "level": "avancado",
+      "subject": "fundamentos",
+      "prompt": "Qual é o papel de um servidor MCP no OpenCode?",
+      "explanation": "O MCP padroniza a exposição de ferramentas e contexto por servidores externos ao agente. O OpenCode conecta-se a esses servidores para ampliar o que o agente pode consultar ou executar.",
+      "options": [
+        { "body": "Substituir o modelo principal por um servidor de inferência local.", "correct": false },
+        { "body": "Fornecer ferramentas e contexto adicionais ao agente por meio de um protocolo padronizado.", "correct": true },
+        { "body": "Hospedar a interface TUI e o servidor de sessões do OpenCode.", "correct": false },
+        { "body": "Compilar o código TypeScript do projeto automaticamente.", "correct": false },
+        { "body": "Gerenciar branches, commits e pull requests no lugar do Git.", "correct": false },
+        { "body": "Armazenar a configuração global do OpenCode.", "correct": false },
+        { "body": "Aplicar políticas de RLS no banco de dados do projeto.", "correct": false },
+        { "body": "Definir os atalhos de teclado disponíveis na TUI.", "correct": false },
+        { "body": "Traduzir prompts entre provedores de modelo.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F4-012",
+      "level": "avancado",
+      "subject": "fundamentos",
+      "prompt": "Por que plugins de terceiros exigem cautela?",
+      "explanation": "Plugins executam código dentro do ambiente do OpenCode e podem registrar ferramentas ou interceptar hooks. Um plugin malicioso ou mal configurado pode alterar o comportamento do agente e acessar dados do projeto.",
+      "options": [
+        { "body": "Porque eles alteram apenas o tema visual da interface.", "correct": false },
+        { "body": "Porque exigem reinstalação a cada nova sessão.", "correct": false },
+        { "body": "Porque desativam todas as ferramentas embutidas.", "correct": false },
+        { "body": "Porque só funcionam em projetos sem AGENTS.md.", "correct": false },
+        { "body": "Porque são executados apenas em modo plan.", "correct": false },
+        { "body": "Porque são código executável com acesso ao ambiente do OpenCode e podem alterar comportamento ou expor dados.", "correct": true },
+        { "body": "Porque impedem o uso de servidores MCP remotos.", "correct": false },
+        { "body": "Porque substituem automaticamente as permissões do usuário.", "correct": false },
+        { "body": "Porque só podem ser escritos na linguagem do provedor de modelo.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F4-013",
+      "level": "avancado",
+      "subject": "fundamentos",
+      "prompt": "Qual é a vantagem de skills serem carregadas sob demanda?",
+      "explanation": "As skills ficam disponíveis sem ocupar o contexto o tempo todo. O agente carrega apenas as instruções relevantes para a tarefa, o que preserva espaço para o código e o histórico da conversa.",
+      "options": [
+        { "body": "Permitir que a skill execute ferramentas sem passar por permissões.", "correct": false },
+        { "body": "Substituir o AGENTS.md em projetos grandes.", "correct": false },
+        { "body": "Evitar ocupar contexto com instruções que não são relevantes para a tarefa atual.", "correct": true },
+        { "body": "Tornar o modelo mais rápido em todas as respostas.", "correct": false },
+        { "body": "Eliminar a necessidade de ferramentas especializadas.", "correct": false },
+        { "body": "Guardar segredos do projeto no arquivo da skill.", "correct": false },
+        { "body": "Garantir que o agente nunca peça confirmação ao usuário.", "correct": false },
+        { "body": "Impedir que o agente leia arquivos fora do diretório da skill.", "correct": false },
+        { "body": "Manter a skill ativa mesmo sem correspondência com a tarefa.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F4-001",
+      "level": "avancado",
+      "subject": "configuracao",
+      "prompt": "Quando o mesmo campo existe na configuração global e na do projeto, qual prevalece?",
+      "explanation": "As configurações são mescladas, e os valores definidos no projeto prevalecem sobre os globais. Isso permite manter padrões pessoais e sobrescrever apenas o que o repositório exige.",
+      "options": [
+        { "body": "Apenas a configuração global é considerada; a do projeto é ignorada.", "correct": false },
+        { "body": "Apenas a configuração do projeto é considerada; a global é sempre descartada.", "correct": false },
+        { "body": "As configurações são somadas sem regra de precedência, e o OpenCode escolhe a primeira chave encontrada.", "correct": false },
+        { "body": "A configuração do projeto só vale se a global estiver vazia.", "correct": false },
+        { "body": "A configuração global sempre prevalece, pois é carregada por último.", "correct": false },
+        { "body": "O OpenCode usa a configuração do arquivo com o nome alfabeticamente menor.", "correct": false },
+        { "body": "As duas são mescladas, e a configuração do projeto tem precedência sobre a global.", "correct": true },
+        { "body": "Variáveis de ambiente substituem qualquer arquivo de configuração.", "correct": false },
+        { "body": "A precedência depende do modelo escolhido na sessão.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F4-002",
+      "level": "avancado",
+      "subject": "configuracao",
+      "prompt": "Qual é a vantagem de usar opencode.jsonc em vez de opencode.json?",
+      "explanation": "O formato JSONC aceita comentários, o que ajuda a documentar decisões de configuração sem quebrar o arquivo. O schema continua podendo ser referenciado para validação e autocomplete.",
+      "options": [
+        { "body": "Permitir armazenar segredos criptografados no próprio arquivo.", "correct": false },
+        { "body": "Habilitar automaticamente todos os plugins instalados.", "correct": false },
+        { "body": "Permitir comentários no arquivo, mantendo a configuração válida para o OpenCode.", "correct": true },
+        { "body": "Dispensar a validação por schema e o autocomplete do editor.", "correct": false },
+        { "body": "Permitir código executável dentro da configuração.", "correct": false },
+        { "body": "Tornar o carregamento da configuração mais rápido que o do JSON.", "correct": false },
+        { "body": "Impedir que a configuração global seja mesclada.", "correct": false },
+        { "body": "Substituir o AGENTS.md como fonte de instruções.", "correct": false },
+        { "body": "Definir permissões sem precisar declarar allow, ask ou deny.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F4-003",
+      "level": "avancado",
+      "subject": "configuracao",
+      "prompt": "No frontmatter de um agente customizado em Markdown, o que o campo mode define?",
+      "explanation": "O mode determina se o agente atua como primário, como subagente ou nos dois papéis. Isso controla se ele pode ser selecionado diretamente ou apenas acionado por outro agente.",
+      "options": [
+        { "body": "O modelo padrão usado pelo agente.", "correct": false },
+        { "body": "As permissões de shell do agente.", "correct": false },
+        { "body": "A temperatura aplicada às respostas.", "correct": false },
+        { "body": "A lista de ferramentas disponíveis.", "correct": false },
+        { "body": "O tema da interface usado na sessão.", "correct": false },
+        { "body": "O provedor de autenticação do agente.", "correct": false },
+        { "body": "O diretório onde o agente salva snapshots.", "correct": false },
+        { "body": "A versão mínima do OpenCode exigida.", "correct": false },
+        { "body": "Se o agente é primário, subagente ou ambos, determinando como pode ser acionado.", "correct": true }
+      ]
+    },
+    {
+      "externalId": "CONF-F4-004",
+      "level": "avancado",
+      "subject": "configuracao",
+      "prompt": "Por que a description de um subagente é importante na composição de agentes?",
+      "explanation": "O agente principal decide a delegação com base na descrição do subagente. Uma descrição clara indica em quais tarefas aquele subagente é especialista e reduz delegações inadequadas.",
+      "options": [
+        { "body": "Porque o agente principal usa essa descrição para decidir quando delegar uma tarefa ao subagente.", "correct": true },
+        { "body": "Porque ela define o título exibido na lista de sessões.", "correct": false },
+        { "body": "Porque ela substitui o campo model do subagente.", "correct": false },
+        { "body": "Porque ela limita o tamanho máximo do contexto do subagente.", "correct": false },
+        { "body": "Porque ela habilita plugins automaticamente.", "correct": false },
+        { "body": "Porque ela controla as permissões de git do projeto.", "correct": false },
+        { "body": "Porque ela é usada como mensagem de commit pelo subagente.", "correct": false },
+        { "body": "Porque ela impede que o subagente use ferramentas.", "correct": false },
+        { "body": "Porque ela define o formato de saída das respostas.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F4-005",
+      "level": "avancado",
+      "subject": "configuracao",
+      "prompt": "Um agente customizado define model e temperature no frontmatter. Qual é o efeito?",
+      "explanation": "Esses campos configuram o comportamento do próprio agente e prevalecem sobre os padrões globais quando ele é acionado. Outros agentes continuam usando seus próprios valores.",
+      "options": [
+        { "body": "Eles alteram todos os agentes do projeto, inclusive os embutidos.", "correct": false },
+        { "body": "Eles só têm efeito no agente build.", "correct": false },
+        { "body": "Eles só valem para subagentes, nunca para agentes primários.", "correct": false },
+        { "body": "Eles exigem reiniciar o OpenCode a cada mensagem.", "correct": false },
+        { "body": "Esses valores valem para esse agente e substituem os padrões globais quando ele é usado.", "correct": true },
+        { "body": "Eles são ignorados se o AGENTS.md existir.", "correct": false },
+        { "body": "Eles definem as permissões de shell do agente.", "correct": false },
+        { "body": "Eles configuram o formatter e o LSP do projeto.", "correct": false },
+        { "body": "Eles só funcionam com modelos remotos, não locais.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F4-006",
+      "level": "avancado",
+      "subject": "configuracao",
+      "prompt": "Qual configuração expressa permissões granulares para comandos de shell?",
+      "explanation": "O campo permission.bash pode ser um objeto que associa padrões de comando a allow, ask ou deny. Assim, é possível liberar comandos rotineiros e exigir confirmação ou bloquear os perigosos.",
+      "options": [
+        { "body": "Um booleano bash: true, que libera ou bloqueia todos os comandos.", "correct": false },
+        { "body": "Uma lista de modelos permitidos para executar shell.", "correct": false },
+        { "body": "Um plugin que intercepta comandos antes da execução.", "correct": false },
+        { "body": "Uma variável de ambiente com os comandos permitidos.", "correct": false },
+        { "body": "Um campo tools.bash com o valor ask para todos os comandos.", "correct": false },
+        { "body": "Um arquivo AGENTS.md com a lista de comandos proibidos.", "correct": false },
+        { "body": "Uma skill que substitui a ferramenta de shell.", "correct": false },
+        { "body": "Um objeto em permission.bash mapeando padrões de comando para allow, ask ou deny.", "correct": true },
+        { "body": "Uma configuração de MCP que expõe apenas comandos seguros.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F4-007",
+      "level": "avancado",
+      "subject": "configuracao",
+      "prompt": "Como impedir que um agente específico use a ferramenta de escrita, sem afetar os demais agentes?",
+      "explanation": "O mapa tools do agente permite habilitar ou desabilitar ferramentas individualmente. Desabilitar a escrita nesse agente mantém a ferramenta disponível para os outros.",
+      "options": [
+        { "body": "Aplicar uma permissão global de deny para a ferramenta de escrita.", "correct": false },
+        { "body": "Definir tools no agente desabilitando a ferramenta de escrita.", "correct": true },
+        { "body": "Remover o arquivo da ferramenta do diretório de instalação.", "correct": false },
+        { "body": "Instalar um plugin que apague a ferramenta para todos os agentes.", "correct": false },
+        { "body": "Definir a variável de ambiente que oculta a ferramenta.", "correct": false },
+        { "body": "Alterar o modelo do agente para um que não edite arquivos.", "correct": false },
+        { "body": "Desabilitar todos os servidores MCP do projeto.", "correct": false },
+        { "body": "Renomear o agente para plan, pois só ele pode editar.", "correct": false },
+        { "body": "Criar um comando customizado que bloqueie a escrita.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F4-008",
+      "level": "avancado",
+      "subject": "configuracao",
+      "prompt": "Na prática, o que a permissão ask provoca em uma chamada de ferramenta?",
+      "explanation": "A permissão ask transforma a chamada em uma decisão do usuário antes da execução. A ferramenta só roda depois de uma aprovação explícita, e a rejeição impede a ação.",
+      "options": [
+        { "body": "A chamada é executada imediatamente e registrada em log.", "correct": false },
+        { "body": "A chamada é bloqueada permanentemente, sem chance de aprovação.", "correct": false },
+        { "body": "A chamada é negada em silêncio, e o modelo não recebe resposta.", "correct": false },
+        { "body": "O modelo é consultado para decidir se a chamada pode rodar.", "correct": false },
+        { "body": "A chamada é repetida automaticamente até ser aprovada.", "correct": false },
+        { "body": "A chamada fica pendente até o usuário aprovar ou rejeitar a execução.", "correct": true },
+        { "body": "A permissão ask só se aplica a leitura de arquivos.", "correct": false },
+        { "body": "A permissão ask desabilita o agente até a próxima sessão.", "correct": false },
+        { "body": "A chamada é convertida em uma pergunta ao provedor de modelo.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F4-009",
+      "level": "avancado",
+      "subject": "configuracao",
+      "prompt": "De que formas um plugin pode ser disponibilizado a um projeto OpenCode?",
+      "explanation": "Plugins podem ser arquivos locais no diretório de plugins do projeto ou pacotes npm declarados na configuração. Em ambos os casos, o código passa a fazer parte do ambiente do OpenCode.",
+      "options": [
+        { "body": "Somente como um pacote npm global, sem arquivos locais.", "correct": false },
+        { "body": "Somente por variável de ambiente, sem registro na configuração.", "correct": false },
+        { "body": "Somente como servidor MCP remoto.", "correct": false },
+        { "body": "Como arquivo local no diretório de plugins do projeto ou como pacote npm declarado na configuração.", "correct": true },
+        { "body": "Somente dentro de uma skill, no arquivo SKILL.md.", "correct": false },
+        { "body": "Somente como comando customizado em Markdown.", "correct": false },
+        { "body": "Somente como agente primário no frontmatter.", "correct": false },
+        { "body": "Somente por meio de uma entrada no AGENTS.md.", "correct": false },
+        { "body": "Somente se o projeto não tiver configuração global.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F4-010",
+      "level": "avancado",
+      "subject": "configuracao",
+      "prompt": "Qual é a diferença básica entre um MCP local e um MCP remoto na configuração?",
+      "explanation": "O servidor local é iniciado como um processo por um comando configurado. O remoto é acessado por uma URL e pode exigir headers para autenticação ou outras necessidades.",
+      "options": [
+        { "body": "O local usa uma URL, e o remoto é iniciado por um comando.", "correct": false },
+        { "body": "O local só pode ler arquivos, e o remoto só pode escrever.", "correct": false },
+        { "body": "O local não aceita variáveis de ambiente, e o remoto aceita.", "correct": false },
+        { "body": "O remoto é sempre executado na mesma máquina do usuário.", "correct": false },
+        { "body": "O local exige autenticação OAuth, e o remoto dispensa.", "correct": false },
+        { "body": "O remoto não pode ser desativado pela configuração.", "correct": false },
+        { "body": "O local é configurado apenas no escopo global.", "correct": false },
+        { "body": "O remoto só funciona com o agente plan.", "correct": false },
+        { "body": "O local é iniciado por um comando no ambiente, enquanto o remoto é acessado por URL e pode usar headers.", "correct": true }
+      ]
+    },
+    {
+      "externalId": "CONF-F4-011",
+      "level": "avancado",
+      "subject": "configuracao",
+      "prompt": "Como desativar temporariamente um servidor MCP sem apagar sua configuração?",
+      "explanation": "O campo enabled permite desligar o servidor mantendo comando, URL e demais ajustes no arquivo. Isso é útil para reduzir ferramentas expostas sem perder a configuração para reativação futura.",
+      "options": [
+        { "body": "Apagando a entrada do servidor do arquivo de configuração.", "correct": false },
+        { "body": "Removendo a URL ou o comando do servidor.", "correct": false },
+        { "body": "Definindo o modelo da sessão como nulo.", "correct": false },
+        { "body": "Comentando a lista de plugins do projeto.", "correct": false },
+        { "body": "Aplicando deny a todos os comandos de shell.", "correct": false },
+        { "body": "Renomeando o servidor para um nome reservado.", "correct": false },
+        { "body": "Marcando o servidor com enabled: false.", "correct": true },
+        { "body": "Removendo o campo type da configuração.", "correct": false },
+        { "body": "Trocando o servidor de local para remoto.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F4-012",
+      "level": "avancado",
+      "subject": "configuracao",
+      "prompt": "Para que serve a substituição {env:VAR} na configuração do OpenCode?",
+      "explanation": "A substituição lê o valor de uma variável de ambiente no momento do carregamento da configuração. Assim, tokens e chaves ficam fora do arquivo versionado e podem ser trocados por ambiente.",
+      "options": [
+        { "body": "Definir um alias de shell usado pelas ferramentas.", "correct": false },
+        { "body": "Criar uma variável de ambiente durante a sessão.", "correct": false },
+        { "body": "Inserir o valor de uma variável de ambiente sem gravar o segredo diretamente no arquivo.", "correct": true },
+        { "body": "Baixar um segredo de um cofre remoto antes de iniciar o agente.", "correct": false },
+        { "body": "Criptografar o arquivo de configuração inteiro.", "correct": false },
+        { "body": "Executar um comando e usar sua saída como configuração.", "correct": false },
+        { "body": "Selecionar o modelo com base no nome da variável.", "correct": false },
+        { "body": "Referenciar um arquivo de configuração global alternativo.", "correct": false },
+        { "body": "Substituir o valor por uma permissão allow ou deny.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F4-013",
+      "level": "avancado",
+      "subject": "configuracao",
+      "prompt": "O que a opção share com valor disabled faz?",
+      "explanation": "O valor disabled bloqueia a geração de links públicos de sessão. É uma proteção útil em repositórios com dados sensíveis ou políticas que proíbem compartilhamento externo.",
+      "options": [
+        { "body": "Desabilita todos os plugins de terceiros.", "correct": false },
+        { "body": "Impede a conexão com servidores MCP remotos.", "correct": false },
+        { "body": "Oculta os modelos disponíveis para os agentes.", "correct": false },
+        { "body": "Bloqueia comandos de git no projeto.", "correct": false },
+        { "body": "Impede que sessões sejam compartilhadas por link público.", "correct": true },
+        { "body": "Desativa a autenticação de provedores.", "correct": false },
+        { "body": "Remove o botão de compartilhamento apenas da interface web.", "correct": false },
+        { "body": "Faz o OpenCode funcionar somente em modo plan.", "correct": false },
+        { "body": "Exige confirmação para cada chamada de ferramenta.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F4-001",
+      "level": "avancado",
+      "subject": "fluxo",
+      "prompt": "Qual sequência descreve um fluxo prudente para uma mudança relevante?",
+      "explanation": "Entender o contexto e planejar reduz mudanças equivocadas. Aplicar em partes, revisar o diff e rodar os checks permite detectar regressões antes de considerar o trabalho concluído.",
+      "options": [
+        { "body": "Aplicar todas as mudanças de uma vez e revisar apenas no final.", "correct": false },
+        { "body": "Pedir ao agente que faça commit e push sem revisar o diff.", "correct": false },
+        { "body": "Ignorar os testes para não gastar contexto.", "correct": false },
+        { "body": "Desativar as permissões para evitar interrupções.", "correct": false },
+        { "body": "Começar pela edição e só depois entender o código.", "correct": false },
+        { "body": "Planejar com contexto, aplicar mudanças pequenas, revisar o diff e rodar os checks antes de concluir.", "correct": true },
+        { "body": "Compartilhar a sessão antes de validar as alterações.", "correct": false },
+        { "body": "Trocar de modelo a cada arquivo alterado.", "correct": false },
+        { "body": "Usar apenas o agente plan, mesmo para editar.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F4-002",
+      "level": "avancado",
+      "subject": "fluxo",
+      "prompt": "Por que delegar uma exploração ampla a um subagente pode ajudar no gerenciamento de contexto?",
+      "explanation": "O subagente mantém seu próprio histórico de busca e leitura, em vez de despejar tudo no agente principal. Ele devolve uma resposta condensada, preservando contexto para a implementação.",
+      "options": [
+        { "body": "Porque o subagente trabalha em contexto próprio e devolve um resumo, reduzindo o histórico no agente principal.", "correct": true },
+        { "body": "Porque o subagente não consome tokens ao explorar o projeto.", "correct": false },
+        { "body": "Porque o subagente compartilha o mesmo contexto e evita duplicação.", "correct": false },
+        { "body": "Porque o subagente ignora permissões e responde mais rápido.", "correct": false },
+        { "body": "Porque o subagente grava os resultados diretamente no AGENTS.md.", "correct": false },
+        { "body": "Porque o subagente substitui a necessidade de revisar o diff.", "correct": false },
+        { "body": "Porque o subagente apaga automaticamente arquivos irrelevantes.", "correct": false },
+        { "body": "Porque o subagente usa sempre um modelo maior que o principal.", "correct": false },
+        { "body": "Porque o subagente impede que o agente principal use ferramentas.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F4-003",
+      "level": "avancado",
+      "subject": "fluxo",
+      "prompt": "Antes de aceitar uma alteração gerada, qual verificação é mais adequada?",
+      "explanation": "O diff mostra exatamente o que mudou e revela alterações colaterais que o resumo do agente pode não mencionar. Revisar o diff é diferente de confiar apenas na afirmação de que os testes passaram.",
+      "options": [
+        { "body": "Confiar no resultado porque o agente afirmou que os testes passaram.", "correct": false },
+        { "body": "Aceitar a alteração e corrigir eventuais problemas em produção.", "correct": false },
+        { "body": "Verificar apenas se o número de linhas mudou.", "correct": false },
+        { "body": "Revisar somente o nome dos arquivos alterados.", "correct": false },
+        { "body": "Assumir que mudanças pequenas nunca introduzem regressões.", "correct": false },
+        { "body": "Aplicar a alteração e comparar o estilo do código depois.", "correct": false },
+        { "body": "Pedir ao agente que aprove o próprio diff.", "correct": false },
+        { "body": "Ler o diff e confirmar que ele corresponde ao pedido, sem mudanças colaterais.", "correct": true },
+        { "body": "Desativar o formatter para ver o diff original.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F4-004",
+      "level": "avancado",
+      "subject": "fluxo",
+      "prompt": "Uma alteração recente quebrou o projeto. Qual recurso do OpenCode ajuda a desfazer o trabalho da sessão?",
+      "explanation": "O undo usa os snapshots registrados para reverter mudanças feitas durante a sessão. Ele é mais direto do que tentar reconstruir manualmente o estado anterior.",
+      "options": [
+        { "body": "Compactar a sessão para remover o histórico recente.", "correct": false },
+        { "body": "Compartilhar a sessão para inspecionar as mudanças em outro cliente.", "correct": false },
+        { "body": "O undo/snapshot da sessão, que reverte as mudanças registradas.", "correct": true },
+        { "body": "Executar init para regenerar o AGENTS.md.", "correct": false },
+        { "body": "Trocar o provedor de modelo e repetir o pedido.", "correct": false },
+        { "body": "Reiniciar o servidor MCP que forneceu as ferramentas.", "correct": false },
+        { "body": "Apagar o arquivo de configuração global.", "correct": false },
+        { "body": "Desabilitar o formatter e o LSP do projeto.", "correct": false },
+        { "body": "Criar uma nova skill para desfazer a alteração.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F4-005",
+      "level": "avancado",
+      "subject": "fluxo",
+      "prompt": "Quando o histórico da sessão está ficando grande, qual ação ajuda a liberar contexto?",
+      "explanation": "Compactar substitui parte do histórico por um resumo, liberando espaço na janela de contexto. A sessão continua com as informações essenciais, em vez de crescer até o limite.",
+      "options": [
+        { "body": "Compartilhar a sessão para que o histórico saia do contexto local.", "correct": false },
+        { "body": "Trocar o tema da interface para reduzir o uso de memória.", "correct": false },
+        { "body": "Desabilitar o formatter para liberar espaço.", "correct": false },
+        { "body": "Apagar o AGENTS.md e continuar sem instruções.", "correct": false },
+        { "body": "Adicionar mais servidores MCP para distribuir o contexto.", "correct": false },
+        { "body": "Aumentar a temperatura do agente.", "correct": false },
+        { "body": "Converter a sessão em um comando customizado.", "correct": false },
+        { "body": "Desativar as permissões para evitar mensagens de confirmação.", "correct": false },
+        { "body": "Compactar a sessão, substituindo parte do histórico por um resumo.", "correct": true }
+      ]
+    },
+    {
+      "externalId": "FLUX-F4-006",
+      "level": "avancado",
+      "subject": "fluxo",
+      "prompt": "Para que serve o comando init em um projeto que ainda não tem AGENTS.md?",
+      "explanation": "O init analisa a estrutura e as convenções do projeto para criar instruções iniciais ao agente. O arquivo gerado deve ser revisado e ajustado, pois é um ponto de partida e não uma verdade definitiva.",
+      "options": [
+        { "body": "Inicializar um repositório Git vazio no diretório.", "correct": false },
+        { "body": "Instalar as dependências do projeto automaticamente.", "correct": false },
+        { "body": "Criar o schema do banco de dados e as migrações.", "correct": false },
+        { "body": "Analisar o projeto e gerar instruções iniciais para o agente.", "correct": true },
+        { "body": "Subir o servidor HTTP do OpenCode em segundo plano.", "correct": false },
+        { "body": "Configurar a autenticação de um provedor de modelos.", "correct": false },
+        { "body": "Baixar o modelo padrão para uso local.", "correct": false },
+        { "body": "Gerar um arquivo de lock para os plugins.", "correct": false },
+        { "body": "Criar uma sessão compartilhada com link público.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F4-007",
+      "level": "avancado",
+      "subject": "fluxo",
+      "prompt": "Antes de compartilhar uma sessão com alguém externo, o que deve ser verificado?",
+      "explanation": "O link público expõe o conteúdo da sessão, que pode incluir segredos, dados pessoais e código proprietário. A revisão do histórico deve acontecer antes da geração do link.",
+      "options": [
+        { "body": "Se o modelo escolhido é o mais rápido disponível.", "correct": false },
+        { "body": "Se o tema da interface combina com o cliente usado.", "correct": false },
+        { "body": "Se o formatter está habilitado no projeto.", "correct": false },
+        { "body": "Se a branch atual está atualizada com o remoto.", "correct": false },
+        { "body": "Se o agente plan está selecionado.", "correct": false },
+        { "body": "Se o arquivo opencode.jsonc tem comentários.", "correct": false },
+        { "body": "Se o histórico contém segredos, dados pessoais ou trechos de código que não podem ser públicos.", "correct": true },
+        { "body": "Se o servidor MCP local está usando a porta padrão.", "correct": false },
+        { "body": "Se o link será acessível apenas por usuários autenticados.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F4-008",
+      "level": "avancado",
+      "subject": "fluxo",
+      "prompt": "Como reduzir o risco de compartilhamento acidental em um repositório sensível?",
+      "explanation": "Desabilitar o compartilhamento na configuração evita que um comando gere um link público sem intenção. Também é importante não usar comandos de compartilhamento nesse contexto.",
+      "options": [
+        { "body": "Usar sempre o agente plan para qualquer tarefa.", "correct": false },
+        { "body": "Configurar share como disabled e evitar comandos de compartilhamento.", "correct": true },
+        { "body": "Desabilitar o LSP para reduzir a exposição de código.", "correct": false },
+        { "body": "Usar apenas o modelo small_model nas sessões.", "correct": false },
+        { "body": "Apagar o AGENTS.md antes de iniciar o trabalho.", "correct": false },
+        { "body": "Manter todos os servidores MCP habilitados, mas sem permissões.", "correct": false },
+        { "body": "Desativar o formatter automático após cada edição.", "correct": false },
+        { "body": "Compartilhar apenas sessões que não usaram ferramentas.", "correct": false },
+        { "body": "Renomear o projeto para evitar que apareça em buscas.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F4-009",
+      "level": "avancado",
+      "subject": "fluxo",
+      "prompt": "Em um comando customizado, qual é a função de $ARGUMENTS?",
+      "explanation": "O marcador é substituído pelo texto que o usuário passou ao invocar o comando. Isso permite reutilizar o mesmo comando com alvos ou instruções diferentes.",
+      "options": [
+        { "body": "Selecionar o agente que executará o comando.", "correct": false },
+        { "body": "Definir o modelo usado pelo comando.", "correct": false },
+        { "body": "Injetar um segredo no prompt do comando.", "correct": false },
+        { "body": "Referenciar um arquivo do projeto no enunciado.", "correct": false },
+        { "body": "Receber o texto passado pelo usuário ao invocar o comando.", "correct": true },
+        { "body": "Marcar o comando para rodar como subagente.", "correct": false },
+        { "body": "Indicar o diretório de trabalho do comando.", "correct": false },
+        { "body": "Limitar o número de ferramentas disponíveis.", "correct": false },
+        { "body": "Habilitar o compartilhamento automático da sessão.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F4-010",
+      "level": "avancado",
+      "subject": "fluxo",
+      "prompt": "Um comando customizado deve sempre rodar como subagente. Qual campo de frontmatter expressa isso?",
+      "explanation": "O campo subtask executa o comando em um contexto de subagente. Isso é diferente de definir o mode de um agente, que controla o papel do próprio agente.",
+      "options": [
+        { "body": "mode: subagent", "correct": false },
+        { "body": "agent: subagent", "correct": false },
+        { "body": "subagent: true", "correct": false },
+        { "body": "task: true", "correct": false },
+        { "body": "primary: false", "correct": false },
+        { "body": "tools: task", "correct": false },
+        { "body": "permission: subagent", "correct": false },
+        { "body": "model: subagent", "correct": false },
+        { "body": "subtask: true", "correct": true }
+      ]
+    },
+    {
+      "externalId": "FLUX-F4-011",
+      "level": "avancado",
+      "subject": "fluxo",
+      "prompt": "Um plugin precisa bloquear comandos destrutivos antes de serem executados. Qual hook é adequado?",
+      "explanation": "O hook tool.execute.before recebe a chamada antes da execução e pode inspecionar ou modificar os argumentos. Lançar um erro nesse ponto interrompe a ferramenta e devolve o bloqueio ao agente.",
+      "options": [
+        { "body": "tool.execute.after, alterando a saída depois da execução.", "correct": false },
+        { "body": "chat.params, ajustando a temperatura antes da resposta.", "correct": false },
+        { "body": "tool.execute.before, inspecionando os argumentos e interrompendo a execução quando necessário.", "correct": true },
+        { "body": "config, modificando a configuração na inicialização.", "correct": false },
+        { "body": "auth, controlando o login do provedor.", "correct": false },
+        { "body": "event, apenas observando eventos sem poder bloquear.", "correct": false },
+        { "body": "chat.message, alterando o texto da mensagem do usuário.", "correct": false },
+        { "body": "permission.ask, aprovando automaticamente todas as chamadas.", "correct": false },
+        { "body": "tool, registrando uma nova ferramenta no agente.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F4-012",
+      "level": "avancado",
+      "subject": "fluxo",
+      "prompt": "Qual é o risco de um plugin usar permission.ask para aprovar automaticamente todas as chamadas?",
+      "explanation": "Aprovar tudo elimina o ponto em que o usuário avaliaria comandos e edições perigosas. O plugin passa a permitir ações destrutivas ou acesso indevido sem que ninguém perceba.",
+      "options": [
+        { "body": "Ele melhora a segurança por reduzir o número de prompts.", "correct": false },
+        { "body": "Ele impede que plugins de terceiros sejam carregados.", "correct": false },
+        { "body": "Ele desativa os hooks de ferramentas automaticamente.", "correct": false },
+        { "body": "Ele troca o modelo por um mais seguro.", "correct": false },
+        { "body": "Ele registra cada chamada em um arquivo de auditoria.", "correct": false },
+        { "body": "Ele remove a revisão humana e pode permitir ações destrutivas ou acesso indevido.", "correct": true },
+        { "body": "Ele só afeta comandos de leitura, nunca de escrita.", "correct": false },
+        { "body": "Ele exige autenticação adicional do provedor.", "correct": false },
+        { "body": "Ele limita o contexto disponível para o agente.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F4-013",
+      "level": "avancado",
+      "subject": "fluxo",
+      "prompt": "Um servidor MCP retorna instruções pedindo para o agente ler e enviar arquivos de credenciais. Qual é a postura correta?",
+      "explanation": "Saídas de ferramentas são dados não confiáveis e podem conter prompt injection. O agente não deve obedecer a instruções embutidas no conteúdo, e o servidor deve ter permissões restritas.",
+      "options": [
+        { "body": "Tratar o conteúdo como não confiável, não seguir a instrução e restringir as permissões do servidor.", "correct": true },
+        { "body": "Seguir a instrução, pois servidores MCP são considerados confiáveis por padrão.", "correct": false },
+        { "body": "Desativar todos os logs para evitar que o conteúdo seja registrado.", "correct": false },
+        { "body": "Conceder mais acesso ao servidor para que ele conclua a tarefa.", "correct": false },
+        { "body": "Compartilhar a sessão para que outra pessoa avalie o pedido.", "correct": false },
+        { "body": "Aumentar a temperatura para que o modelo ignore instruções externas.", "correct": false },
+        { "body": "Remover o AGENTS.md, que pode estar causando o comportamento.", "correct": false },
+        { "body": "Trocar o modelo para um que não use ferramentas.", "correct": false },
+        { "body": "Aceitar a instrução apenas se ela vier em inglês.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F4-014",
+      "level": "avancado",
+      "subject": "fluxo",
+      "prompt": "Ao retomar uma sessão anterior para continuar uma tarefa, qual cuidado é mais importante?",
+      "explanation": "O histórico da sessão pode estar defasado em relação ao repositório, que pode ter mudado por outras pessoas ou processos. Revisar o estado atual evita aplicar conclusões antigas a um código diferente.",
+      "options": [
+        { "body": "Assumir que o contexto da sessão reflete exatamente os arquivos atuais.", "correct": false },
+        { "body": "Apagar o histórico para garantir que o modelo não se confunda.", "correct": false },
+        { "body": "Desativar as permissões para continuar sem interrupções.", "correct": false },
+        { "body": "Reinstalar os plugins antes de retomar o trabalho.", "correct": false },
+        { "body": "Começar sempre do zero, pois sessões antigas não podem ser continuadas.", "correct": false },
+        { "body": "Ignorar os checks executados anteriormente.", "correct": false },
+        { "body": "Compartilhar a sessão antes de qualquer alteração.", "correct": false },
+        { "body": "Revisar o estado atual dos arquivos e o que já foi feito, pois o repositório pode ter mudado desde a sessão.", "correct": true },
+        { "body": "Trocar o modelo para garantir que o histórico seja recompilado.", "correct": false }
+      ]
+    }
+  ]
+}

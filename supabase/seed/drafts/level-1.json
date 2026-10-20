@@ -1,0 +1,730 @@
+{
+  "meta": {
+    "version": 1,
+    "reviewed_by": "PENDENTE — revisão humana",
+    "reviewed_at": "2026-10-19",
+    "source": "documentação oficial do OpenCode"
+  },
+  "questions": [
+    {
+      "externalId": "FUND-F1-001",
+      "level": "facil",
+      "subject": "fundamentos",
+      "prompt": "O que melhor descreve o OpenCode?",
+      "explanation": "O OpenCode é um agente de programação com IA que roda no terminal e pode usar diferentes provedores de modelo. Ele não é um sistema operacional, banco de dados ou editor de imagens.",
+      "options": [
+        { "body": "Um agente de programação com IA que roda no terminal e pode usar diferentes provedores de modelo", "correct": true },
+        { "body": "Um sistema operacional voltado apenas para desenvolvedores", "correct": false },
+        { "body": "Um banco de dados relacional usado para armazenar código", "correct": false },
+        { "body": "Um editor de imagens com recursos de inteligência artificial", "correct": false },
+        { "body": "Uma linguagem de programação criada para projetos web", "correct": false },
+        { "body": "Um gerenciador de pacotes exclusivo do ecossistema Node.js", "correct": false },
+        { "body": "Uma extensão de navegador que substitui o VS Code", "correct": false },
+        { "body": "Um framework de front-end com componentes prontos", "correct": false },
+        { "body": "Um serviço de hospedagem que só aceita projetos estáticos", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F1-002",
+      "level": "facil",
+      "subject": "fundamentos",
+      "prompt": "Qual comando abre a interface de terminal (TUI) do OpenCode no diretório do projeto?",
+      "explanation": "Executar `opencode` sem subcomando abre a TUI no diretório atual. Os demais subcomandos têm finalidades específicas, como autenticação ou execução não interativa.",
+      "options": [
+        { "body": "opencode models", "correct": false },
+        { "body": "opencode run", "correct": false },
+        { "body": "opencode auth login", "correct": false },
+        { "body": "opencode serve", "correct": false },
+        { "body": "opencode web", "correct": false },
+        { "body": "opencode", "correct": true },
+        { "body": "opencode init", "correct": false },
+        { "body": "opencode config", "correct": false },
+        { "body": "opencode start", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F1-003",
+      "level": "facil",
+      "subject": "fundamentos",
+      "prompt": "Para que serve o comando `opencode run \"...\"`?",
+      "explanation": "O `run` envia um prompt e executa a tarefa de forma não interativa, sem abrir a TUI. Isso é útil para automações e comandos rápidos.",
+      "options": [
+        { "body": "Abrir a interface web do OpenCode", "correct": false },
+        { "body": "Listar os modelos disponíveis", "correct": false },
+        { "body": "Executar um prompt de forma não interativa, sem abrir a TUI", "correct": true },
+        { "body": "Configurar credenciais de um provedor", "correct": false },
+        { "body": "Subir um servidor HTTP local", "correct": false },
+        { "body": "Instalar plugins de terceiros", "correct": false },
+        { "body": "Criar um novo projeto a partir de um template", "correct": false },
+        { "body": "Exportar a sessão atual para um arquivo", "correct": false },
+        { "body": "Atualizar o OpenCode para a última versão", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F1-004",
+      "level": "facil",
+      "subject": "fundamentos",
+      "prompt": "O que o comando `opencode auth login` permite fazer?",
+      "explanation": "O `auth login` configura as credenciais de acesso a um provedor de modelos. Sem essa autenticação, o OpenCode pode não conseguir usar o provedor escolhido.",
+      "options": [
+        { "body": "Criar um novo agente personalizado", "correct": false },
+        { "body": "Abrir a TUI no diretório atual", "correct": false },
+        { "body": "Listar os modelos disponíveis para uso", "correct": false },
+        { "body": "Iniciar um servidor local do OpenCode", "correct": false },
+        { "body": "Baixar o código-fonte do OpenCode", "correct": false },
+        { "body": "Publicar a sessão atual em um link público", "correct": false },
+        { "body": "Configurar as credenciais de acesso a um provedor de modelos", "correct": true },
+        { "body": "Validar o arquivo opencode.json do projeto", "correct": false },
+        { "body": "Executar os testes do projeto automaticamente", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F1-005",
+      "level": "facil",
+      "subject": "fundamentos",
+      "prompt": "Para que serve o comando `opencode models`?",
+      "explanation": "O `models` mostra os modelos disponíveis para uso com as credenciais configuradas. Ele ajuda a descobrir os identificadores no formato `provider/model`.",
+      "options": [
+        { "body": "Abrir o gerenciador de modelos matemáticos", "correct": false },
+        { "body": "Listar os modelos disponíveis para uso", "correct": true },
+        { "body": "Criar um modelo customizado no projeto", "correct": false },
+        { "body": "Baixar todos os modelos para o disco local", "correct": false },
+        { "body": "Mostrar apenas o modelo padrão configurado", "correct": false },
+        { "body": "Trocar o modelo usado por todos os agentes", "correct": false },
+        { "body": "Exibir o histórico de sessões anteriores", "correct": false },
+        { "body": "Configurar a chave de API do provedor", "correct": false },
+        { "body": "Abrir a documentação oficial no navegador", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F1-006",
+      "level": "facil",
+      "subject": "fundamentos",
+      "prompt": "Onde fica, tipicamente, a configuração global do OpenCode?",
+      "explanation": "A configuração global fica no diretório de configuração do usuário, em `~/.config/opencode/`. Já a configuração do projeto fica no próprio repositório.",
+      "options": [
+        { "body": "~/opencode/", "correct": false },
+        { "body": "./opencode/", "correct": false },
+        { "body": "~/.opencode/global/", "correct": false },
+        { "body": "/etc/opencode/", "correct": false },
+        { "body": "~/.config/opencode/", "correct": true },
+        { "body": "~/.config/opencode.json", "correct": false },
+        { "body": "./.config/opencode/", "correct": false },
+        { "body": "~/Documents/opencode/", "correct": false },
+        { "body": "~/.local/opencode/", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F1-007",
+      "level": "facil",
+      "subject": "fundamentos",
+      "prompt": "Qual arquivo é usado para a configuração do projeto no OpenCode?",
+      "explanation": "A configuração do projeto fica no próprio repositório, em um arquivo JSON ou JSONC na raiz. Ele define opções que valem para aquele projeto.",
+      "options": [
+        { "body": "package.json", "correct": false },
+        { "body": "agents.json", "correct": false },
+        { "body": "settings.json", "correct": false },
+        { "body": "config.yaml", "correct": false },
+        { "body": "opencode.config.js", "correct": false },
+        { "body": ".opencodeignore", "correct": false },
+        { "body": "tsconfig.json", "correct": false },
+        { "body": "opencode.json (ou opencode.jsonc)", "correct": true },
+        { "body": "AGENTS.md", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F1-008",
+      "level": "facil",
+      "subject": "fundamentos",
+      "prompt": "Qual é o papel do arquivo `AGENTS.md` em um projeto?",
+      "explanation": "O `AGENTS.md` reúne regras e instruções que o agente deve considerar ao trabalhar no projeto. Ele serve para transmitir convenções e contexto, não credenciais ou dependências.",
+      "options": [
+        { "body": "Lista de dependências instaladas no projeto", "correct": false },
+        { "body": "Registro de todas as sessões já abertas", "correct": false },
+        { "body": "Arquivo de credenciais dos provedores", "correct": false },
+        { "body": "Arquivo de regras e instruções do projeto que o agente deve considerar", "correct": true },
+        { "body": "Catálogo de modelos disponíveis", "correct": false },
+        { "body": "Relatório de testes automatizados", "correct": false },
+        { "body": "Backup do banco de dados local", "correct": false },
+        { "body": "Índice de arquivos ignorados pelo Git", "correct": false },
+        { "body": "Manual de instalação do sistema operacional", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F1-009",
+      "level": "facil",
+      "subject": "fundamentos",
+      "prompt": "Qual é a diferença básica entre os agentes embutidos `build` e `plan`?",
+      "explanation": "O agente `build` pode editar arquivos para implementar mudanças, enquanto o `plan` prioriza análise e planejamento sem editar. Por isso o `plan` costuma ser usado antes de alterações maiores.",
+      "options": [
+        { "body": "O build só lê arquivos, enquanto o plan pode editar qualquer um", "correct": false },
+        { "body": "Ambos são idênticos e só mudam o nome exibido", "correct": false },
+        { "body": "O plan executa comandos de shell, enquanto o build apenas conversa", "correct": false },
+        { "body": "O build serve para tarefas auxiliares e o plan para tarefas principais", "correct": false },
+        { "body": "O plan só funciona com MCP remoto", "correct": false },
+        { "body": "O build é usado apenas em produção", "correct": false },
+        { "body": "O plan substitui o arquivo AGENTS.md", "correct": false },
+        { "body": "O build não pode ser selecionado pelo usuário", "correct": false },
+        { "body": "O build pode editar arquivos, enquanto o plan foca em análise e planejamento sem editar", "correct": true }
+      ]
+    },
+    {
+      "externalId": "FUND-F1-010",
+      "level": "facil",
+      "subject": "fundamentos",
+      "prompt": "O que é uma sessão no OpenCode?",
+      "explanation": "Uma sessão é uma conversa contínua com o agente, com histórico e contexto próprios. Novas tarefas podem ser feitas em novas sessões para manter o contexto organizado.",
+      "options": [
+        { "body": "Uma conversa contínua com o agente, com histórico e contexto próprios", "correct": true },
+        { "body": "Um arquivo temporário criado durante a instalação", "correct": false },
+        { "body": "Uma conexão de banco de dados aberta pelo agente", "correct": false },
+        { "body": "Um modelo de linguagem carregado na memória", "correct": false },
+        { "body": "Um plugin instalado globalmente", "correct": false },
+        { "body": "Um comando agendado no sistema operacional", "correct": false },
+        { "body": "Uma credencial salva para um provedor", "correct": false },
+        { "body": "Um diretório de trabalho criado automaticamente", "correct": false },
+        { "body": "Um teste automatizado executado em segundo plano", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F1-011",
+      "level": "facil",
+      "subject": "fundamentos",
+      "prompt": "O que significa TUI no contexto do OpenCode?",
+      "explanation": "TUI é a interface interativa executada no terminal, com painéis e atalhos. É a forma principal de usar o OpenCode localmente.",
+      "options": [
+        { "body": "Um tipo de banco de dados usado em nuvem", "correct": false },
+        { "body": "Uma linguagem de marcação para documentação", "correct": false },
+        { "body": "Um formato de arquivo de configuração", "correct": false },
+        { "body": "Um protocolo de rede para transferência de arquivos", "correct": false },
+        { "body": "Um padrão de projeto para código orientado a objetos", "correct": false },
+        { "body": "Interface interativa executada no terminal", "correct": true },
+        { "body": "Um serviço de hospedagem de aplicações", "correct": false },
+        { "body": "Um conjunto de testes de interface gráfica", "correct": false },
+        { "body": "Uma extensão obrigatória do navegador", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F1-012",
+      "level": "facil",
+      "subject": "fundamentos",
+      "prompt": "O que significa dizer que o OpenCode é agnóstico de provedor?",
+      "explanation": "Ser agnóstico de provedor significa que o OpenCode pode trabalhar com diferentes provedores de modelos. O usuário escolhe o provedor e o modelo conforme sua configuração.",
+      "options": [
+        { "body": "Que o OpenCode só funciona sem conexão com a internet", "correct": false },
+        { "body": "Que o OpenCode ignora a configuração do usuário", "correct": false },
+        { "body": "Que o OpenCode pode trabalhar com diferentes provedores de modelos", "correct": true },
+        { "body": "Que o OpenCode não precisa de autenticação", "correct": false },
+        { "body": "Que o OpenCode só aceita um modelo por projeto", "correct": false },
+        { "body": "Que o OpenCode executa apenas comandos locais", "correct": false },
+        { "body": "Que o OpenCode dispensa a TUI", "correct": false },
+        { "body": "Que o OpenCode mantém o mesmo modelo para sempre", "correct": false },
+        { "body": "Que o OpenCode não suporta agentes", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F1-013",
+      "level": "facil",
+      "subject": "fundamentos",
+      "prompt": "O que o comando `opencode web` faz?",
+      "explanation": "O `web` abre a interface web do OpenCode, uma alternativa à TUI. Ele não executa um prompt nem configura credenciais.",
+      "options": [
+        { "body": "Executar um prompt sem abrir a TUI", "correct": false },
+        { "body": "Listar os modelos disponíveis", "correct": false },
+        { "body": "Configurar as credenciais de um provedor", "correct": false },
+        { "body": "Criar um novo projeto web", "correct": false },
+        { "body": "Baixar páginas da internet para o projeto", "correct": false },
+        { "body": "Iniciar apenas o servidor sem interface", "correct": false },
+        { "body": "Publicar o projeto em um domínio público", "correct": false },
+        { "body": "Abrir a interface web do OpenCode", "correct": true },
+        { "body": "Validar o arquivo de configuração", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F1-001",
+      "level": "facil",
+      "subject": "configuracao",
+      "prompt": "Qual formato é usado para indicar um modelo na configuração do OpenCode?",
+      "explanation": "O modelo é identificado no formato `provider/model`, unindo o provedor e o nome do modelo. Esse formato aparece em campos como `model` e `small_model`.",
+      "options": [
+        { "body": "modelo@provedor", "correct": false },
+        { "body": "provider:model", "correct": false },
+        { "body": "modelo.provedor", "correct": false },
+        { "body": "provider_model", "correct": false },
+        { "body": "provider/model", "correct": true },
+        { "body": "modelo/provedor/versao", "correct": false },
+        { "body": "provider::model", "correct": false },
+        { "body": "/provider/model", "correct": false },
+        { "body": "modelo-provider", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F1-002",
+      "level": "facil",
+      "subject": "configuracao",
+      "prompt": "Qual é a vantagem de usar `opencode.jsonc` em vez de `opencode.json`?",
+      "explanation": "O formato JSONC aceita comentários, o que ajuda a documentar escolhas de configuração. O conteúdo continua sendo JSON válido para o OpenCode.",
+      "options": [
+        { "body": "Permite executar comandos sem permissão", "correct": false },
+        { "body": "Aceita comentários no arquivo de configuração", "correct": true },
+        { "body": "Dispensa o uso de chaves de API", "correct": false },
+        { "body": "Guarda credenciais em texto puro com segurança", "correct": false },
+        { "body": "Compila o projeto automaticamente", "correct": false },
+        { "body": "Substitui o AGENTS.md", "correct": false },
+        { "body": "Sincroniza a configuração entre máquinas", "correct": false },
+        { "body": "Valida a configuração em tempo de execução", "correct": false },
+        { "body": "Cria backups automáticos do projeto", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F1-003",
+      "level": "facil",
+      "subject": "configuracao",
+      "prompt": "Para que serve a chave `$schema` em um arquivo de configuração do OpenCode?",
+      "explanation": "O `$schema` aponta para o esquema da configuração e melhora a validação e o autocomplete no editor. Ele não altera o modelo nem as permissões por si só.",
+      "options": [
+        { "body": "Define o modelo padrão do projeto", "correct": false },
+        { "body": "Armazena a chave de API do provedor", "correct": false },
+        { "body": "Lista os plugins instalados", "correct": false },
+        { "body": "Indica o diretório de trabalho do agente", "correct": false },
+        { "body": "Ativa o modo de produção", "correct": false },
+        { "body": "Controla as permissões de ferramentas", "correct": false },
+        { "body": "Ajuda na validação e no autocomplete da configuração no editor", "correct": true },
+        { "body": "Seleciona o agente padrão da sessão", "correct": false },
+        { "body": "Configura o servidor MCP remoto", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F1-004",
+      "level": "facil",
+      "subject": "configuracao",
+      "prompt": "Como a configuração global e a configuração do projeto se relacionam?",
+      "explanation": "As configurações são mescladas, e a do projeto tem precedência sobre a global. Assim, o repositório pode ajustar padrões definidos pelo usuário.",
+      "options": [
+        { "body": "A global sempre prevalece sobre a do projeto", "correct": false },
+        { "body": "Apenas a global é considerada, ignorando o projeto", "correct": false },
+        { "body": "Apenas a do projeto é considerada, ignorando a global", "correct": false },
+        { "body": "As duas são mescladas, com a configuração do projeto prevalecendo", "correct": true },
+        { "body": "As duas são ignoradas quando existe AGENTS.md", "correct": false },
+        { "body": "O OpenCode escolhe a mais antiga pelo horário do arquivo", "correct": false },
+        { "body": "O usuário precisa copiar a global para o projeto manualmente", "correct": false },
+        { "body": "A do projeto só vale se for um opencode.jsonc", "correct": false },
+        { "body": "A global só vale para agentes subagentes", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F1-005",
+      "level": "facil",
+      "subject": "configuracao",
+      "prompt": "Para que serve o campo `small_model` na configuração?",
+      "explanation": "O `small_model` indica um modelo para tarefas auxiliares e mais simples. O modelo principal continua sendo definido em `model`.",
+      "options": [
+        { "body": "Executar tarefas auxiliares, como resumos e operações mais simples", "correct": true },
+        { "body": "Definir o modelo principal usado pelo agente build", "correct": false },
+        { "body": "Substituir todos os modelos configurados", "correct": false },
+        { "body": "Escolher o modelo usado apenas no modo plan", "correct": false },
+        { "body": "Listar os modelos disponíveis no provedor", "correct": false },
+        { "body": "Guardar a credencial de acesso ao provedor", "correct": false },
+        { "body": "Controlar o tamanho máximo da sessão", "correct": false },
+        { "body": "Selecionar o modelo dos testes automatizados", "correct": false },
+        { "body": "Definir o modelo usado pelo MCP remoto", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F1-006",
+      "level": "facil",
+      "subject": "configuracao",
+      "prompt": "O que os valores `allow`, `ask` e `deny` controlam nas permissões?",
+      "explanation": "Eles definem se uma ferramenta pode executar direto, precisa de confirmação ou está bloqueada. Isso vale para permissões globais ou específicas por ferramenta.",
+      "options": [
+        { "body": "Definem os níveis de dificuldade das tarefas", "correct": false },
+        { "body": "Escolhem os provedores de modelo disponíveis", "correct": false },
+        { "body": "Classificam os arquivos do projeto por prioridade", "correct": false },
+        { "body": "Indicam quais agentes podem ser criados", "correct": false },
+        { "body": "Controlam o formato dos links de compartilhamento", "correct": false },
+        { "body": "Controlam se uma ferramenta pode executar, pedir confirmação ou ser bloqueada", "correct": true },
+        { "body": "Definem a ordem de carregamento dos plugins", "correct": false },
+        { "body": "Selecionam os idiomas aceitos pelo agente", "correct": false },
+        { "body": "Configuram a frequência de backups automáticos", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F1-007",
+      "level": "facil",
+      "subject": "configuracao",
+      "prompt": "Onde uma skill do projeto costuma ser definida?",
+      "explanation": "Skills ficam em uma pasta dentro de `.opencode/skills`, com um arquivo próprio por skill. Elas são carregadas sob demanda quando fazem sentido para a tarefa.",
+      "options": [
+        { "body": ".opencode/agents/<nome>/SKILL.md", "correct": false },
+        { "body": ".opencode/commands/<nome>/SKILL.md", "correct": false },
+        { "body": ".opencode/plugins/<nome>/SKILL.md", "correct": false },
+        { "body": "skills/<nome>/SKILL.md", "correct": false },
+        { "body": ".config/skills/<nome>/SKILL.md", "correct": false },
+        { "body": ".opencode/skills/SKILL.md", "correct": false },
+        { "body": "openspec/skills/<nome>/SKILL.md", "correct": false },
+        { "body": ".opencode/skill/<nome>/index.md", "correct": false },
+        { "body": ".opencode/skills/<nome>/SKILL.md", "correct": true }
+      ]
+    },
+    {
+      "externalId": "CONF-F1-008",
+      "level": "facil",
+      "subject": "configuracao",
+      "prompt": "O que é MCP no contexto do OpenCode?",
+      "explanation": "MCP é um protocolo para conectar ferramentas e recursos externos ao agente. Ele permite ampliar as capacidades do OpenCode sem embutir tudo no código principal.",
+      "options": [
+        { "body": "Um formato de arquivo para configurar modelos", "correct": false },
+        { "body": "Um tipo de agente embutido do OpenCode", "correct": false },
+        { "body": "Um protocolo que permite conectar ferramentas e recursos externos ao agente", "correct": true },
+        { "body": "Um comando para instalar plugins locais", "correct": false },
+        { "body": "Um padrão de escrita de testes automatizados", "correct": false },
+        { "body": "Um serviço de hospedagem para projetos web", "correct": false },
+        { "body": "Um sistema de controle de versão distribuído", "correct": false },
+        { "body": "Uma linguagem de consulta para bancos relacionais", "correct": false },
+        { "body": "Um método de compactação de arquivos de projeto", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F1-009",
+      "level": "facil",
+      "subject": "configuracao",
+      "prompt": "Qual é a diferença entre um servidor MCP local e um remoto?",
+      "explanation": "O MCP local executa um comando no seu ambiente, enquanto o remoto é acessado por uma URL. Por isso a configuração de cada tipo usa campos diferentes.",
+      "options": [
+        { "body": "O local usa URL e o remoto usa command", "correct": false },
+        { "body": "O local só funciona no modo plan", "correct": false },
+        { "body": "O remoto não precisa de configuração", "correct": false },
+        { "body": "O local é exclusivo para bancos de dados", "correct": false },
+        { "body": "O remoto só aceita arquivos locais", "correct": false },
+        { "body": "O local não pode usar variáveis de ambiente", "correct": false },
+        { "body": "O local executa um comando no ambiente; o remoto acessa um servidor por URL", "correct": true },
+        { "body": "O remoto é sempre mais seguro e dispensa confiança", "correct": false },
+        { "body": "O local é configurado apenas no arquivo global", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F1-010",
+      "level": "facil",
+      "subject": "configuracao",
+      "prompt": "Onde ficam os comandos customizados de um projeto?",
+      "explanation": "Comandos customizados são arquivos Markdown em `.opencode/commands/`. O frontmatter pode definir metadados, e `$ARGUMENTS` recebe os argumentos passados.",
+      "options": [
+        { "body": ".opencode/agents/*.md", "correct": false },
+        { "body": ".opencode/skills/*.md", "correct": false },
+        { "body": ".opencode/plugins/*.md", "correct": false },
+        { "body": "commands/*.json", "correct": false },
+        { "body": ".opencode/commands/*.md", "correct": true },
+        { "body": ".config/opencode/commands/*.ts", "correct": false },
+        { "body": ".opencode/command/*.yaml", "correct": false },
+        { "body": "openspec/commands/*.md", "correct": false },
+        { "body": ".opencode/commands/*.jsonc", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F1-011",
+      "level": "facil",
+      "subject": "configuracao",
+      "prompt": "O que um plugin pode fazer no OpenCode?",
+      "explanation": "Plugins podem adicionar ferramentas e hooks, estendendo o comportamento do OpenCode. Como são código executável, plugins de terceiros exigem confiança.",
+      "options": [
+        { "body": "Definir os modelos disponíveis no provedor", "correct": false },
+        { "body": "Adicionar ferramentas e hooks ao OpenCode", "correct": true },
+        { "body": "Substituir o arquivo AGENTS.md do projeto", "correct": false },
+        { "body": "Criar sessões automaticamente em segundo plano", "correct": false },
+        { "body": "Gerenciar as credenciais dos provedores", "correct": false },
+        { "body": "Formar o banco de dados de sessões", "correct": false },
+        { "body": "Controlar o acesso ao ranking público", "correct": false },
+        { "body": "Instalar o Node.js no sistema", "correct": false },
+        { "body": "Configurar o servidor web do projeto", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F1-012",
+      "level": "facil",
+      "subject": "configuracao",
+      "prompt": "O que a opção `share` controla?",
+      "explanation": "A opção `share` controla o compartilhamento de sessões e a geração de links públicos. Como esses links podem expor conteúdo, é preciso revisar o que será compartilhado.",
+      "options": [
+        { "body": "Definir quais ferramentas cada agente pode usar", "correct": false },
+        { "body": "Escolher o modelo principal da sessão", "correct": false },
+        { "body": "Sincronizar a configuração global entre máquinas", "correct": false },
+        { "body": "Autorizar o acesso de um provedor de modelos", "correct": false },
+        { "body": "Distribuir plugins entre os membros da equipe", "correct": false },
+        { "body": "Publicar o projeto automaticamente na Vercel", "correct": false },
+        { "body": "Exportar o banco de dados do ambiente local", "correct": false },
+        { "body": "Controlar o compartilhamento de sessões e os links públicos gerados", "correct": true },
+        { "body": "Definir permissões de escrita em arquivos", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F1-013",
+      "level": "facil",
+      "subject": "configuracao",
+      "prompt": "O que é uma ferramenta (tool) no OpenCode?",
+      "explanation": "Uma ferramenta é uma capacidade que o agente pode acionar, como ler arquivos, buscar conteúdo ou executar comandos. As permissões definem quais ferramentas podem ser usadas.",
+      "options": [
+        { "body": "Um arquivo de configuração global do OpenCode", "correct": false },
+        { "body": "Um modelo de linguagem especializado em código", "correct": false },
+        { "body": "Um tipo de sessão criada pelo usuário", "correct": false },
+        { "body": "Uma capacidade que o agente pode usar, como ler arquivos ou executar comandos", "correct": true },
+        { "body": "Um provedor de modelos em nuvem", "correct": false },
+        { "body": "Um formato de link para compartilhar sessões", "correct": false },
+        { "body": "Um agente embutido que só planeja", "correct": false },
+        { "body": "Um protocolo de comunicação entre servidores", "correct": false },
+        { "body": "Um teste manual do checklist de qualidade", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F1-001",
+      "level": "facil",
+      "subject": "fluxo",
+      "prompt": "Antes de pedir uma mudança grande, qual prática é recomendada?",
+      "explanation": "Planejar antes de editar reduz retrabalho e ajuda a alinhar o escopo. O modo `plan` é útil justamente para analisar e propor um caminho sem alterar arquivos.",
+      "options": [
+        { "body": "Aplicar todas as sugestões sem revisar", "correct": false },
+        { "body": "Desligar as permissões para ganhar velocidade", "correct": false },
+        { "body": "Colar todas as chaves de API no prompt", "correct": false },
+        { "body": "Começar por vários arquivos ao mesmo tempo", "correct": false },
+        { "body": "Pedir ao agente para ignorar os testes", "correct": false },
+        { "body": "Planejar a abordagem, por exemplo com o agente em modo plan", "correct": true },
+        { "body": "Remover o AGENTS.md para simplificar", "correct": false },
+        { "body": "Executar comandos destrutivos primeiro", "correct": false },
+        { "body": "Compartilhar a sessão antes de terminar", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F1-002",
+      "level": "facil",
+      "subject": "fluxo",
+      "prompt": "Por que é importante revisar os diffs produzidos pelo agente?",
+      "explanation": "O diff mostra exatamente o que mudou, permitindo detectar alterações indesejadas ou fora do escopo. Revisar não substitui a execução dos testes, mas complementa a validação.",
+      "options": [
+        { "body": "Verificar o que mudou e identificar alterações indesejadas antes de aceitar", "correct": true },
+        { "body": "Aumentar automaticamente o número de arquivos alterados", "correct": false },
+        { "body": "Substituir a necessidade de rodar testes", "correct": false },
+        { "body": "Garantir que o agente use menos contexto", "correct": false },
+        { "body": "Comparar o desempenho entre provedores", "correct": false },
+        { "body": "Validar a licença dos plugins instalados", "correct": false },
+        { "body": "Gerar um link público da sessão", "correct": false },
+        { "body": "Reduzir o custo dos modelos utilizados", "correct": false },
+        { "body": "Instalar as dependências do projeto", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F1-003",
+      "level": "facil",
+      "subject": "fluxo",
+      "prompt": "O que fazer depois que o agente altera o código do projeto?",
+      "explanation": "Rodar os checks do projeto confirma se a mudança funciona e não quebrou nada. Testes, lint e verificação de tipos são exemplos de validação.",
+      "options": [
+        { "body": "Assumir que a mudança está correta sem executar nada", "correct": false },
+        { "body": "Apagar o histórico da sessão", "correct": false },
+        { "body": "Trocar de provedor antes de validar", "correct": false },
+        { "body": "Publicar direto em produção", "correct": false },
+        { "body": "Remover os testes que falharem", "correct": false },
+        { "body": "Ignorar avisos do compilador", "correct": false },
+        { "body": "Desativar o formatter do projeto", "correct": false },
+        { "body": "Compartilhar a sessão com o time", "correct": false },
+        { "body": "Rodar os checks do projeto, como testes, lint e verificação de tipos", "correct": true }
+      ]
+    },
+    {
+      "externalId": "FLUX-F1-004",
+      "level": "facil",
+      "subject": "fluxo",
+      "prompt": "Qual é a forma recomendada de lidar com segredos ao usar o OpenCode?",
+      "explanation": "Segredos devem ficar em variáveis de ambiente não versionadas e nunca ser colados no chat. Assim você evita expor chaves em histórico, links ou arquivos do repositório.",
+      "options": [
+        { "body": "Escrever as chaves diretamente no AGENTS.md", "correct": false },
+        { "body": "Compartilhar as chaves em links públicos de sessão", "correct": false },
+        { "body": "Manter segredos em variáveis de ambiente não versionadas e não colá-los no chat", "correct": true },
+        { "body": "Versionar o arquivo .env no repositório", "correct": false },
+        { "body": "Enviar as chaves no prompt para o agente validar", "correct": false },
+        { "body": "Guardar as chaves em comentários do código", "correct": false },
+        { "body": "Incluir as chaves no opencode.json do projeto", "correct": false },
+        { "body": "Publicar as chaves em um gist para backup", "correct": false },
+        { "body": "Desativar a autenticação do provedor", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F1-005",
+      "level": "facil",
+      "subject": "fluxo",
+      "prompt": "Como instruções encontradas em páginas web ou arquivos externos devem ser tratadas pelo agente?",
+      "explanation": "Conteúdo externo pode conter instruções maliciosas ou fora de contexto. Ele deve ser tratado como dado não confiável, e não como uma ordem superior.",
+      "options": [
+        { "body": "Como comandos prioritários do sistema", "correct": false },
+        { "body": "Como configuração global do OpenCode", "correct": false },
+        { "body": "Como permissões allow automáticas", "correct": false },
+        { "body": "Como instruções equivalentes ao AGENTS.md", "correct": false },
+        { "body": "Como regras que substituem o usuário", "correct": false },
+        { "body": "Como plugins confiáveis por padrão", "correct": false },
+        { "body": "Como dados não confiáveis, não como ordens a serem seguidas", "correct": true },
+        { "body": "Como parte do modelo principal", "correct": false },
+        { "body": "Como testes a serem executados", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F1-006",
+      "level": "facil",
+      "subject": "fluxo",
+      "prompt": "O que caracteriza uma prática responsável de vibe coding?",
+      "explanation": "Vibe coding responsável combina velocidade com controle: revisar mudanças, manter o escopo pequeno e rodar os checks. Aceitar tudo sem ler transfere riscos desnecessários ao projeto.",
+      "options": [
+        { "body": "Aceitar todo o código gerado sem ler", "correct": false },
+        { "body": "Iterar com a IA mantendo revisão, mudanças pequenas e checks", "correct": true },
+        { "body": "Usar a IA apenas para escrever documentação", "correct": false },
+        { "body": "Evitar testes para acelerar a entrega", "correct": false },
+        { "body": "Deixar o agente decidir sem supervisão", "correct": false },
+        { "body": "Trocar de modelo a cada mensagem", "correct": false },
+        { "body": "Trabalhar sempre em um único arquivo gigante", "correct": false },
+        { "body": "Compartilhar segredos para dar contexto", "correct": false },
+        { "body": "Ignorar o plano e editar direto em produção", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F1-007",
+      "level": "facil",
+      "subject": "fluxo",
+      "prompt": "Qual é uma vantagem de fazer mudanças pequenas durante uma tarefa?",
+      "explanation": "Mudanças pequenas são mais fáceis de revisar e ajudam a isolar a causa de erros. Elas também tornam mais simples reverter um passo problemático.",
+      "options": [
+        { "body": "Eliminam a necessidade de revisar o código", "correct": false },
+        { "body": "Impedem que o agente use ferramentas", "correct": false },
+        { "body": "Reduzem a quantidade de testes necessários", "correct": false },
+        { "body": "Garantem que não haverá conflitos de merge", "correct": false },
+        { "body": "Facilitam a revisão e ajudam a isolar a causa de erros", "correct": true },
+        { "body": "Dispensam o uso de controle de versão", "correct": false },
+        { "body": "Deixam o contexto da sessão maior", "correct": false },
+        { "body": "Obrigam o uso do modo plan", "correct": false },
+        { "body": "Permitem pular os checks do projeto", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F1-008",
+      "level": "facil",
+      "subject": "fluxo",
+      "prompt": "Para que serve o modo `plan` no fluxo de trabalho?",
+      "explanation": "O modo `plan` analisa o problema e propõe uma abordagem antes de alterar arquivos. Isso permite revisar o plano e corrigir o rumo antes de qualquer edição.",
+      "options": [
+        { "body": "Executar migrações no banco de produção", "correct": false },
+        { "body": "Instalar dependências automaticamente", "correct": false },
+        { "body": "Editar vários arquivos sem confirmação", "correct": false },
+        { "body": "Substituir os testes por uma explicação", "correct": false },
+        { "body": "Publicar a aplicação em um link público", "correct": false },
+        { "body": "Configurar credenciais de provedores", "correct": false },
+        { "body": "Listar os modelos disponíveis", "correct": false },
+        { "body": "Analisar o problema e propor um plano antes de alterar arquivos", "correct": true },
+        { "body": "Criar plugins de terceiros", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F1-009",
+      "level": "facil",
+      "subject": "fluxo",
+      "prompt": "O que fazer se o agente propuser uma mudança fora do escopo combinado?",
+      "explanation": "O usuário deve revisar a proposta e recusar ou ajustar o que estiver fora do escopo. Aceitar automaticamente amplia o risco e dificulta a revisão.",
+      "options": [
+        { "body": "Aceitar, pois o agente sempre conhece o escopo", "correct": false },
+        { "body": "Desativar as permissões para evitar bloqueios", "correct": false },
+        { "body": "Apagar o AGENTS.md e continuar", "correct": false },
+        { "body": "Revisar e recusar ou ajustar a proposta antes de aplicar", "correct": true },
+        { "body": "Pedir ao agente para esconder a mudança", "correct": false },
+        { "body": "Aplicar e corrigir somente em produção", "correct": false },
+        { "body": "Ignorar o diff e seguir para a próxima tarefa", "correct": false },
+        { "body": "Compartilhar a sessão para pedir opinião pública", "correct": false },
+        { "body": "Trocar o modelo e repetir sem revisar", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F1-010",
+      "level": "facil",
+      "subject": "fluxo",
+      "prompt": "Por que manter o `AGENTS.md` atualizado ajuda no fluxo de trabalho?",
+      "explanation": "O `AGENTS.md` transmite contexto, convenções e regras do projeto ao agente. Com informações corretas, as respostas tendem a seguir melhor o padrão do repositório.",
+      "options": [
+        { "body": "Fornecer contexto, convenções e regras do projeto ao agente", "correct": true },
+        { "body": "Guardar as credenciais dos provedores", "correct": false },
+        { "body": "Substituir os testes automatizados", "correct": false },
+        { "body": "Listar os modelos mais baratos", "correct": false },
+        { "body": "Servir como banco de dados de sessões", "correct": false },
+        { "body": "Definir os links públicos de compartilhamento", "correct": false },
+        { "body": "Controlar a cobrança do provedor", "correct": false },
+        { "body": "Armazenar o histórico do Git", "correct": false },
+        { "body": "Configurar o servidor MCP remoto", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F1-011",
+      "level": "facil",
+      "subject": "fluxo",
+      "prompt": "O que é o contexto de uma sessão?",
+      "explanation": "O contexto reúne as informações e o histórico que o agente considera ao responder. Contexto relevante melhora a qualidade, enquanto excesso de informação pode atrapalhar.",
+      "options": [
+        { "body": "O espaço em disco disponível para o projeto", "correct": false },
+        { "body": "A lista de plugins instalados globalmente", "correct": false },
+        { "body": "O tempo máximo de execução de um comando", "correct": false },
+        { "body": "O número de modelos configurados", "correct": false },
+        { "body": "O diretório onde o OpenCode foi instalado", "correct": false },
+        { "body": "As informações e o histórico que o agente considera ao responder", "correct": true },
+        { "body": "A versão do Node.js usada no projeto", "correct": false },
+        { "body": "O limite de tamanho dos arquivos do projeto", "correct": false },
+        { "body": "A quantidade de sessões salvas no disco", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F1-012",
+      "level": "facil",
+      "subject": "fluxo",
+      "prompt": "Quando é recomendado iniciar uma nova sessão?",
+      "explanation": "Uma nova sessão é útil ao mudar de tarefa ou assunto, pois evita misturar contextos. Assim o agente foca no que é relevante para o novo trabalho.",
+      "options": [
+        { "body": "A cada mensagem enviada ao agente", "correct": false },
+        { "body": "Sempre que o agente ler um arquivo", "correct": false },
+        { "body": "Ao mudar para uma tarefa ou assunto diferente, para evitar contexto confuso", "correct": true },
+        { "body": "Antes de rodar qualquer teste", "correct": false },
+        { "body": "Depois de cada commit no repositório", "correct": false },
+        { "body": "Quando o provedor estiver indisponível", "correct": false },
+        { "body": "Para instalar um novo plugin", "correct": false },
+        { "body": "Ao abrir o arquivo AGENTS.md", "correct": false },
+        { "body": "Sempre que o modelo for alterado", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F1-013",
+      "level": "facil",
+      "subject": "fluxo",
+      "prompt": "Antes de executar um comando destrutivo sugerido pelo agente, o que fazer?",
+      "explanation": "Comandos destrutivos podem apagar dados ou alterar o ambiente de forma irreversível. Revisar e confirmar conscientemente, ou negar a permissão, evita perdas acidentais.",
+      "options": [
+        { "body": "Executar sem ler para economizar tempo", "correct": false },
+        { "body": "Desativar as permissões ask permanentemente", "correct": false },
+        { "body": "Confiar no comando porque veio do agente", "correct": false },
+        { "body": "Repetir o comando em todos os diretórios", "correct": false },
+        { "body": "Compartilhar o comando em um link público", "correct": false },
+        { "body": "Ignorar o aviso e responder allow sempre", "correct": false },
+        { "body": "Executar primeiro e verificar depois", "correct": false },
+        { "body": "Remover o backup antes de testar", "correct": false },
+        { "body": "Revisar o comando e confirmar conscientemente antes de executar", "correct": true }
+      ]
+    },
+    {
+      "externalId": "FLUX-F1-014",
+      "level": "facil",
+      "subject": "fluxo",
+      "prompt": "O que fazer antes de compartilhar uma sessão do OpenCode?",
+      "explanation": "Links de sessão podem expor o conteúdo discutido, incluindo dados sensíveis. Revisar e remover segredos antes de compartilhar reduz o risco de vazamento.",
+      "options": [
+        { "body": "Compartilhar tudo, pois links públicos são privados", "correct": false },
+        { "body": "Assumir que o OpenCode apaga segredos automaticamente", "correct": false },
+        { "body": "Compartilhar apenas depois de colar as chaves no prompt", "correct": false },
+        { "body": "Usar o compartilhamento para versionar o .env", "correct": false },
+        { "body": "Desativar a autenticação para facilitar o acesso", "correct": false },
+        { "body": "Publicar o link no AGENTS.md do projeto", "correct": false },
+        { "body": "Revisar o conteúdo e remover segredos e dados sensíveis antes de compartilhar", "correct": true },
+        { "body": "Compartilhar sem revisar porque o link expira rápido", "correct": false },
+        { "body": "Enviar o link apenas para o provedor de modelos", "correct": false }
+      ]
+    }
+  ]
+}

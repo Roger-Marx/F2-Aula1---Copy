@@ -1,0 +1,730 @@
+{
+  "meta": {
+    "version": 1,
+    "reviewed_by": "PENDENTE — revisão humana",
+    "reviewed_at": "2026-10-19",
+    "source": "documentação oficial do OpenCode"
+  },
+  "questions": [
+    {
+      "externalId": "FUND-F3-001",
+      "level": "intermediario",
+      "subject": "fundamentos",
+      "prompt": "Em um agente customizado do OpenCode, qual valor de `mode` indica que ele pode ser escolhido diretamente pelo usuário como agente principal?",
+      "explanation": "O campo `mode` define como o agente é utilizado. O valor `primary` o torna selecionável para conduzir a conversa, enquanto `subagent` o restringe ao uso delegado.",
+      "options": [
+        { "body": "secondary", "correct": false },
+        { "body": "internal", "correct": false },
+        { "body": "primary", "correct": true },
+        { "body": "subagent", "correct": false },
+        { "body": "hidden", "correct": false },
+        { "body": "delegated", "correct": false },
+        { "body": "system", "correct": false },
+        { "body": "tool", "correct": false },
+        { "body": "manual", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F3-002",
+      "level": "intermediario",
+      "subject": "fundamentos",
+      "prompt": "Qual é a principal finalidade do campo `description` no frontmatter de um subagente?",
+      "explanation": "A descrição é exibida ao agente principal para que ele saiba quando faz sentido delegar uma tarefa àquele subagente. Por isso ela deve explicar o propósito e os limites do agente.",
+      "options": [
+        { "body": "Definir o nome exibido na lista de sessões da TUI.", "correct": false },
+        { "body": "Servir de contexto para o agente principal decidir quando delegar uma tarefa a esse subagente.", "correct": true },
+        { "body": "Estabelecer o modelo padrão usado pelo subagente.", "correct": false },
+        { "body": "Listar as ferramentas que o subagente pode executar.", "correct": false },
+        { "body": "Documentar o agente apenas para leitores humanos, sem efeito sobre o modelo.", "correct": false },
+        { "body": "Determinar o nível de permissão de edição de arquivos.", "correct": false },
+        { "body": "Escolher o diretório raiz em que o subagente trabalha.", "correct": false },
+        { "body": "Indicar o formato de saída esperado nas respostas.", "correct": false },
+        { "body": "Controlar se o subagente aparece no comando de ajuda.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F3-003",
+      "level": "intermediario",
+      "subject": "fundamentos",
+      "prompt": "O que caracteriza o agente embutido `plan`?",
+      "explanation": "O `plan` é voltado a análise e planejamento e, por padrão, não realiza edições. Ele é útil para investigar o código e propor um plano antes da execução.",
+      "options": [
+        { "body": "Edita arquivos livremente, exatamente como o build.", "correct": false },
+        { "body": "Executa apenas comandos de shell, sem ler arquivos.", "correct": false },
+        { "body": "É um subagente usado exclusivamente por plugins.", "correct": false },
+        { "body": "Substitui o build quando o modelo não suporta ferramentas.", "correct": false },
+        { "body": "Foca em análise e planejamento e, por padrão, não faz edições.", "correct": true },
+        { "body": "Serve apenas para gerar títulos de sessão.", "correct": false },
+        { "body": "Mantém as mesmas permissões do build, mas com outro nome.", "correct": false },
+        { "body": "É o agente usado pelo servidor HTTP para autenticação.", "correct": false },
+        { "body": "Só pode ser invocado por comandos customizados.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F3-004",
+      "level": "intermediario",
+      "subject": "fundamentos",
+      "prompt": "Qual ferramenta permite que um agente principal delegue uma tarefa a um subagente?",
+      "explanation": "A ferramenta `task` é o mecanismo pelo qual o agente principal aciona um subagente. O subagente executa a tarefa em contexto próprio e devolve o resultado.",
+      "options": [
+        { "body": "delegate", "correct": false },
+        { "body": "task", "correct": true },
+        { "body": "agent", "correct": false },
+        { "body": "subtask", "correct": false },
+        { "body": "spawn", "correct": false },
+        { "body": "dispatch", "correct": false },
+        { "body": "handoff", "correct": false },
+        { "body": "worker", "correct": false },
+        { "body": "invoke", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F3-005",
+      "level": "intermediario",
+      "subject": "fundamentos",
+      "prompt": "Onde uma skill deve ser colocada para ser descoberta pelo OpenCode no escopo do projeto?",
+      "explanation": "Skills de projeto ficam em `.opencode/skills/<nome>/SKILL.md`. O arquivo `SKILL.md` concentra o frontmatter com nome e descrição e o corpo com as instruções.",
+      "options": [
+        { "body": ".opencode/skills/<nome>/SKILL.md", "correct": true },
+        { "body": ".opencode/skill/<nome>.md", "correct": false },
+        { "body": ".opencode/agents/<nome>/SKILL.md", "correct": false },
+        { "body": "skills/<nome>/index.md", "correct": false },
+        { "body": ".opencode/commands/<nome>/SKILL.md", "correct": false },
+        { "body": ".config/opencode/skills/<nome>.json", "correct": false },
+        { "body": ".opencode/plugins/<nome>/SKILL.md", "correct": false },
+        { "body": "docs/skills/<nome>/SKILL.md", "correct": false },
+        { "body": ".opencode/skills/SKILL-<nome>.md", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F3-006",
+      "level": "intermediario",
+      "subject": "fundamentos",
+      "prompt": "Como o conteúdo de uma skill é disponibilizado ao agente?",
+      "explanation": "As skills são carregadas sob demanda: os metadados ficam disponíveis para o agente decidir quando usá-las, e o corpo é lido apenas no momento relevante. Isso evita inflar o contexto com todas as instruções de uma vez.",
+      "options": [
+        { "body": "Todo o conteúdo de todas as skills é injetado no início de cada sessão.", "correct": false },
+        { "body": "A skill só é carregada se for citada explicitamente no AGENTS.md.", "correct": false },
+        { "body": "O conteúdo é baixado de um servidor remoto a cada mensagem.", "correct": false },
+        { "body": "Os metadados ficam visíveis e o corpo é carregado sob demanda quando a skill é relevante.", "correct": true },
+        { "body": "Apenas o nome é usado; o corpo nunca chega ao modelo.", "correct": false },
+        { "body": "O corpo é convertido automaticamente em uma ferramenta de shell.", "correct": false },
+        { "body": "As skills são carregadas somente quando o agente está no modo plan.", "correct": false },
+        { "body": "O carregamento exige reiniciar o servidor a cada uso.", "correct": false },
+        { "body": "A skill é aplicada como formatter após cada edição.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F3-007",
+      "level": "intermediario",
+      "subject": "fundamentos",
+      "prompt": "Qual alternativa diferencia corretamente agentes primários de subagentes no OpenCode?",
+      "explanation": "Agentes primários conduzem a conversa e podem ser escolhidos pelo usuário. Subagentes são acionados por outros agentes ou comandos para executar tarefas delegadas em contexto separado.",
+      "options": [
+        { "body": "Agentes primários só rodam no modo plan; subagentes só rodam no build.", "correct": false },
+        { "body": "Subagentes são escolhidos na TUI; agentes primários só podem ser chamados por plugins.", "correct": false },
+        { "body": "Agentes primários podem ser selecionados para conduzir a conversa; subagentes são acionados para tarefas delegadas.", "correct": true },
+        { "body": "A diferença é apenas o modelo: primários usam o modelo principal e subagentes usam embeddings.", "correct": false },
+        { "body": "Agentes primários não têm permissões; subagentes têm permissões totais.", "correct": false },
+        { "body": "Subagentes não podem usar ferramentas; primários podem usar todas.", "correct": false },
+        { "body": "Primários são definidos apenas na configuração global; subagentes apenas no projeto.", "correct": false },
+        { "body": "Subagentes são executados somente pelo servidor HTTP, nunca pela TUI.", "correct": false },
+        { "body": "Não há diferença prática; os dois termos são sinônimos na configuração.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F3-008",
+      "level": "intermediario",
+      "subject": "fundamentos",
+      "prompt": "Qual é o papel de `small_model` na configuração do OpenCode?",
+      "explanation": "`small_model` aponta para um modelo menor usado em tarefas auxiliares, como títulos e resumos. O modelo principal continua responsável pelo trabalho mais complexo.",
+      "options": [
+        { "body": "Definir o modelo de fallback usado quando o principal falha.", "correct": false },
+        { "body": "Escolher o modelo de embeddings para busca semântica.", "correct": false },
+        { "body": "Fixar o modelo do agente plan, independentemente do build.", "correct": false },
+        { "body": "Validar o schema da configuração antes de iniciar a sessão.", "correct": false },
+        { "body": "Configurar o modelo executado pelo formatter após as edições.", "correct": false },
+        { "body": "Executar tarefas auxiliares, como gerar títulos e resumos, com um modelo menor.", "correct": true },
+        { "body": "Definir o modelo usado para aplicar permissões de ferramentas.", "correct": false },
+        { "body": "Substituir o modelo principal em todas as conversas interativas.", "correct": false },
+        { "body": "Controlar o modelo usado exclusivamente por servidores MCP.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F3-009",
+      "level": "intermediario",
+      "subject": "fundamentos",
+      "prompt": "Onde um agente customizado em Markdown é colocado para ficar disponível no escopo do projeto?",
+      "explanation": "Agentes de projeto ficam em `.opencode/agents/`. O arquivo Markdown combina frontmatter de configuração com o corpo de instruções do agente.",
+      "options": [
+        { "body": ".opencode/agent/", "correct": false },
+        { "body": ".opencode/agents/", "correct": true },
+        { "body": ".opencode/commands/", "correct": false },
+        { "body": ".opencode/skills/", "correct": false },
+        { "body": ".opencode/plugins/", "correct": false },
+        { "body": ".opencode/subagents/", "correct": false },
+        { "body": "agents/", "correct": false },
+        { "body": ".opencode/config/agents/", "correct": false },
+        { "body": ".opencode/mcp/agents/", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F3-010",
+      "level": "intermediario",
+      "subject": "fundamentos",
+      "prompt": "Qual campo do frontmatter de um comando customizado define qual agente deve executá-lo?",
+      "explanation": "O campo `agent` indica o agente usado na execução do comando. Isso permite, por exemplo, associar um comando de revisão ao agente `plan`.",
+      "options": [
+        { "body": "mode", "correct": false },
+        { "body": "executor", "correct": false },
+        { "body": "runtime", "correct": false },
+        { "body": "profile", "correct": false },
+        { "body": "primary", "correct": false },
+        { "body": "delegate", "correct": false },
+        { "body": "agent", "correct": true },
+        { "body": "use", "correct": false },
+        { "body": "worker", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F3-011",
+      "level": "intermediario",
+      "subject": "fundamentos",
+      "prompt": "Qual placeholder recebe o texto digitado pelo usuário após o nome de um comando customizado?",
+      "explanation": "O placeholder `$ARGUMENTS` é substituído pelos argumentos informados na invocação do comando. Assim, o mesmo comando pode receber alvos ou instruções diferentes.",
+      "options": [
+        { "body": "$INPUT", "correct": false },
+        { "body": "$ARGS", "correct": false },
+        { "body": "$ARGUMENTS", "correct": true },
+        { "body": "{{args}}", "correct": false },
+        { "body": "$PROMPT", "correct": false },
+        { "body": "$TEXT", "correct": false },
+        { "body": "%arguments%", "correct": false },
+        { "body": "$QUERY", "correct": false },
+        { "body": "$PARAMS", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F3-012",
+      "level": "intermediario",
+      "subject": "fundamentos",
+      "prompt": "Quando um formatter configurado no OpenCode costuma ser acionado?",
+      "explanation": "A formatação pode ser executada após o agente editar arquivos, ajustando o estilo automaticamente. Ela complementa, mas não substitui, a revisão do diff e os checks do projeto.",
+      "options": [
+        { "body": "Antes de iniciar qualquer sessão, para preparar o repositório.", "correct": false },
+        { "body": "Somente quando o usuário executa um comando manual de formatação.", "correct": false },
+        { "body": "Apenas no modo plan, antes de o agente propor mudanças.", "correct": false },
+        { "body": "No momento do commit, como um hook obrigatório do Git.", "correct": false },
+        { "body": "Após o agente editar arquivos, para ajustar o estilo automaticamente.", "correct": true },
+        { "body": "A cada tecla digitada no editor da TUI.", "correct": false },
+        { "body": "Somente ao abrir a interface web do OpenCode.", "correct": false },
+        { "body": "Apenas para arquivos JSON de configuração.", "correct": false },
+        { "body": "Somente se o campo `$schema` estiver presente.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FUND-F3-013",
+      "level": "intermediario",
+      "subject": "fundamentos",
+      "prompt": "Qual é o principal benefício de configurar um servidor LSP no OpenCode?",
+      "explanation": "O LSP fornece diagnósticos, erros e informações de tipos do código ao agente. Com esses sinais, o agente consegue localizar e corrigir problemas com mais precisão.",
+      "options": [
+        { "body": "Substituir o modelo de linguagem por análise estática.", "correct": false },
+        { "body": "Formatar automaticamente todos os arquivos do repositório.", "correct": false },
+        { "body": "Habilitar servidores MCP remotos sem configuração adicional.", "correct": false },
+        { "body": "Autenticar o usuário em provedores de modelo.", "correct": false },
+        { "body": "Compartilhar a sessão com outras pessoas por um link público.", "correct": false },
+        { "body": "Versionar o código automaticamente a cada edição.", "correct": false },
+        { "body": "Compilar e publicar a aplicação em produção.", "correct": false },
+        { "body": "Fornecer diagnósticos e informações de tipos que ajudam o agente a corrigir o código.", "correct": true },
+        { "body": "Desabilitar ferramentas de edição para evitar mudanças.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F3-001",
+      "level": "intermediario",
+      "subject": "configuracao",
+      "prompt": "Para que serve o campo `$schema` em um arquivo `opencode.json`?",
+      "explanation": "O `$schema` ajuda o editor a validar o arquivo e oferecer autocomplete. Ele é uma referência de ferramentas de edição e não altera o comportamento do OpenCode em execução.",
+      "options": [
+        { "body": "Criptografar os campos sensíveis da configuração.", "correct": false },
+        { "body": "Definir a versão mínima do OpenCode exigida pelo projeto.", "correct": false },
+        { "body": "Indicar o caminho do banco de dados usado pelas sessões.", "correct": false },
+        { "body": "Ajudar o editor a validar o arquivo e oferecer autocomplete, sem mudar o comportamento em execução.", "correct": true },
+        { "body": "Registrar o esquema de autenticação do provedor de modelo.", "correct": false },
+        { "body": "Selecionar o schema do banco usado pelo servidor MCP.", "correct": false },
+        { "body": "Habilitar o modo de produção automaticamente.", "correct": false },
+        { "body": "Listar os plugins confiáveis do projeto.", "correct": false },
+        { "body": "Converter o arquivo JSON em YAML na inicialização.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F3-002",
+      "level": "intermediario",
+      "subject": "configuracao",
+      "prompt": "Por que usar `opencode.jsonc` em vez de `opencode.json`?",
+      "explanation": "O formato JSONC aceita comentários, o que facilita documentar escolhas de configuração. O conteúdo continua sendo JSON válido para o OpenCode.",
+      "options": [
+        { "body": "Porque o formato JSONC permite incluir comentários no arquivo.", "correct": true },
+        { "body": "Porque o JSONC criptografa automaticamente os segredos.", "correct": false },
+        { "body": "Porque o JSONC é o único formato aceito para configuração global.", "correct": false },
+        { "body": "Porque o JSONC permite usar YAML dentro do mesmo arquivo.", "correct": false },
+        { "body": "Porque o JSONC dispensa a validação por schema.", "correct": false },
+        { "body": "Porque o JSONC executa plugins antes de carregar as regras.", "correct": false },
+        { "body": "Porque o JSONC é convertido em Markdown antes da leitura.", "correct": false },
+        { "body": "Porque o JSONC permite referenciar arquivos por URL sem baixá-los.", "correct": false },
+        { "body": "Porque o JSONC remove a necessidade de frontmatter nos agentes.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F3-003",
+      "level": "intermediario",
+      "subject": "configuracao",
+      "prompt": "Onde fica a configuração global do OpenCode no perfil do usuário?",
+      "explanation": "A configuração global fica no diretório `~/.config/opencode/` no perfil do usuário. Ela é combinada com a configuração do projeto durante a inicialização.",
+      "options": [
+        { "body": "Em `~/.opencode/`.", "correct": false },
+        { "body": "Na raiz do projeto, em `opencode.json`.", "correct": false },
+        { "body": "Em `~/.config/opencode/`.", "correct": true },
+        { "body": "Em `.opencode/config/global.json`.", "correct": false },
+        { "body": "Em `~/.local/share/opencode.json`.", "correct": false },
+        { "body": "Em `/etc/opencode/opencode.json`.", "correct": false },
+        { "body": "Em `.config/opencode/` dentro do repositório.", "correct": false },
+        { "body": "Em `~/.cache/opencode/config.json`.", "correct": false },
+        { "body": "Em `~/.config/opencode.json/`.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F3-004",
+      "level": "intermediario",
+      "subject": "configuracao",
+      "prompt": "Como o OpenCode combina a configuração global com a configuração do projeto?",
+      "explanation": "As configurações são mescladas, e os valores definidos no projeto têm precedência sobre os equivalentes globais. Assim, o projeto pode ajustar o comportamento sem repetir toda a configuração.",
+      "options": [
+        { "body": "Mescla as duas, com os valores do projeto tendo precedência sobre os globais equivalentes.", "correct": true },
+        { "body": "Usa apenas a configuração global, ignorando a do projeto.", "correct": false },
+        { "body": "Usa apenas a configuração do projeto, ignorando a global.", "correct": false },
+        { "body": "Gera um erro quando as duas definem a mesma chave.", "correct": false },
+        { "body": "Escolhe a configuração modificada mais recentemente.", "correct": false },
+        { "body": "Sorteia os valores conflitantes a cada inicialização.", "correct": false },
+        { "body": "Exige que o projeto importe a configuração global explicitamente.", "correct": false },
+        { "body": "Sobrescreve o arquivo global com o conteúdo do projeto.", "correct": false },
+        { "body": "Aplica a global somente em modo plan e a do projeto em build.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F3-005",
+      "level": "intermediario",
+      "subject": "configuracao",
+      "prompt": "Um agente de revisão precisa de respostas consistentes e repetíveis. Qual ajuste de `temperature` é mais adequado?",
+      "explanation": "Temperaturas baixas reduzem a variação das respostas, favorecendo consistência. Temperaturas altas aumentam a diversidade, o que não é o objetivo de uma revisão repetível.",
+      "options": [
+        { "body": "Aumentar a temperatura para ampliar a criatividade da revisão.", "correct": false },
+        { "body": "Definir a temperatura como zero para desabilitar o modelo.", "correct": false },
+        { "body": "Usar uma temperatura baixa, reduzindo a variação das respostas.", "correct": true },
+        { "body": "Deixar a temperatura sempre no valor máximo permitido.", "correct": false },
+        { "body": "Configurar a temperatura apenas no arquivo global, nunca no agente.", "correct": false },
+        { "body": "Usar `small_model` em vez de ajustar a temperatura.", "correct": false },
+        { "body": "Remover o campo `model` para que a temperatura seja ignorada.", "correct": false },
+        { "body": "Definir a temperatura no frontmatter do comando, pois agentes não a aceitam.", "correct": false },
+        { "body": "Trocar a temperatura por uma permissão do tipo ask.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F3-006",
+      "level": "intermediario",
+      "subject": "configuracao",
+      "prompt": "Como fazer um agente customizado usar um modelo diferente do restante da sessão?",
+      "explanation": "O campo `model` no frontmatter do agente define o modelo usado por ele. Isso permite, por exemplo, usar um modelo mais econômico em agentes auxiliares.",
+      "options": [
+        { "body": "Definir `small_model` no arquivo de configuração global.", "correct": false },
+        { "body": "Passar a opção `provider` no frontmatter do comando.", "correct": false },
+        { "body": "Alterar a variável de ambiente do modelo antes de cada mensagem.", "correct": false },
+        { "body": "Criar uma permissão de modelo com valor allow.", "correct": false },
+        { "body": "Definir `model` no frontmatter do agente.", "correct": true },
+        { "body": "Adicionar o modelo à lista `instructions`.", "correct": false },
+        { "body": "Configurar o modelo no servidor LSP associado.", "correct": false },
+        { "body": "Usar `tools` para mapear o modelo desejado.", "correct": false },
+        { "body": "Não é possível; todos os agentes usam o modelo da sessão.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F3-007",
+      "level": "intermediario",
+      "subject": "configuracao",
+      "prompt": "Qual bloco do frontmatter de um agente aceita os valores `allow`, `ask` e `deny`?",
+      "explanation": "O bloco `permission` usa esses três valores para definir o que é permitido, o que exige confirmação e o que é bloqueado. Ele pode ser aplicado de forma global ou por ferramenta.",
+      "options": [
+        { "body": "`tools`", "correct": false },
+        { "body": "`permission`", "correct": true },
+        { "body": "`access`", "correct": false },
+        { "body": "`policy`", "correct": false },
+        { "body": "`security`", "correct": false },
+        { "body": "`mode`", "correct": false },
+        { "body": "`rules`", "correct": false },
+        { "body": "`auth`", "correct": false },
+        { "body": "`capabilities`", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F3-008",
+      "level": "intermediario",
+      "subject": "configuracao",
+      "prompt": "No frontmatter de um agente, o que faz `tools: { bash: false }`?",
+      "explanation": "O mapa `tools` liga ou desliga ferramentas para aquele agente. Marcar `bash` como `false` remove a ferramenta de shell do escopo dele, sem afetar os demais agentes.",
+      "options": [
+        { "body": "Exige confirmação do usuário antes de cada comando de shell.", "correct": false },
+        { "body": "Desabilita a leitura de arquivos para o agente.", "correct": false },
+        { "body": "Remove o bash de todos os agentes do projeto.", "correct": false },
+        { "body": "Torna o bash disponível apenas no modo plan.", "correct": false },
+        { "body": "Converte o bash em uma permissão do tipo deny.", "correct": false },
+        { "body": "Inverte o comportamento do bash, permitindo apenas leitura.", "correct": false },
+        { "body": "Desabilita a ferramenta de shell para esse agente.", "correct": true },
+        { "body": "Define o bash como ferramenta padrão do subagente.", "correct": false },
+        { "body": "Instala uma versão restrita do shell no ambiente.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F3-009",
+      "level": "intermediario",
+      "subject": "configuracao",
+      "prompt": "O que o campo `subtask: true` no frontmatter de um comando provoca?",
+      "explanation": "Com `subtask: true`, o comando é executado em uma sessão de subagente, separada do contexto principal. Isso é útil para tarefas que devem rodar isoladamente e devolver apenas o resultado.",
+      "options": [
+        { "body": "Cria uma branch de Git antes de executar o comando.", "correct": false },
+        { "body": "Executa o comando em segundo plano no shell do sistema.", "correct": false },
+        { "body": "Força o uso do agente plan, independentemente do campo agent.", "correct": false },
+        { "body": "Executa o comando em uma sessão de subagente, separada do contexto principal.", "correct": true },
+        { "body": "Desabilita todas as ferramentas durante a execução.", "correct": false },
+        { "body": "Divide o comando em várias mensagens sequenciais na mesma sessão.", "correct": false },
+        { "body": "Impede que o comando receba argumentos.", "correct": false },
+        { "body": "Marca o comando como disponível apenas para administradores.", "correct": false },
+        { "body": "Faz o comando ser executado pelo servidor HTTP em vez da TUI.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F3-010",
+      "level": "intermediario",
+      "subject": "configuracao",
+      "prompt": "Para que serve a opção `instructions` na configuração do OpenCode?",
+      "explanation": "`instructions` permite indicar arquivos adicionais cujo conteúdo é carregado como regras. Isso ajuda a manter convenções em arquivos separados do `AGENTS.md`.",
+      "options": [
+        { "body": "Listar os comandos customizados disponíveis no projeto.", "correct": false },
+        { "body": "Definir os servidores MCP locais e remotos.", "correct": false },
+        { "body": "Registrar os plugins que podem executar hooks.", "correct": false },
+        { "body": "Selecionar os formatters usados após as edições.", "correct": false },
+        { "body": "Configurar as permissões de ferramentas por agente.", "correct": false },
+        { "body": "Indicar arquivos adicionais de instruções que devem ser carregados como regras.", "correct": true },
+        { "body": "Escolher o modelo auxiliar para gerar títulos.", "correct": false },
+        { "body": "Definir a lista de skills disponíveis no projeto.", "correct": false },
+        { "body": "Especificar os idiomas aceitos pelo servidor LSP.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F3-011",
+      "level": "intermediario",
+      "subject": "configuracao",
+      "prompt": "Qual é o papel do arquivo `AGENTS.md` na raiz do projeto?",
+      "explanation": "O `AGENTS.md` reúne regras e contexto do projeto que o agente deve seguir. Ele é lido automaticamente e complementa a configuração, sem substituí-la.",
+      "options": [
+        { "body": "Substituir o `opencode.json` na definição de modelos e permissões.", "correct": false },
+        { "body": "Listar os modelos disponíveis para o projeto.", "correct": false },
+        { "body": "Fornecer regras e contexto do projeto que o agente deve seguir.", "correct": true },
+        { "body": "Configurar os servidores MCP usados pela sessão.", "correct": false },
+        { "body": "Definir os hooks executados por plugins de terceiros.", "correct": false },
+        { "body": "Registrar as credenciais dos provedores de modelo.", "correct": false },
+        { "body": "Servir como arquivo de saída para os diffs gerados.", "correct": false },
+        { "body": "Substituir as skills no carregamento de instruções.", "correct": false },
+        { "body": "Controlar o compartilhamento público das sessões.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F3-012",
+      "level": "intermediario",
+      "subject": "configuracao",
+      "prompt": "Qual configuração descreve um servidor MCP local?",
+      "explanation": "Um MCP local é iniciado como processo no ambiente e usa `type: \"local\"` com um `command`. Servidores remotos, por contraste, são acessados por URL.",
+      "options": [
+        { "body": "`type: \"remote\"` com `url` e headers de autenticação.", "correct": false },
+        { "body": "`type: \"stdio\"` com um endpoint HTTP.", "correct": false },
+        { "body": "`type: \"local\"` com `url` apontando para localhost.", "correct": false },
+        { "body": "`type: \"http\"` com `command` e `environment`.", "correct": false },
+        { "body": "`type: \"process\"` com `headers` e `port`.", "correct": false },
+        { "body": "`type: \"socket\"` com `url` e `command` simultâneos.", "correct": false },
+        { "body": "`type: \"embedded\"` com `provider` e `model`.", "correct": false },
+        { "body": "`type: \"local\"` com `command` para iniciar o processo.", "correct": true },
+        { "body": "`type: \"remote\"` com `command` e `environment`.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "CONF-F3-013",
+      "level": "intermediario",
+      "subject": "configuracao",
+      "prompt": "Por que plugins de terceiros exigem cautela antes de serem habilitados?",
+      "explanation": "Plugins são código executável e podem adicionar ferramentas e hooks com acesso ao ambiente. Por isso, origem e conteúdo devem ser revisados antes da habilitação.",
+      "options": [
+        { "body": "Porque são código executável que pode adicionar ferramentas e hooks com acesso ao ambiente.", "correct": true },
+        { "body": "Porque só funcionam em sistemas operacionais específicos.", "correct": false },
+        { "body": "Porque desativam a autenticação do provedor de modelo.", "correct": false },
+        { "body": "Porque impedem o uso de agentes primários.", "correct": false },
+        { "body": "Porque exigem uma assinatura paga para serem carregados.", "correct": false },
+        { "body": "Porque apagam o histórico de sessões ao iniciar.", "correct": false },
+        { "body": "Porque substituem automaticamente o `AGENTS.md`.", "correct": false },
+        { "body": "Porque só podem ser usados no modo plan.", "correct": false },
+        { "body": "Porque bloqueiam a configuração global do usuário.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F3-001",
+      "level": "intermediario",
+      "subject": "fluxo",
+      "prompt": "Qual fluxo é mais adequado para conduzir uma mudança não trivial no código?",
+      "explanation": "Planejar primeiro reduz mudanças precipitadas. Revisar o plano antes de executar com o build mantém o controle sobre o escopo e as decisões.",
+      "options": [
+        { "body": "Pedir ao build que altere tudo de uma vez e revisar apenas no final.", "correct": false },
+        { "body": "Explorar e planejar com o agente plan, revisar o plano e então executar com o build.", "correct": true },
+        { "body": "Usar apenas comandos de shell manuais, sem envolver o agente.", "correct": false },
+        { "body": "Começar pelo build e só usar o plan se houver erros de compilação.", "correct": false },
+        { "body": "Desabilitar todas as ferramentas e pedir uma resposta em texto livre.", "correct": false },
+        { "body": "Executar o build em modo subtask para evitar revisar o diff.", "correct": false },
+        { "body": "Trocar o modelo principal por um modelo menor durante toda a tarefa.", "correct": false },
+        { "body": "Ignorar o AGENTS.md para não limitar as opções do agente.", "correct": false },
+        { "body": "Deixar o agente escolher o escopo sem informar o objetivo.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F3-002",
+      "level": "intermediario",
+      "subject": "fluxo",
+      "prompt": "Qual é a vantagem de usar um subagente para uma busca ampla no código?",
+      "explanation": "O subagente investiga em contexto separado e devolve um resumo ao agente principal. Isso evita encher o contexto principal com muitos trechos exploratórios.",
+      "options": [
+        { "body": "O subagente ignora as permissões configuradas para o projeto.", "correct": false },
+        { "body": "O subagente sempre usa o modelo mais caro disponível.", "correct": false },
+        { "body": "A busca fica mais rápida porque dispensa leitura de arquivos.", "correct": false },
+        { "body": "O resultado é aplicado automaticamente, sem revisão do agente principal.", "correct": false },
+        { "body": "A exploração ocorre em contexto separado e o agente principal recebe um resumo, preservando seu contexto.", "correct": true },
+        { "body": "O subagente grava as alterações diretamente no repositório remoto.", "correct": false },
+        { "body": "O contexto principal é duplicado para cada arquivo encontrado.", "correct": false },
+        { "body": "O subagente substitui o AGENTS.md durante a execução.", "correct": false },
+        { "body": "A busca deixa de precisar de ferramentas de leitura.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F3-003",
+      "level": "intermediario",
+      "subject": "fluxo",
+      "prompt": "Ao criar uma skill, o que torna o campo `description` eficaz?",
+      "explanation": "A descrição orienta o agente sobre quando aplicar a skill. Explicitar o propósito e as situações de uso aumenta a chance de o carregamento ocorrer no momento certo.",
+      "options": [
+        { "body": "Repetir o nome da pasta para garantir a descoberta.", "correct": false },
+        { "body": "Usar o máximo de palavras possível, sem indicar quando aplicar.", "correct": false },
+        { "body": "Descrever com clareza o que a skill faz e quando ela deve ser usada.", "correct": true },
+        { "body": "Escrever a descrição apenas em inglês, independentemente do projeto.", "correct": false },
+        { "body": "Deixar o campo vazio para que o agente decida livremente.", "correct": false },
+        { "body": "Listar apenas palavras-chave soltas, sem contexto de uso.", "correct": false },
+        { "body": "Incluir o código completo da skill dentro da descrição.", "correct": false },
+        { "body": "Definir permissões de ferramentas no lugar do propósito.", "correct": false },
+        { "body": "Copiar a descrição de outra skill para manter consistência.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F3-004",
+      "level": "intermediario",
+      "subject": "fluxo",
+      "prompt": "Um comando customizado deve apenas revisar código, sem alterar arquivos. Qual frontmatter ajuda a garantir esse comportamento?",
+      "explanation": "Associar o comando ao agente `plan` aproveita um agente voltado a análise, que por padrão não edita. Isso reduz o risco de mudanças indesejadas durante a revisão.",
+      "options": [
+        { "body": "`agent: build`, para que a revisão possa corrigir tudo automaticamente.", "correct": false },
+        { "body": "`subtask: false`, para impedir qualquer alteração de arquivo.", "correct": false },
+        { "body": "`tools: bash`, para limitar a revisão ao shell.", "correct": false },
+        { "body": "`model: small_model`, para tornar a revisão somente leitura.", "correct": false },
+        { "body": "`permission: allow`, para liberar apenas leitura.", "correct": false },
+        { "body": "`agent: plan`, para executar a revisão com o agente de planejamento.", "correct": true },
+        { "body": "`mode: subagent`, para que o comando não possa editar arquivos.", "correct": false },
+        { "body": "`temperature: 0`, para desabilitar as ferramentas de escrita.", "correct": false },
+        { "body": "`description`, para declarar que o comando é somente leitura.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F3-005",
+      "level": "intermediario",
+      "subject": "fluxo",
+      "prompt": "Antes de aceitar uma alteração gerada pelo agente, qual prática é recomendada?",
+      "explanation": "Revisar o diff confirma que a mudança corresponde ao pedido e não introduz efeitos colaterais. A revisão humana continua sendo essencial, mesmo com bons resultados aparentes.",
+      "options": [
+        { "body": "Revisar o diff e confirmar que a mudança corresponde ao pedido.", "correct": true },
+        { "body": "Aceitar imediatamente, pois o agente já validou o próprio código.", "correct": false },
+        { "body": "Aplicar a mudança em produção antes de executar os testes.", "correct": false },
+        { "body": "Ignorar arquivos não relacionados para reduzir o tempo de revisão.", "correct": false },
+        { "body": "Confiar apenas no resumo textual, sem olhar as linhas alteradas.", "correct": false },
+        { "body": "Remover o AGENTS.md para evitar conflito com a proposta.", "correct": false },
+        { "body": "Comparar somente a quantidade de linhas adicionadas e removidas.", "correct": false },
+        { "body": "Pedir ao agente que aprove a própria alteração.", "correct": false },
+        { "body": "Adiar a revisão até que o repositório tenha novas mudanças.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F3-006",
+      "level": "intermediario",
+      "subject": "fluxo",
+      "prompt": "Depois que o agente edita o código, qual é uma boa prática de verificação?",
+      "explanation": "Executar formatter, lint, typecheck ou testes confirma que a mudança funciona e segue o padrão do projeto. A verificação deve fazer parte do fluxo, não ser deixada para depois.",
+      "options": [
+        { "body": "Aguardar a próxima sessão para descobrir se algo quebrou.", "correct": false },
+        { "body": "Verificar apenas se o arquivo foi salvo no disco.", "correct": false },
+        { "body": "Confiar na formatação automática como única validação.", "correct": false },
+        { "body": "Rodar formatter, lint, typecheck ou testes relevantes antes de considerar concluído.", "correct": true },
+        { "body": "Apagar os testes que falharem para manter a build verde.", "correct": false },
+        { "body": "Reiniciar a sessão sem executar nenhum check.", "correct": false },
+        { "body": "Comparar o diff com a documentação, sem rodar comandos.", "correct": false },
+        { "body": "Desabilitar o LSP para evitar diagnósticos conflitantes.", "correct": false },
+        { "body": "Aceitar a mudança e deixar os checks para o deploy.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F3-007",
+      "level": "intermediario",
+      "subject": "fluxo",
+      "prompt": "Como `small_model` pode ajudar a controlar custo em um fluxo de trabalho?",
+      "explanation": "Tarefas auxiliares simples podem usar um modelo menor, reservando o modelo principal para o trabalho complexo. Isso reduz o consumo sem comprometer as etapas que exigem mais capacidade.",
+      "options": [
+        { "body": "Substituindo o modelo principal em todas as tarefas de edição.", "correct": false },
+        { "body": "Eliminando a necessidade de revisar os diffs gerados.", "correct": false },
+        { "body": "Desativando o carregamento de skills para economizar tokens.", "correct": false },
+        { "body": "Impedindo o uso de subagentes durante a sessão.", "correct": false },
+        { "body": "Reduzindo o número de ferramentas disponíveis para o agente.", "correct": false },
+        { "body": "Trocando o provedor de modelo por um serviço local.", "correct": false },
+        { "body": "Delegando tarefas auxiliares simples a um modelo menor e mantendo o principal para o trabalho complexo.", "correct": true },
+        { "body": "Removendo o campo `model` da configuração do projeto.", "correct": false },
+        { "body": "Usando o mesmo modelo para tudo, mas com temperatura mais alta.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F3-008",
+      "level": "intermediario",
+      "subject": "fluxo",
+      "prompt": "Quando vale a pena criar um agente customizado para o projeto?",
+      "explanation": "Um agente customizado é útil quando há convenções e tarefas recorrentes que podem ser encapsuladas. Instruções, modelo e ferramentas próprios tornam o comportamento mais previsível.",
+      "options": [
+        { "body": "Sempre que houver uma tarefa única, que nunca se repetirá.", "correct": false },
+        { "body": "Quando há convenções e tarefas recorrentes que podem ser encapsuladas com instruções e ferramentas próprias.", "correct": true },
+        { "body": "Somente para substituir o `opencode.json` por completo.", "correct": false },
+        { "body": "Para evitar a necessidade de revisar as mudanças geradas.", "correct": false },
+        { "body": "Apenas quando o projeto não tiver um `AGENTS.md`.", "correct": false },
+        { "body": "Para contornar permissões definidas no escopo global.", "correct": false },
+        { "body": "Quando se deseja eliminar o uso de subagentes.", "correct": false },
+        { "body": "Para que cada mensagem use um modelo diferente automaticamente.", "correct": false },
+        { "body": "Somente se o projeto não usar servidores MCP.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F3-009",
+      "level": "intermediario",
+      "subject": "fluxo",
+      "prompt": "Um agente deve apenas revisar documentação, sem executar comandos. Qual configuração reduz o risco?",
+      "explanation": "Desabilitar a ferramenta de shell limita o que o agente pode fazer no ambiente. O escopo de ferramentas deve refletir a tarefa, reduzindo efeitos colaterais.",
+      "options": [
+        { "body": "Aumentar a temperatura para que o agente evite comandos.", "correct": false },
+        { "body": "Definir `subtask: true` no comando de revisão.", "correct": false },
+        { "body": "Usar `small_model` para que o agente não tenha acesso ao shell.", "correct": false },
+        { "body": "Adicionar o shell ao bloco `instructions`.", "correct": false },
+        { "body": "Desabilitar a ferramenta de shell para esse agente.", "correct": true },
+        { "body": "Configurar um servidor LSP para bloquear comandos.", "correct": false },
+        { "body": "Remover o `AGENTS.md` para evitar instruções conflitantes.", "correct": false },
+        { "body": "Marcar o agente como primário em vez de subagente.", "correct": false },
+        { "body": "Definir `model` como um provedor diferente.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F3-010",
+      "level": "intermediario",
+      "subject": "fluxo",
+      "prompt": "Antes de habilitar um plugin de terceiros, o que deve ser verificado?",
+      "explanation": "Plugins executam código no ambiente e podem acessar recursos ou adicionar hooks. Revisar origem e conteúdo é uma etapa de confiança antes da habilitação.",
+      "options": [
+        { "body": "Se o plugin tem uma interface gráfica própria.", "correct": false },
+        { "body": "Se ele foi escrito na mesma linguagem do projeto.", "correct": false },
+        { "body": "Se o nome do plugin aparece na documentação do modelo.", "correct": false },
+        { "body": "Se ele aumenta automaticamente a temperatura do agente.", "correct": false },
+        { "body": "Se ele substitui o `AGENTS.md` por instruções próprias.", "correct": false },
+        { "body": "Se ele dispensa o uso de permissões no projeto.", "correct": false },
+        { "body": "Se ele está listado como dependência do servidor LSP.", "correct": false },
+        { "body": "Revisar o código e a origem, pois o plugin executa no ambiente e pode acessar recursos.", "correct": true },
+        { "body": "Se ele funciona apenas no modo plan.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F3-011",
+      "level": "intermediario",
+      "subject": "fluxo",
+      "prompt": "Como lidar com uma tarefa grande e ambígua no OpenCode?",
+      "explanation": "Dividir a tarefa em etapas pequenas e verificáveis facilita a revisão e reduz o risco de desvios. Cada etapa validada dá mais segurança para avançar.",
+      "options": [
+        { "body": "Pedir ao agente que implemente tudo de uma vez, sem plano.", "correct": false },
+        { "body": "Aumentar a temperatura para que o agente explore mais alternativas.", "correct": false },
+        { "body": "Dividir em etapas pequenas e verificáveis, validando cada uma antes de seguir.", "correct": true },
+        { "body": "Desabilitar os testes para acelerar a implementação.", "correct": false },
+        { "body": "Usar apenas o modelo menor em todas as etapas.", "correct": false },
+        { "body": "Remover as regras do projeto para dar mais liberdade ao agente.", "correct": false },
+        { "body": "Evitar o agente plan e começar diretamente pelo build.", "correct": false },
+        { "body": "Deixar o escopo indefinido para que o agente decida sozinho.", "correct": false },
+        { "body": "Aplicar todas as mudanças em produção antes de revisar.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F3-012",
+      "level": "intermediario",
+      "subject": "fluxo",
+      "prompt": "Duas investigações independentes precisam ser feitas no código. Qual uso de subagentes faz sentido?",
+      "explanation": "Subagentes separados podem investigar assuntos independentes sem misturar contextos. Depois, o agente principal consolida os resultados e decide os próximos passos.",
+      "options": [
+        { "body": "Executar as duas investigações na mesma mensagem, sem separar contextos.", "correct": false },
+        { "body": "Usar apenas um subagente e pedir que ele responda às duas ao mesmo tempo.", "correct": false },
+        { "body": "Delegar as duas investigações ao agente plan na mesma sessão principal.", "correct": false },
+        { "body": "Evitar subagentes, pois eles não podem ler arquivos.", "correct": false },
+        { "body": "Pedir ao build que altere o código antes de investigar.", "correct": false },
+        { "body": "Executar as investigações em subagentes separados e consolidar os resultados.", "correct": true },
+        { "body": "Desabilitar as ferramentas de busca para reduzir o escopo.", "correct": false },
+        { "body": "Usar comandos de shell manuais em vez de agentes.", "correct": false },
+        { "body": "Ignorar uma das investigações para simplificar o contexto.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F3-013",
+      "level": "intermediario",
+      "subject": "fluxo",
+      "prompt": "Qual é um bom uso para um comando customizado no projeto?",
+      "explanation": "Comandos customizados padronizam tarefas repetitivas, como uma checklist de revisão. Isso reduz variação e deixa o processo explícito para toda a equipe.",
+      "options": [
+        { "body": "Padronizar uma checklist de revisão que a equipe executa com frequência.", "correct": true },
+        { "body": "Substituir o arquivo de configuração global do usuário.", "correct": false },
+        { "body": "Definir as permissões de todos os agentes do projeto.", "correct": false },
+        { "body": "Instalar servidores MCP automaticamente.", "correct": false },
+        { "body": "Versionar o código sem passar pelo Git.", "correct": false },
+        { "body": "Executar apenas tarefas que nunca se repetem.", "correct": false },
+        { "body": "Eliminar a necessidade de frontmatter nos agentes.", "correct": false },
+        { "body": "Configurar o modelo auxiliar da sessão.", "correct": false },
+        { "body": "Desativar o carregamento de skills no projeto.", "correct": false }
+      ]
+    },
+    {
+      "externalId": "FLUX-F3-014",
+      "level": "intermediario",
+      "subject": "fluxo",
+      "prompt": "O agente propõe uma alteração que contraria uma regra explícita do `AGENTS.md`. O que fazer?",
+      "explanation": "As regras do projeto existem para orientar o comportamento do agente. O correto é manter a regra e pedir que a proposta seja ajustada a ela, ou discutir a mudança com a equipe antes.",
+      "options": [
+        { "body": "Aceitar a alteração, pois o agente conhece melhor o código.", "correct": false },
+        { "body": "Apagar a regra do `AGENTS.md` para evitar conflito.", "correct": false },
+        { "body": "Ignorar o `AGENTS.md` e seguir apenas o instinto do modelo.", "correct": false },
+        { "body": "Seguir a regra do projeto e pedir ao agente que ajuste a proposta.", "correct": true },
+        { "body": "Aplicar a mudança e atualizar a regra somente depois do deploy.", "correct": false },
+        { "body": "Desabilitar o agente plan para que a regra não seja lida.", "correct": false },
+        { "body": "Remover o arquivo do repositório e continuar a tarefa.", "correct": false },
+        { "body": "Aceitar porque a regra só vale para o modo build.", "correct": false },
+        { "body": "Trocar o modelo por um que não leia instruções do projeto.", "correct": false }
+      ]
+    }
+  ]
+}
