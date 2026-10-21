@@ -1,7 +1,7 @@
 # pod_v2.md — Trabalho pendente (OpenCode Quiz)
 
-> **Status:** v1.1 — 2026-10-20 — **somente o que falta**.
-> **Base:** `prd.md` v1.2, `SECURITY.md`, `AGENTS.md` e `pod.md` v1.1 (§1–§19 = desenho aprovado + snapshot do que já foi feito).
+> **Status:** v1.2 — 2026-10-21 — **somente o que falta**.
+> **Base:** `prd.md` v1.2, `SECURITY.md`, `AGENTS.md` e `pod.md` v1.2 (§1–§19 = desenho aprovado + snapshot do que já foi feito).
 > **Precedência:** `SECURITY.md` > `prd.md` > `pod.md` > `pod_v2.md` > `AGENTS.md`.
 > **Regra:** nenhuma tarefa aqui amplia o escopo do `prd.md`. Sem suíte automatizada (decisão do projeto). Só relatar verificação **efetivamente executada**.
 
@@ -10,8 +10,9 @@
 - É a lista priorizada do que resta para fechar a fase de Desenvolvimento (fases F2–F8 de `pod.md` §14).
 - **Não** é um replanejamento: o desenho continua em `pod.md`. Não repetir aqui o que já está no código.
 - **v1.1 (2026-10-20):** reordenado por **caminho crítico** e **dono da tarefa**; separa explicitamente o que só o usuário pode fazer (§9); registra o que foi verificado nesta rodada.
+- **v1.2 (2026-10-21):** alinhado com o estado real — o gate D26 está **aberto** (dry-run de produção passa) e o §10 dizia o contrário; `pod.md` e `README.md` atualizados para o status de verificação real.
 
-**Já pronto (não refazer):** app Next.js completo e compilando; 5 migrations **aplicadas** no projeto dev; 200 questões semeadas (200 ativas, 1.800 opções, 40/nível, 13/13/14); `typecheck`, `lint` e `build` passam; repositório GitHub no ar com `main` protegida; 3 defeitos corrigidos e verificados. Ver `pod.md` §12.1 e §19.
+**Já pronto (não refazer):** app Next.js completo e compilando; 5 migrations **aplicadas** no projeto dev; 200 questões semeadas (200 ativas, 1.800 opções, 40/nível, 13/13/14); `typecheck`, `lint` e `build` passam; repositório GitHub no ar com `main` protegida; 7 defeitos corrigidos e verificados (BUG-001 a BUG-007). Ver `pod.md` §12.1 e §19.
 
 **Pré-requisitos humanos/ambiente:** acesso ao **dashboard do Supabase** (dev e produção); acesso à conta **Vercel**; um **revisor humano** para as 200 questões (D26); e o próprio usuário para as decisões da §8.2.
 
@@ -174,7 +175,7 @@ Rodar contra dev com `npm run dev`. Executar o checklist de `pod.md` §12 e regi
 
 ## 4. P2 — Segurança
 
-- [x] **P2.1 — Desvio `HttpOnly` (PD43).** **Fechado (DA1, 2026-10-19):** risco aceito — `@supabase/ssr` exige cookie legível pelo browser; `Secure` explícito em produção e `SameSite=Lax` mantidos. Não declarar conformidade total com `HttpOnly`. **Falta apenas registrar em `SECURITY.md`/`README`** (texto de justify, 5 min).
+- [x] **P2.1 — Desvio `HttpOnly` (PD43).** **Fechado (DA1, 2026-10-19):** risco aceito — `@supabase/ssr` exige cookie legível pelo browser; `Secure` explícito em produção e `SameSite=Lax` mantidos. Não declarar conformidade total com `HttpOnly`. **README atualizado em 2026-10-21** com o texto de justify; falta o mesmo registro em `SECURITY.md`.
 - [x] **P2.2 — Service role.** Confirmado: `SUPABASE_SERVICE_ROLE_KEY` não aparece em `src/` (grep) nem em nenhum arquivo versionado; existe só em `.env.local` (ignorado) e nos scripts locais. **Reexecutar após o deploy** para confirmar que não está nos envs da Vercel.
 - [ ] **P2.3 — Headers/CSP.** Rodar `npm run build && npm start` e conferir `Content-Security-Policy`, `Referrer-Policy`, `X-Content-Type-Options`, `X-Frame-Options`/`frame-ancestors`, `Permissions-Policy` e HSTS (produção) em `next.config.ts`.
 - [x] **P2.4 — E-mail nunca exposto.** Grep por `email` nas respostas de RPC/rotas: nenhuma rota o devolve; `RankingEntry` (`src/lib/quiz/types.ts:61`) tem apenas `position`, `nickname`, `score`, `achievedAt`. Falta a inspeção do payload em execução.
@@ -217,6 +218,7 @@ Rodar contra dev com `npm run dev`. Executar o checklist de `pod.md` §12 e regi
 ## 7. P5 — Encerramento
 
 - [ ] Atualizar `pod.md` (status v1.2 — fases concluídas com evidência) e `README.md` (status de verificação real).
+  - [x] `pod.md` v1.2 e `README.md` atualizados em 2026-10-21; falta apenas registrar os itens do §17 com evidência.
 - [ ] Registrar os itens executados do §17 de `pod.md` (definição de pronto) com evidência.
 - [x] **Primeiro commit git** — feito 2026-10-20 sob autorização explícita: `main` no GitHub, `origin` conectado, branch protegida contra force-push.
 - [ ] Fechar as decisões abertas da §8.2.
@@ -273,9 +275,9 @@ npm run typecheck
 npm run lint
 npm run build
 npm run seed -- --dry-run --env=dev
-npm run seed -- --dry-run --env=production   # só passa após P0.3
+npm run seed -- --dry-run --env=production   # já passa: P0.3 concluído em 2026-10-20
 npm run review -- --flags                     # erros/avisos da rubrica nas 200
 npm run review -- --level=1 --full            # leitura de um nível
 ```
 
-**Estado verificado em 2026-10-20:** `typecheck` ✅ · `lint` ✅ · `build` ✅ (17 rotas + proxy) · dry-run dev ✅ · dry-run production ❌ **reprova corretamente** (gate D26 fechado) · `review --flags` → 0 erros, 12 avisos · `git status` limpo, `main` sincronizado com `origin/main`.
+**Estado verificado em 2026-10-20:** `typecheck` ✅ · `lint` ✅ · `build` ✅ (17 rotas + proxy) · dry-run dev ✅ · dry-run production ✅ **passa** (exit 0, gate D26 aberto com `meta.reviewed_by = "Roger_Marx"`) · `review --flags` → 0 erros, 12 avisos · `git status` limpo, `main` sincronizado com `origin/main` (force-push bloqueado).

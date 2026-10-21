@@ -1,6 +1,7 @@
 # pod.md — Plano de Desenvolvimento (OpenCode Quiz)
 
-> **Status:** v1.1 — 2026-10-19 — plano da fase de **Desenvolvimento** + **snapshot da implementação**.
+> **Status:** v1.2 — 2026-10-21 — plano da fase de **Desenvolvimento** + **snapshot da implementação**.
+> **v1.2 (2026-10-21):** status alinhado ao que foi efetivamente verificado; o gate D26 está **aberto** (`meta.reviewed_by = "Roger_Marx"`, dry-run de produção exit 0) e `README.md`/`pod_v2.md` foram sincronizados com este snapshot.
 > **Base:** `prd.md` **v1.2** (D1–D65), `SECURITY.md` e `AGENTS.md` (só nas partes que não conflitam).
 > **Precedência:** `SECURITY.md` > `prd.md` > `pod.md` > `AGENTS.md`.
 > **Regra:** nenhuma decisão deste plano amplia o escopo do `prd.md`; decisões técnicas são registradas em **PD1–PD45** (§15).
@@ -729,7 +730,7 @@ npm run build
 | Sondas HTTP com a chave `anon` (2026-10-20) | leitura de todas as tabelas e chamada de todas as RPCs de sessão → **401/42501**; `rpc_public_ranking` e `rpc_check_nickname` → 200 |
 | Auth do projeto dev (2026-10-20) | `mailer_autoconfirm = true`, `external.email = true`, `password_min_length = 8`; signup devolve sessão com `email_confirmed_at`; login 200; senha de 7 caracteres → 422 |
 
-**Não executado (pendente):** fluxo manual de auth/quiz/resumo/ranking; Lighthouse/a11y (D63); medição de start (< 300 ms p95, D62); deploy (§13). Já executados desde a primeira versão deste snapshot: `supabase db push` (5/5, 2026-10-19) e `scripts/verify-security.sql` (2026-10-20 — passou; ver `bug_log.md` e `pod_v2.md` P0.2). Ver `pod_v2.md`.
+**Não executado (pendente):** recuperação de senha; o restante do checklist manual de `pod_v2.md` §3 (apelido, timer, refresh/abandono, `next`); Lighthouse/a11y (D63); medição de start (< 300 ms p95, D62); deploy (§13). O fluxo de auth/quiz/resumo/ranking **foi** verificado no PC e em um celular Android real em 2026-10-20 (BUG-001 a BUG-007 fechados; ver `bug_log.md`). Também executados desde a primeira versão deste snapshot: `supabase db push` (5/5, 2026-10-19) e `scripts/verify-security.sql` (2026-10-20 — passou; ver `pod_v2.md` P0.2). Detalhes em `pod_v2.md`.
 
 ## 13. Deploy
 
@@ -773,7 +774,7 @@ npm run build
 | **F6 — Banco de questões** | 200 questões revisadas + seed validado | 40/nível, 13/13/14, 9 opções, revisão humana | ✅ 200 questões sem erro objetivo de rubrica (0 erros, 12 avisos via `npm run review`) e **revisão humana atestada** em 2026-10-20; dry-run de produção exit 0 |
 | **F7 — Verificação** | typecheck, lint, build, SQL e checklist manual | evidências registradas; D56 atendido | 🟡 parcial: `typecheck`/`lint`/`build`/review/SQL ✅ (D56 atendido no dev); **checklist manual pendente** |
 | **F8 — Deploy** | Supabase + Vercel + checklist | produção validada | ⛔ **não iniciado** |
-| **Git/GitHub** | versionamento, remote e higiene de branch | repositório no ar, `main` protegida | ✅ concluído 2026-10-20 (`main`, 3 commits, force-push bloqueado) |
+| **Git/GitHub** | versionamento, remote e higiene de branch | repositório no ar, `main` protegida | ✅ concluído 2026-10-20 (`main`, histórico linear, force-push bloqueado) |
 
 **Dependências:** F2 antes de F3/F4; F6 pode correr em paralelo a F3–F5, mas é o caminho crítico (revisão humana). F5 depende de F3/F4; F8 depende de F7.
 
@@ -871,7 +872,7 @@ npm run build
 
 > `AGENTS.md`, skill, `prd.md` e `SECURITY.md` estão alinhados. `pod.md` §9 é a referência de rotas de UI.
 
-## 19. Snapshot da implementação (2026-10-19)
+## 19. Snapshot da implementação (2026-10-19, revisado em 2026-10-21)
 
 **Estado:** código completo e compilando; migrations **aplicadas** no projeto dev e 200 questões semeadas. Snapshot do repositório:
 
@@ -898,8 +899,8 @@ npm run build
 ├─ supabase/
 │  ├─ config.toml
 │  ├─ migrations/ 20261019000{100_schema,200_functions,300_rls,400_catalog,500_seed_helpers}.sql
-│  └─ seed/       questions.json (200 rascunhos) · drafts/level-{1..5}.json · DRAFT-BRIEF.md
-├─ scripts/       seed.ts · seed-dev-users.ts · verify-security.sql
+│  └─ seed/       questions.json (200 questões revisadas) · drafts/level-{1..5}.json · DRAFT-BRIEF.md
+├─ scripts/       seed.ts · seed-dev-users.ts · review-questions.ts · verify-security.sql
 ├─ .opencode/skills/frontend-design/SKILL.md
 └─ prd.md · SECURITY.md · AGENTS.md · pod.md · pod_v2.md · README.md
 ```
@@ -908,7 +909,7 @@ npm run build
 
 **Correções aplicadas nesta rodada (fora do rascunho original):** sentinela de TTL (PD36), `answered` no resumo (PD37), opções 2×2 (PD38), estados de erro + `error.tsx` (PD39), limpeza de eyebrows/marcadores (PD40), HTTP 400 para input inválido (PD41), nomes de exibição do prd (PD42), cookies `Secure` + desvio `HttpOnly` (PD43), CSRF de localhost só fora de produção (PD44), `minimum_password_length` + matcher do proxy (PD45), e remoção do campo de confirmação de senha em `/redefinir-senha`.
 
-**Evidência:** §12.1. **Riscos abertos:** verificação do desvio `HttpOnly` (decidido em DA1, falta o texto em `SECURITY.md`); checklist manual de E2E; a11y/performance; deploy. Auditoria de RLS **fechada** em 2026-10-20 (`verify-security.sql` passou no dev) e **revisão humana das 200 questões concluída** na mesma data (`meta.reviewed_by` preenchido, dry-run de produção exit 0).
+**Evidência:** §12.1. **Riscos abertos:** texto de justify do desvio `HttpOnly` em `SECURITY.md` (já registrado no `README.md` em 2026-10-21); checklist manual de E2E; a11y/performance; deploy. Auditoria de RLS **fechada** em 2026-10-20 (`verify-security.sql` passou no dev) e **revisão humana das 200 questões concluída** na mesma data (`meta.reviewed_by` preenchido, dry-run de produção exit 0).
 
 ## 20. Trabalho pendente
 
