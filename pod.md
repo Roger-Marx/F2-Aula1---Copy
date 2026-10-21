@@ -1,14 +1,15 @@
 # pod.md — Plano de Desenvolvimento (OpenCode Quiz)
 
-> **Status:** v1.2 — 2026-10-21 — plano da fase de **Desenvolvimento** + **snapshot da implementação**.
+> **Status:** v1.3 — 2026-10-21 — plano da fase de **Desenvolvimento** + **snapshot da implementação**.
 > **v1.2 (2026-10-21):** status alinhado ao que foi efetivamente verificado; o gate D26 está **aberto** (`meta.reviewed_by = "Roger_Marx"`, dry-run de produção exit 0) e `README.md`/`pod_v2.md` foram sincronizados com este snapshot.
+> **v1.3 (2026-10-21):** registra o **deploy público** em `https://opencodequiz.vercel.app` usando o Supabase de **dev** e o encerramento do desenvolvimento neste ponto (DA8, `pod_v2.md`): sem SMTP, sem plano pago e sem projeto de produção.
 > **Base:** `prd.md` **v1.2** (D1–D65), `SECURITY.md` e `AGENTS.md` (só nas partes que não conflitam).
 > **Precedência:** `SECURITY.md` > `prd.md` > `pod.md` > `AGENTS.md`.
 > **Regra:** nenhuma decisão deste plano amplia o escopo do `prd.md`; decisões técnicas são registradas em **PD1–PD45** (§15).
 >
 > **Como ler este documento:** §1–§13 continuam sendo o desenho aprovado; §14 (fases), §15 (PD) e §19–§20 registram o que **já foi implementado** e o que falta. O trabalho restante, em ordem de prioridade e sem repetir o que está pronto, está em **`pod_v2.md`**.
 >
-> **Resumo executivo:** o código está escrito e compila (`typecheck`, `lint` e `build` passam). O projeto Supabase **dev** está migrado e semeado (5/5 migrations, 200 questões) e a **auditoria de RLS/grants passou** em 2026-10-20. O fluxo manual de auth/quiz/resumo/ranking foi **verificado no PC e no celular** em 2026-10-20 (cadastro, login, 10 respostas, resumo e ranking; BUG-001 a BUG-007 fechados). Continuam **pendentes de verificação** a recuperação de senha, os demais itens do checklist manual, a acessibilidade/performance e o deploy (§12.1, §19).
+> **Resumo executivo:** o código está escrito e compila (`typecheck`, `lint` e `build` passam). O projeto Supabase **dev** está migrado e semeado (5/5 migrations, 200 questões) e a **auditoria de RLS/grants passou** em 2026-10-20. O fluxo manual de auth/quiz/resumo/ranking foi **verificado no PC e no celular** em 2026-10-20 (cadastro, login, 10 respostas, resumo e ranking; BUG-001 a BUG-007 fechados). O app está **publicado** em `https://opencodequiz.vercel.app`, com headers e CSRF verificados em 2026-10-21, mas **apontando para o Supabase de dev** — o desenvolvimento foi encerrado nesse ponto por DA8 (sem SMTP, sem plano pago, sem projeto de produção). Nunca foram medidos acessibilidade/performance e o restante do checklist manual (§12.1, §19).
 
 ## 0. Decisões fechadas nesta etapa
 
@@ -730,9 +731,11 @@ npm run build
 | Sondas HTTP com a chave `anon` (2026-10-20) | leitura de todas as tabelas e chamada de todas as RPCs de sessão → **401/42501**; `rpc_public_ranking` e `rpc_check_nickname` → 200 |
 | Auth do projeto dev (2026-10-20) | `mailer_autoconfirm = true`, `external.email = true`, `password_min_length = 8`; signup devolve sessão com `email_confirmed_at`; login 200; senha de 7 caracteres → 422 |
 
-**Não executado (pendente):** recuperação de senha; o restante do checklist manual de `pod_v2.md` §3 (apelido, timer, refresh/abandono, `next`); Lighthouse/a11y (D63); medição de start (< 300 ms p95, D62); deploy (§13). O fluxo de auth/quiz/resumo/ranking **foi** verificado no PC e em um celular Android real em 2026-10-20 (BUG-001 a BUG-007 fechados; ver `bug_log.md`). Também executados desde a primeira versão deste snapshot: `supabase db push` (5/5, 2026-10-19) e `scripts/verify-security.sql` (2026-10-20 — passou; ver `pod_v2.md` P0.2). Detalhes em `pod_v2.md`.
+**Não executado (pendente):** recuperação de senha; o restante do checklist manual de `pod_v2.md` §3 (apelido, timer, refresh/abandono, `next`); Lighthouse/a11y (D63); medição de start (< 300 ms p95, D62). O fluxo de auth/quiz/resumo/ranking **foi** verificado no PC e em um celular Android real em 2026-10-20 (BUG-001 a BUG-007 fechados; ver `bug_log.md`). Também executados desde a primeira versão deste snapshot: `supabase db push` (5/5, 2026-10-19), `scripts/verify-security.sql` (2026-10-20 — passou) e o deploy público na Vercel (2026-10-21 — no ar, apontando para o banco de dev, por DA8). Detalhes em `pod_v2.md`.
 
 ## 13. Deploy
+
+**Estado em 2026-10-21 (verificado):** a Vercel está publicada em `https://opencodequiz.vercel.app` (200, headers de `next.config.ts` ativos, `Origin` cruzada → 403), mas usando o **Supabase de dev** — `supabase projects list` tem um projeto só e o `/api/ranking` público devolve os mesmos registros do dev. O desenvolvimento foi encerrado nesse ponto por **DA8**: sem SMTP, sem plano pago e sem projeto de produção. O roteiro abaixo fica como referência caso isso mude.
 
 **Supabase (produção):**
 
@@ -773,7 +776,7 @@ npm run build
 | **F5 — UI** | home, auth, quiz, resumo, ranking conforme skill | responsivo, acessível, copy pt-BR | 🟡 código pronto; a11y/perf **não medidos** |
 | **F6 — Banco de questões** | 200 questões revisadas + seed validado | 40/nível, 13/13/14, 9 opções, revisão humana | ✅ 200 questões sem erro objetivo de rubrica (0 erros, 12 avisos via `npm run review`) e **revisão humana atestada** em 2026-10-20; dry-run de produção exit 0 |
 | **F7 — Verificação** | typecheck, lint, build, SQL e checklist manual | evidências registradas; D56 atendido | 🟡 parcial: `typecheck`/`lint`/`build`/review/SQL ✅ (D56 atendido no dev); **checklist manual pendente** |
-| **F8 — Deploy** | Supabase + Vercel + checklist | produção validada | ⛔ **não iniciado** |
+| **F8 — Deploy** | Supabase + Vercel + checklist | produção validada | 🟡 **Vercel publicada** em `https://opencodequiz.vercel.app` com headers/CSRF verificados (2026-10-21), usando o **Supabase de dev**; projeto de produção, SMTP e seed de produção não previstos (DA8) |
 | **Git/GitHub** | versionamento, remote e higiene de branch | repositório no ar, `main` protegida | ✅ concluído 2026-10-20 (`main`, histórico linear, force-push bloqueado) |
 
 **Dependências:** F2 antes de F3/F4; F6 pode correr em paralelo a F3–F5, mas é o caminho crítico (revisão humana). F5 depende de F3/F4; F8 depende de F7.
@@ -909,7 +912,7 @@ npm run build
 
 **Correções aplicadas nesta rodada (fora do rascunho original):** sentinela de TTL (PD36), `answered` no resumo (PD37), opções 2×2 (PD38), estados de erro + `error.tsx` (PD39), limpeza de eyebrows/marcadores (PD40), HTTP 400 para input inválido (PD41), nomes de exibição do prd (PD42), cookies `Secure` + desvio `HttpOnly` (PD43), CSRF de localhost só fora de produção (PD44), `minimum_password_length` + matcher do proxy (PD45), e remoção do campo de confirmação de senha em `/redefinir-senha`.
 
-**Evidência:** §12.1. **Riscos abertos:** texto de justify do desvio `HttpOnly` em `SECURITY.md` (já registrado no `README.md` em 2026-10-21); checklist manual de E2E; a11y/performance; deploy. Auditoria de RLS **fechada** em 2026-10-20 (`verify-security.sql` passou no dev) e **revisão humana das 200 questões concluída** na mesma data (`meta.reviewed_by` preenchido, dry-run de produção exit 0).
+**Evidência:** §12.1. **Riscos abertos:** texto de justify do desvio `HttpOnly` em `SECURITY.md` (já registrado no `README.md` em 2026-10-21); recuperação de senha sem entrega útil no domínio público (DA8); checklist manual incompleto; a11y/performance nunca medidas. Auditoria de RLS **fechada** em 2026-10-20 (`verify-security.sql` passou no dev), **revisão humana das 200 questões concluída** na mesma data e **deploy público verificado** em 2026-10-21 (apontando para o dev, por DA8).
 
 ## 20. Trabalho pendente
 

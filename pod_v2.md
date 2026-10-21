@@ -1,6 +1,6 @@
 # pod_v2.md — Trabalho pendente (OpenCode Quiz)
 
-> **Status:** v1.2 — 2026-10-21 — **somente o que falta**.
+> **Status:** v1.3 — 2026-10-21 — **somente o que falta** (desenvolvimento encerrado neste ponto, DA8).
 > **Base:** `prd.md` v1.2, `SECURITY.md`, `AGENTS.md` e `pod.md` v1.2 (§1–§19 = desenho aprovado + snapshot do que já foi feito).
 > **Precedência:** `SECURITY.md` > `prd.md` > `pod.md` > `pod_v2.md` > `AGENTS.md`.
 > **Regra:** nenhuma tarefa aqui amplia o escopo do `prd.md`. Sem suíte automatizada (decisão do projeto). Só relatar verificação **efetivamente executada**.
@@ -11,6 +11,7 @@
 - **Não** é um replanejamento: o desenho continua em `pod.md`. Não repetir aqui o que já está no código.
 - **v1.1 (2026-10-20):** reordenado por **caminho crítico** e **dono da tarefa**; separa explicitamente o que só o usuário pode fazer (§9); registra o que foi verificado nesta rodada.
 - **v1.2 (2026-10-21):** alinhado com o estado real — o gate D26 está **aberto** (dry-run de produção passa) e o §10 dizia o contrário; `pod.md` e `README.md` atualizados para o status de verificação real.
+- **v1.3 (2026-10-21):** registra o **deploy público** (`https://opencodequiz.vercel.app`) apontando para o Supabase de **dev** e a decisão **DA8** de encerrar o desenvolvimento aqui — sem SMTP, sem plano pago e sem projeto de produção. As pendências que dependiam disso deixam de ser bloqueadores e passam a “não previstas”.
 
 **Já pronto (não refazer):** app Next.js completo e compilando; 5 migrations **aplicadas** no projeto dev; 200 questões semeadas (200 ativas, 1.800 opções, 40/nível, 13/13/14); `typecheck`, `lint` e `build` passam; repositório GitHub no ar com `main` protegida; 7 defeitos corrigidos e verificados (BUG-001 a BUG-007). Ver `pod.md` §12.1 e §19.
 
@@ -32,7 +33,7 @@
 | **F5 — UI** | home, auth, quiz, resumo, ranking | 🟡 código pronto; **a11y/perf não medidos** |
 | **F6 — Banco de questões** | 200 questões revisadas + seed validado | ✅ 200 sem erro objetivo de rubrica e **revisão humana atestada** (2026-10-20); dry-run de produção exit 0 |
 | **F7 — Verificação** | typecheck, lint, build, SQL, checklist manual | 🟡 `typecheck`/`lint`/`build`/review/SQL ✅; **checklist manual pendente** |
-| **F8 — Deploy** | Supabase + Vercel + checklist | ⛔ **não iniciado** |
+| **F8 — Deploy** | Supabase + Vercel + checklist | 🟡 **Vercel publicado** em `https://opencodequiz.vercel.app` (headers e CSRF verificados) usando o **Supabase de dev**; projeto de produção, SMTP e seed de produção **não previstos** (DA8) |
 | **Git/GitHub** | versionamento + remote + CI de higiene | ✅ concluído 2026-10-20 (`main`, histórico linear, branch protegida) |
 
 ### 1.2 O caminho crítico
@@ -49,7 +50,7 @@ BUG-004  confirmação off no dev  ✅ concluído 2026-10-20 ────┤
 P1  E2E manual (recuperação, timer, a11y) ──► F8 deploy ────┘
 ```
 
-**P0.3 era o gargalo.** Agora que ele está concluído, o caminho crítico é só a sequência operacional de deploy: criar o Supabase de produção, criar a Vercel e publicar.
+**P0.3 era o gargalo.** Ele está concluído e o deploy da Vercel **já aconteceu**; o que não existe é o Supabase de produção. Em 2026-10-21 o desenvolvimento foi **encerrado neste ponto** (DA8): o app fica público usando o banco de dev, sem SMTP e sem plano pago. Não há mais caminho crítico aberto — o que resta são melhorias opcionais e a verificação que nunca foi medida (§3, §5).
 
 ### 1.3 O que trava o quê
 
@@ -59,7 +60,7 @@ P1  E2E manual (recuperação, timer, a11y) ──► F8 deploy ────┘
 | ~~BUG-004 "Confirm email" off no dev~~ ✅ 2026-10-20 | cadastro e login no dev | — |
 | ~~BUG-002 respostas do celular~~ ✅ 2026-10-20 | login Android (causa raiz no BUG-007) | — |
 | ~~P0.3 revisão humana~~ ✅ 2026-10-20 | seed de produção | — |
-| DA3/DA4/DA5 | — | sem travamento técnico | §8.2 |
+| DA3/DA4/DA5 | — | não travam mais nada desde DA8 (2026-10-21) | §8.1 |
 
 ---
 
@@ -196,32 +197,60 @@ Rodar contra dev com `npm run dev`. Executar o checklist de `pod.md` §12 e regi
 
 ---
 
-## 6. P4 — Deploy (F8)
+## 6. P4 — Deploy (F8) — encerrado parcialmente por decisão (DA8)
 
-**Supabase (produção):**
-- [ ] Projeto de produção; `db push` das mesmas migrations.
-- [ ] Auth: **confirmação de e-mail ligada**; `Site URL` e redirects de produção (`/auth/callback`, `/redefinir-senha`); senha mínima 8; provedores não usados desabilitados.
-- [ ] Seed de produção **somente questões**, `meta.reviewed_by` preenchido; nenhum usuário fictício.
-- [ ] `scripts/verify-security.sql` no projeto de produção.
+**Estado em 2026-10-21 (verificado):**
 
-**Vercel:**
-- [ ] Projeto Next.js, Node 22, conectado ao repositório (`Roger-Marx/F2-Aula1---Copy`).
-- [ ] Env somente `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_SITE_URL`. **Sem** service role.
-- [ ] Deploy em `*.vercel.app` (sem domínio próprio); headers/CSP ativos; cookies `Secure`.
+| Item | Status |
+| --- | --- |
+| Vercel publicada em `https://opencodequiz.vercel.app` | ✅ 200, `Server: Vercel` |
+| Headers/CSP/HSTS/`X-Frame-Options`/`Permissions-Policy` | ✅ ativos no domínio público |
+| CSRF por `Origin` | ✅ `POST /api/quiz/start` com `Origin: https://evil.example` → 403; com a própria origem → 401 (sem sessão) |
+| Banco usado pelo site publicado | 🟡 **o de dev** — `/api/ranking` devolve as 6 linhas do dev com os mesmos `achievedAt`; `supabase projects list` tem **um** projeto só |
+| Projeto Supabase de produção | ⛔ não existe, por decisão |
+| SMTP / confirmação de e-mail no público | ⛔ desligada, por decisão |
+| Seed de produção / `verify-security.sql` em produção | ⛔ não aplicável |
 
-**Checklist pós-deploy (D56):** sessões não editáveis pelo cliente; RLS deny-all sem policies; `anon`/`authenticated` não leem o gabarito; RPCs exigem `auth.uid()`; seed de produção sem dados de teste; e-mail nunca exposto; fluxo manual completo; Lighthouse ≥ 90; start < 300 ms p95.
+**Decisão DA8 (2026-10-21):** o desenvolvimento encerra neste ponto. Não haverá
+projeto de produção, SMTP próprio nem plano pago; o app permanece disponível ao
+público geral apontando para o banco de dev, com dados não sensíveis.
 
-**Rollback:** Vercel → redeploy anterior; banco → nova migration forward-only (nada destrutivo sem backup).
+**Consequências aceitas:**
+
+- Cadastro público sem confirmação de e-mail; qualquer pessoa cria conta.
+- Recuperação de senha **não funciona no domínio público**: o `Site URL` do
+  projeto é `http://localhost:3000` e a allow list está vazia, então o link do
+  e-mail não chega ao site.
+- O ranking público exibe os usuários de teste de dev (`dev-ana`, `abacaxi`,
+  `pedro`, `queijo`, `roger`, `Biazoca`).
+- Free tier pode pausar o projeto por inatividade.
+- O critério D56 “seed de produção sem dados de teste” **não se aplica** a este
+  arranjo; ele continua válido se algum dia existir um ambiente de produção.
+
+**Roteiro caso isso mude** (não previsto): decidir SMTP → criar o Supabase de
+produção → `db push` → seed só de questões → `verify-security.sql` → trocar as
+envs da Vercel (sem service role) → **redeploy** (as `NEXT_PUBLIC_*` são
+embutidas no build) → `Site URL` + allow list (`/auth/callback`,
+`/redefinir-senha`) → checklist D56 + fluxo manual com e-mail real.
+
+**Checklist pós-deploy (D56):** sessões não editáveis pelo cliente; RLS deny-all
+sem policies; `anon`/`authenticated` não leem o gabarito; RPCs exigem
+`auth.uid()`; e-mail nunca exposto; fluxo manual completo; Lighthouse ≥ 90;
+start < 300 ms p95. No dev, os itens de RLS/anon/gabarito **foram** verificados
+em 2026-10-20; fluxo manual, Lighthouse e performance **não**.
+
+**Rollback:** Vercel → redeploy anterior; banco → nova migration forward-only
+(nada destrutivo sem backup).
 
 ---
 
-## 7. P5 — Encerramento
+## 7. P5 — Encerramento (fechado em 2026-10-21)
 
-- [ ] Atualizar `pod.md` (status v1.2 — fases concluídas com evidência) e `README.md` (status de verificação real).
-  - [x] `pod.md` v1.2 e `README.md` atualizados em 2026-10-21; falta apenas registrar os itens do §17 com evidência.
-- [ ] Registrar os itens executados do §17 de `pod.md` (definição de pronto) com evidência.
+- [x] Atualizar `pod.md` e `README.md` (status de verificação real).
+  - `pod.md` v1.3 e `README.md` sincronizados em 2026-10-21 com o deploy público e a DA8.
+- [ ] Registrar os itens executados do §17 de `pod.md` (definição de pronto) com evidência — **não previsto** enquanto o desenvolvimento estiver encerrado.
 - [x] **Primeiro commit git** — feito 2026-10-20 sob autorização explícita: `main` no GitHub, `origin` conectado, branch protegida contra force-push.
-- [ ] Fechar as decisões abertas da §8.2.
+- [x] Fechar as decisões da §8.2 — todas encerradas (DA2 em 2026-10-20; DA3/DA4/DA5 por DA8 em 2026-10-21).
 
 ---
 
@@ -234,21 +263,24 @@ Rodar contra dev com `npm run dev`. Executar o checklist de `pod.md` §12 e regi
 | DA1 | Cookies de auth não-`HttpOnly` (PD43): risco aceito, com `Secure` em produção e `SameSite=Lax` | 2026-10-19 |
 | DA6 | Repositório GitHub **público**: o gabarito público é aceitável (projeto didático) | 2026-10-20 |
 | DA7 | `main` com **branch protection** (sem force-push, sem deleção, histórico linear); sem exigência de PR | 2026-10-20 |
+| DA8 | **Desenvolvimento encerrado neste ponto** (2026-10-21): app público em `https://opencodequiz.vercel.app` usando o Supabase de **dev**; **sem** projeto de produção, **sem** SMTP e **sem** plano pago. Encerra DA3 (TTL mantido em 2 h, lazy), DA4 (sem SMTP) e DA5 (`*.vercel.app`, sem domínio próprio). Consequências aceitas: cadastro público sem confirmação de e-mail, recuperação de senha sem entrega útil no domínio público, ranking com os usuários de teste de dev e free tier sujeito a pausa. Dados no dev permanecem não sensíveis | 2026-10-21 |
 
 ### 8.2 Abertas (dependem de você)
 
-| # | Decisão | Opções | Impacto | Prazo |
-| --- | --- | --- | --- | --- |
-| DA2 | Revisão das questões | revisar no lugar vs. reescrever questões específicas | gate F6 | **iniciar já** |
-| DA3 | TTL de abandono | manter 2 h (lazy) vs. outro valor | comportamento de sessão | antes do deploy |
-| DA4 | SMTP | serviço de e-mail do Supabase vs. SMTP externo | exige autorização de host externo | antes do deploy |
-| DA5 | Escopo do deploy | manter `*.vercel.app` sem domínio próprio (prd) | infra | antes do deploy |
+| # | Decisão | Status |
+| --- | --- | --- |
+| DA2 | Revisão das questões | ✅ fechada em 2026-10-20 (`meta.reviewed_by = "Roger_Marx"`, 0 erros de rubrica) |
+| DA3 | TTL de abandono | ✅ fechada por DA8 — mantido o implementado (2 h, lazy) |
+| DA4 | SMTP | ✅ fechada por DA8 — sem SMTP; confirmação de e-mail desligada no público |
+| DA5 | Escopo do deploy | ✅ fechada por DA8 — `*.vercel.app`, sem domínio próprio |
+
+Nenhuma decisão aberta.
 
 ---
 
 ## 9. Checklist do usuário — em ordem de execução
 
-> O que **só você** pode fazer: dashboard, contas, revisão humana e decisões. Os itens 1, 2, 3 e 4 já foram concluídos (2026-10-20); o próximo é o restante do checklist E2E (item 5).
+> O que **só você** pode fazer: dashboard, contas, revisão humana e decisões. Em 2026-10-21 o desenvolvimento foi encerrado (DA8): não há próximo passo obrigatório. Os itens 5 e 6 continuam sem execução e ficam registrados como não medidos.
 
 | # | Ação | Onde | Tempo | Destrava |
 | --- | --- | --- | --- | --- |
@@ -256,15 +288,15 @@ Rodar contra dev com `npm run dev`. Executar o checklist de `pod.md` §12 e regi
 | 2 | ~~Desligar **"Confirm email"**~~ | — | — | ✅ **feito em 2026-10-20** (BUG-004 verificado por API) |
 | 3 | ~~Responder as **5 perguntas** do BUG-002 pelo celular~~ | — | — | ✅ **feito em 2026-10-20** — causa raiz no BUG-007, corrigido e confirmado |
 | 4 | ~~**Revisar as 200 questões** e preencher `meta.reviewed_by`~~ | — | — | ✅ **feito em 2026-10-20** (dry-run de produção exit 0) |
-| 5 | Rodar o **checklist manual E2E** do §3 | `npm run dev` + navegador | ~1–2 h | §3, F7 |
-| 6 | Medir **a11y e performance** do §5 | DevTools + Lighthouse | ~1 h | §5 |
-| 7 | Fechar as decisões **DA3, DA4, DA5** | aqui | ~10 min | §8.2 |
-| 8 | Criar o **projeto Supabase de produção** e configurar Auth (confirmação **ligada**, Site URL, redirects) | Dashboard Supabase | ~30 min | F8 |
-| 9 | Criar o **projeto Vercel** (Node 22, repo `Roger-Marx/F2-Aula1---Copy`) e configurar os 3 envs | Dashboard Vercel | ~20 min | F8 |
-| 10 | `db push` + seed de produção + `verify-security.sql` **na produção** | terminal + dashboard | ~15 min | §6 |
-| 11 | Fechar os docs (P5) | local | ~30 min | §7 |
+| 5 | Rodar o **checklist manual E2E** do §3 | `npm run dev` + navegador | ~1–2 h | §3, F7 — **não previsto** enquanto o desenvolvimento estiver encerrado |
+| 6 | Medir **a11y e performance** do §5 | DevTools + Lighthouse | ~1 h | §5 — **não previsto** |
+| 7 | ~~Fechar as decisões **DA3, DA4, DA5**~~ | — | — | ✅ **feito em 2026-10-21** por DA8 (sem SMTP, sem plano pago, mantido `*.vercel.app`) |
+| 8 | ~~Criar o **projeto Supabase de produção** e configurar Auth~~ | — | — | ⛔ **não previsto** (DA8): o público usa o banco de dev, confirmação de e-mail desligada |
+| 9 | ~~Criar o **projeto Vercel** e configurar os 3 envs~~ | — | — | ✅ **feito**: `https://opencodequiz.vercel.app` no ar com headers e CSRF verificados em 2026-10-21 |
+| 10 | ~~`db push` + seed de produção + `verify-security.sql` na produção~~ | — | — | ⛔ **não previsto** (DA8) |
+| 11 | ~~Fechar os docs (P5)~~ | local | — | ✅ **feito em 2026-10-21** (`pod.md`, `pod_v2.md`, `README.md`, `AGENTS.md`) |
 
-**Sequenciamento:** 5 e 6 e 7 (em paralelo) → 8 → 9 → 10 → 11. Os itens 1, 2, 3 e 4 estão concluídos.
+**Sequenciamento (histórico):** 1–4 e 7 concluídos; 9 concluído; 5, 6, 8, 10 e 11 não previstos ou encerrados por DA8. Não há próximo passo obrigatório.
 
 ---
 
@@ -281,3 +313,5 @@ npm run review -- --level=1 --full            # leitura de um nível
 ```
 
 **Estado verificado em 2026-10-20:** `typecheck` ✅ · `lint` ✅ · `build` ✅ (17 rotas + proxy) · dry-run dev ✅ · dry-run production ✅ **passa** (exit 0, gate D26 aberto com `meta.reviewed_by = "Roger_Marx"`) · `review --flags` → 0 erros, 12 avisos · `git status` limpo, `main` sincronizado com `origin/main` (force-push bloqueado).
+
+**Deploy público verificado em 2026-10-21:** `GET https://opencodequiz.vercel.app/` → 200 com CSP/HSTS/`X-Frame-Options`/`Permissions-Policy`; `POST /api/quiz/start` com `Origin` cruzada → 403; `GET /api/ranking` idêntico ao `rpc_public_ranking` do projeto de dev (mesmos `achievedAt`); `npx supabase projects list` → um único projeto (dev).

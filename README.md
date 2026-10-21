@@ -3,22 +3,32 @@
 Quiz em pt-BR sobre OpenCode e vibe coding: 10 questões por sessão, 20 segundos
 por resposta, feedback com explicação e ranking público por apelido.
 
+**Publicado:** <https://opencodequiz.vercel.app> — o app usa o projeto Supabase
+de **dev** (único existente). Ver [Deploy atual](#deploy-atual) e as limitações
+conhecidas antes de tratar isso como ambiente de produção.
+
 A fonte de produto é `prd.md` v1.2; o plano de desenvolvimento é `pod.md`; as
-regras de segurança prevalecem em `SECURITY.md`. O que ainda falta (restante do
-checklist manual, a11y/perf e deploy) está em `pod_v2.md`.
+regras de segurança prevalecem em `SECURITY.md`. O desenvolvimento foi encerrado
+em 2026-10-21 neste ponto (decisão DA8 em `pod_v2.md` §8.1).
 
-## Estado atual (2026-10-20)
+## Estado atual (2026-10-21)
 
-Implementação completa e compilando, rodando contra o projeto Supabase de
-**desenvolvimento**. Nenhum defeito aberto.
+Implementação completa, compilando e **no ar**. Nenhum defeito aberto.
 
 - Banco de dev migrado (5/5) e auditado; 200 questões ativas semeadas
-  (idempotente) e revisão humana das questões atestada (D26).
-- Fluxo manual verificado no desktop e em um celular Android real: cadastro,
-  login, quiz de 10 questões, resumo e ranking.
-- Ainda **não** executado: recuperação de senha, o restante do checklist manual
-  de `pod_v2.md` §3 (apelido, timer de 20 s, refresh/abandono, `next`),
-  a11y/perf, headers/CSP e todo o deploy.
+  (idempotente) e revisão humana atestada (D26).
+- Fluxo verificado no desktop e em um celular Android real: cadastro, login,
+  quiz de 10 questões, resumo e ranking.
+- Deploy: Vercel ativo em `opencodequiz.vercel.app`, com CSP/HSTS e os demais
+  headers ligados e a checagem de origem (CSRF) respondendo 403 para origem
+  cruzada. **O site publicado usa o Supabase de dev**, não um projeto de
+  produção — decisão consciente (DA8), porque o projeto é didático e não
+  justifica SMTP próprio nem plano pago.
+- Consequências aceitas desse arranjo: confirmação de e-mail desligada no site
+  público, recuperação de senha sem entrega útil de e-mail e ranking com os
+  usuários de teste de dev.
+- **Não medido:** Lighthouse/a11y, tempo de start (p95) e o restante do checklist
+  manual de `pod_v2.md` §3. Não trate isso como validação de produção.
 - Sem suíte automatizada: a verificação é typecheck, lint, build, SQL e
   checklist manual.
 
@@ -100,6 +110,14 @@ npm run review -- --level=3 --full   # um nível, com alternativas e explicaçã
 
 O seed faz upsert por `external_id`, substitui as opções em transação e desativa
 questões removidas do JSON sem apagar o histórico. Sessões antigas usam snapshots.
+Para semear outro projeto sem editar `.env.local`, defina as variáveis no shell
+(`process.loadEnvFile` não sobrescreve o ambiente já definido):
+
+```powershell
+$env:NEXT_PUBLIC_SUPABASE_URL="https://<projeto>.supabase.co"
+$env:SUPABASE_SERVICE_ROLE_KEY="<service-role-key>"
+npm run seed -- --env=production
+```
 
 ## Verificação
 
@@ -141,12 +159,33 @@ Executado no projeto Supabase de dev (`tcpmvnxjegitfktdbcjo`):
 - Fluxo ponta a ponta em celular Android real: `/cadastro` → `/api/nickname` →
   `/quiz` (10 `answer` + 10 `advance`) → `/resumo` → `/ranking`
 
+Sondas no site publicado (2026-10-21):
+
+- `GET /` → 200 com `Content-Security-Policy`, `Strict-Transport-Security`,
+  `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`,
+  `Referrer-Policy` e `Permissions-Policy`
+- `POST /api/quiz/start` com `Origin: https://evil.example` → **403**; com a
+  origem do próprio site → 401 (sem sessão), como esperado
+- `GET /api/ranking` devolve exatamente as mesmas 6 linhas (mesmos `achievedAt`)
+  que `rpc_public_ranking` no projeto de dev — ou seja, o site publicado usa o
+  banco de dev
+- `npx supabase projects list` — existe **um** projeto só, o de dev
+
 Não executados: recuperação de senha, o restante do checklist manual de
-`pod_v2.md` §3, Lighthouse/a11y, medição de performance e o deploy. Não trate os
-itens acima como validação end-to-end de produção.
+`pod_v2.md` §3, Lighthouse/a11y e medição de performance.
 
 ## Limitações conhecidas
 
+- **Não existe ambiente de produção separado.** O site publicado aponta para o
+  Supabase de dev: confirmação de e-mail está desligada, o ranking exibe os
+  usuários de teste e o projeto fica sujeito ao free tier (pausa por inatividade
+  e limites de uso).
+- **Recuperação de senha não funciona no domínio público**: o `Site URL` do
+  projeto aponta para `http://localhost:3000` e a allow list de redirects está
+  vazia, então o link do e-mail não chega ao site publicado. Não há plano de
+  corrigir isso no curto prazo (decisão DA8: sem SMTP, sem plano pago).
+- O app aceita cadastro público sem confirmação de e-mail. Mantenha dados não
+  sensíveis nele.
 - Os cookies de autenticação do `@supabase/ssr` são `httpOnly: false` (o client
   browser precisa lê-los). `Secure` é aplicado em produção e `SameSite=Lax` é
   mantido, mas **não** há conformidade total com `HttpOnly`. Risco **aceito**
@@ -155,8 +194,6 @@ itens acima como validação end-to-end de produção.
 - O repositório é **público por decisão** (DA6): o `supabase/seed/questions.json`
   expõe o gabarito, o que é aceitável em um projeto didático. Nenhuma credencial
   entra no histórico; `.env.local` permanece ignorado.
-- O projeto de dev tem confirmação de e-mail desligada, então qualquer pessoa
-  pode criar conta nele. Nunca aponte `.env.local` para produção.
 - Sem `psql` nem Docker nesta máquina: o `verify-security.sql` roda pelo
   Management API do Supabase, que não devolve `NOTICE` — "passou" significa "não
   levantou exceção", corroborado pelos valores medidos.
@@ -164,18 +201,33 @@ itens acima como validação end-to-end de produção.
   exibido nem registrado em log.
 - Sem suíte de testes automatizada (decisão do projeto).
 
-## Deploy
+## Deploy atual
 
-Ainda **não iniciado** (`pod_v2.md` §6). O roteiro:
+**Estado:** Vercel ✅ publicada · Supabase de produção ⛔ não existe (por decisão).
 
-- Vercel em `*.vercel.app`; sem domínio customizado.
-- Configure apenas `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` e
-  `NEXT_PUBLIC_SITE_URL`. Nunca a service role key.
-- Crie o projeto Supabase de produção, rode `db push`, o seed **somente de
-  questões** e o `verify-security.sql` nele.
-- Ajuste `Site URL` e as redirect URLs para
-  `https://<app>.vercel.app/auth/callback` e `/redefinir-senha`.
-- Habilite confirmação de e-mail em produção (em dev está desligada).
+O que está no ar e verificado:
+
+- Projeto Vercel em `*.vercel.app` (sem domínio próprio, D50/D64), build Next.js
+  com os headers de `next.config.ts` ativos.
+- CSRF por `Origin` respondendo 403 para origem cruzada.
+- Cookies de auth marcados `Secure` em produção; `oq_quiz_session` `HttpOnly`.
+
+O que foi deliberadamente deixado de fora (DA8, 2026-10-21):
+
+- Projeto Supabase de produção, `db push` de produção, seed de produção e
+  `verify-security.sql` em produção.
+- SMTP próprio e confirmação de e-mail ligada no site público.
+- Plano pago (o free tier pode pausar o projeto por inatividade).
+
+Se um dia isso virar ambiente de produção, a ordem é: decidir SMTP → criar o
+projeto Supabase de produção → `db push` → seed **somente de questões** →
+`verify-security.sql` → apontar as envs da Vercel para o projeto novo
+(`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
+`NEXT_PUBLIC_SITE_URL=https://opencodequiz.vercel.app`, **sem** service role) →
+**redeploy** (variáveis `NEXT_PUBLIC_*` são embutidas no build) → configurar
+`Site URL` e allow list (`/auth/callback`, `/redefinir-senha`) → rodar o
+checklist D56 e o fluxo manual completo, incluindo cadastro com confirmação e
+recuperação de senha reais.
 
 ## Estrutura
 
